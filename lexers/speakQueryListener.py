@@ -409,7 +409,9 @@ class speakQueryListener(ParseTreeListener):
 
     # Exit a parse tree produced by speakQueryParser#directive.
     def exitDirective(self, ctx: speakQueryParser.DirectiveContext):
-        self.validate_exceptions(ctx)
+        tokens = self.normalize_tokens(self.ctx_flatten(ctx))
+        if tokens:
+            self.main_df = self.apply_directive(tokens)
 
     # Enter a parse tree produced by speakQueryParser#macro.
     def enterMacro(self, ctx: speakQueryParser.MacroContext):
@@ -671,6 +673,68 @@ class speakQueryListener(ParseTreeListener):
                 return []
         return flatten_recursive(input_list)
 
+    def apply_directive(self, tokens):
+        """Dispatch directive tokens to the appropriate handler."""
+        if not tokens:
+            return self.main_df
+
+        cmd = tokens[0].lower()
+
+        if cmd in ('search', 'where'):
+            self.current_search_cmd_tokens = tokens[1:]
+            return self.search_cmd_handler.run_search(self.current_search_cmd_tokens, self.main_df)
+        elif cmd == 'fields':
+            from handlers.FieldsHandler import FieldsHandler
+            return FieldsHandler().run_fields(tokens, self.main_df)
+        elif cmd == 'rename':
+            from handlers.RenameHandler import RenameHandler
+            return RenameHandler().run_rename(tokens, self.main_df)
+        elif cmd == 'lookup':
+            from handlers.LookupCmdHandler import LookupCmdHandler
+            return LookupCmdHandler(self.lookup_root).run_lookup(tokens, self.main_df)
+        elif cmd in ('head', 'limit'):
+            from handlers.HeadHandler import HeadHandler
+            return HeadHandler().run_head(tokens, self.main_df)
+        elif cmd == 'bin':
+            from handlers.BinHandler import BinHandler
+            return BinHandler().run_bin(tokens, self.main_df)
+        elif cmd == 'reverse':
+            from handlers.ReverseHandler import ReverseHandler
+            return ReverseHandler().run_reverse(tokens, self.main_df)
+        elif cmd == 'dedup':
+            from handlers.DedupHandler import DedupHandler
+            return DedupHandler().run_dedup(tokens, self.main_df)
+        elif cmd == 'sort':
+            from handlers.SortHandler import SortHandler
+            return SortHandler().run_sort(tokens, self.main_df)
+        elif cmd == 'rex':
+            from handlers.RexHandler import RexHandler
+            return RexHandler().run_rex(tokens, self.main_df)
+        elif cmd == 'regex':
+            from handlers.RegexHandler import RegexHandler
+            return RegexHandler().run_regex(tokens, self.main_df)
+        elif cmd == 'base64':
+            from handlers.Base64Handler import Base64Handler
+            return Base64Handler().run_base64(tokens, self.main_df)
+        elif cmd == 'fillnull':
+            from handlers.FillnullHandler import FillnullHandler
+            return FillnullHandler().run_fillnull(tokens, self.main_df)
+        elif cmd == 'spath':
+            from handlers.SPathHandler import SPathHandler
+            return SPathHandler().run_spath(tokens, self.main_df)
+        elif cmd == 'join':
+            from handlers.JoinHandler import JoinHandler
+            return JoinHandler(self.lookup_root).run_join(tokens, self.main_df)
+        elif cmd == 'append':
+            from handlers.AppendHandler import AppendHandler
+            return AppendHandler().run_append(tokens, self.main_df)
+        elif cmd.startswith('mv'):
+            from handlers.MVHandler import MVHandler
+            return MVHandler().run_mv(tokens, self.main_df)
+        else:
+            logging.warning(f"[!] Unhandled directive '{cmd}'")
+            return self.main_df
+
     # CRITICAL COMPONENT
     def validate_exceptions(self, ctx_obj):
         """
@@ -681,9 +745,9 @@ class speakQueryListener(ParseTreeListener):
             self.generic_processing_exit('validate_exceptions', 'General Syntax Failure.')
 
         if obj_identifier == 'exitDirective':
-            if str(ctx_obj.children[0]) == 'search':
-                self.current_search_cmd_tokens = self.ctx_flatten(ctx_obj)[1:]
-                self.main_df = self.search_cmd_handler.run_search(self.current_search_cmd_tokens, self.main_df)
+            tokens = self.normalize_tokens(self.ctx_flatten(ctx_obj))
+            if tokens:
+                self.main_df = self.apply_directive(tokens)
 
     @staticmethod
     def normalize_tokens(token_list):
