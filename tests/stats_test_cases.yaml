@@ -267,3 +267,12 @@
   expected_columns: ["run_levels"]
   expected_values:
     run_levels: ["DEBUG"]
+
+- id: 31
+  description: "Test Stats 31: range of x values"
+  original_query: 'index="output_parquets/test0.parquet" | stats range(x) as range_x'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","range(x)","as","range_x"]
+  expected_columns: ["range_x"]
+  expected_values:
+    range_x: 2
