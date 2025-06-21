@@ -278,3 +278,17 @@
   eval_tokens: ["eval", "case_field", "=", "case", "(", "test", ">", "12", ",", "\"high\"", ",", "\"low\"", ")", ",", "mix_field", "=", "case", "(", "tonumber", "(", "test", ")", ">=", "12", ",", "\"big\"", ",", "\"small\"", ")"]
   expected_columns: ["case_field", "mix_field"]
 
+- id: 41
+  description: "Test Eval 41: null_flag = isnull(email)"
+  original_query: 'index="user_data/parquet" | eval null_flag = isnull(email)'
+  index_tokens: ["index", "=", "\"user_data/parquet\""]
+  eval_tokens: ["eval", "null_flag", "=", "isnull", "(", "email", ")"]
+  expected_column: "null_flag"
+
+- id: 42
+  description: "Test Eval 42: has_phone = isnotnull(phone)"
+  original_query: 'index="user_data/parquet" | eval has_phone = isnotnull(phone)'
+  index_tokens: ["index", "=", "\"user_data/parquet\""]
+  eval_tokens: ["eval", "has_phone", "=", "isnotnull", "(", "phone", ")"]
+  expected_column: "has_phone"
+

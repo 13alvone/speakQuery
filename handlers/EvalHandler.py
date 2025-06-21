@@ -157,6 +157,8 @@ class EvalHandler:
             "coalesce": lambda *args: pd.Series(
                 GeneralHandler.coalesce_lists([self.ensure_series(a, len(df)).tolist() for a in args])
             ),
+            "isnull": lambda x: x.isnull() if isinstance(x, pd.Series) else pd.isna(x),
+            "isnotnull": lambda x: x.notnull() if isinstance(x, pd.Series) else not pd.isna(x),
             "base64_encode": lambda x: x.apply(lambda v: base64.b64encode(str(v).encode()).decode())
             if isinstance(x, pd.Series) else base64.b64encode(str(x).encode()).decode(),
             "base64_decode": lambda x: x.apply(lambda v: base64.b64decode(str(v)).decode())
