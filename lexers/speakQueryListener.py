@@ -223,7 +223,7 @@ class speakQueryListener(ParseTreeListener):
                 logging.error(f"[x] Failed to tokenize segment '{seg_str}': {e}")
                 raise
 
-            cmd = seg_tokens[0].lower()
+            cmd = seg_tokens[0].split('(')[0].lower()
             logging.info(f"[i] Processing pipeline segment: {cmd}")
 
             if cmd in ('stats', 'eventstats', 'streamstats'):
@@ -381,6 +381,17 @@ class speakQueryListener(ParseTreeListener):
                     self.general_handler.execute_outputlookup(self.main_df, **kwargs)
                 except Exception as e:
                     logging.error(f"[x] OUTPUTLOOKUP failure: {e}")
+
+            elif cmd == 'coalesce':
+                try:
+                    if '(' in seg_str and ')' in seg_str:
+                        inside = seg_str[seg_str.find('(')+1:seg_str.rfind(')')]
+                        fields = [f.strip().strip(',') for f in inside.split(',')]
+                    else:
+                        fields = [t.strip(',') for t in seg_tokens[1:]]
+                    self.main_df = self.general_handler.execute_coalesce(self.main_df, fields)
+                except Exception as e:
+                    logging.error(f"[x] COALESCE failure: {e}")
 
             elif cmd == 'mvexpand':
                 field = seg_tokens[1]
