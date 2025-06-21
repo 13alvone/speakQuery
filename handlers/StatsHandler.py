@@ -3,7 +3,7 @@
 StatsHandler.py
 Purpose: Implements SPL stats, eventstats, and streamstats commands.
          Supports functions: count, sum, avg/mean, min, max, median, mode,
-         dc (distinct count), values, earliest/first, latest/last.
+         dc (distinct count), values, earliest/first, latest/last, range.
          Uses pandas for aggregation and streaming operations.
 """
 import logging
@@ -219,6 +219,7 @@ class StatsHandler:
             'first': lambda s: s.iloc[0] if len(s) > 0 else np.nan,
             'latest': lambda s: s.iloc[-1] if len(s) > 0 else np.nan,
             'last': lambda s: s.iloc[-1] if len(s) > 0 else np.nan,
+            'range': lambda s: s.max() - s.min(),
         }
         if func not in mapping:
             logging.error(f"[x] Unsupported stats func: {func}")
