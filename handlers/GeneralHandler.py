@@ -1619,3 +1619,24 @@ class GeneralHandler:
             df[result_field] = df[field].apply(pick)
         return df
 
+    @staticmethod
+    def execute_mvfind(df: pd.DataFrame, field: str, pattern: str) -> pd.DataFrame:
+        """Search each list in ``field`` for ``pattern`` and record index."""
+        if field not in df.columns:
+            return df
+
+        regex = re.compile(pattern)
+
+        def find_index(value):
+            if isinstance(value, list):
+                for idx, item in enumerate(value):
+                    if regex.search(str(item)):
+                        return idx
+                return -1
+            if pd.isna(value):
+                return -1
+            return 0 if regex.search(str(value)) else -1
+
+        df["mvfind"] = df[field].apply(find_index)
+        return df
+

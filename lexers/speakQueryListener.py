@@ -422,6 +422,11 @@ class speakQueryListener(ParseTreeListener):
                 field = seg_tokens[1]
                 self.main_df = self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
 
+            elif cmd == 'mvfind':
+                field = seg_tokens[1]
+                pattern = seg_tokens[2] if len(seg_tokens) > 2 else ''
+                self.main_df = self.general_handler.execute_mvfind(self.main_df, field, pattern)
+
             elif cmd == 'mvzip':
                 field1 = seg_tokens[1].rstrip(',')
                 field2 = seg_tokens[2].rstrip(',')
