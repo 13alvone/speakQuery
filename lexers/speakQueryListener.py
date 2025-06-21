@@ -26,6 +26,7 @@ from handlers.LookupHandler import LookupHandler
 from handlers.SearchCmdHandler import SearchDirective
 from handlers.StatsHandler import StatsHandler
 from handlers.MacroHandler import MacroHandler
+from handlers.MultiSearchHandler import MultiSearchHandler
 
 # Import speakQueryParser (support for relative or absolute import)
 if "." in __name__:
@@ -119,6 +120,7 @@ class speakQueryListener(ParseTreeListener):
         self.search_cmd_handler = SearchDirective()
         self.stats_handler = StatsHandler()
         self.macro_handler = MacroHandler()
+        self.multisearch_handler = MultiSearchHandler()
 
     # Enter a parse tree produced by speakQueryParser#speakQuery.
     def enterSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
@@ -356,6 +358,32 @@ class speakQueryListener(ParseTreeListener):
                         self.main_df = self.general_handler.execute_append(self.main_df, add_df)
                 except Exception as e:
                     logging.error(f"[x] APPEND failure: {e}")
+
+            elif cmd == 'appendpipe':
+                try:
+                    if '[' in seg_tokens:
+                        start = seg_tokens.index('[') + 1
+                        end = seg_tokens.index(']')
+                        sub_tokens = seg_tokens[start:end]
+                        sub_df = self.run_subsearch(sub_tokens, self.main_df)
+                        self.main_df = self.general_handler.execute_append(self.main_df, sub_df)
+                except Exception as e:
+                    logging.error(f"[x] APPENDPIPE failure: {e}")
+
+            elif cmd == 'multisearch':
+                try:
+                    subs = []
+                    idx = 1
+                    while idx < len(seg_tokens):
+                        if seg_tokens[idx] == '[':
+                            end = seg_tokens.index(']', idx)
+                            subs.append(seg_tokens[idx+1:end])
+                            idx = end + 1
+                        else:
+                            idx += 1
+                    self.main_df = self.multisearch_handler.run_multisearch(subs, process_index_calls)
+                except Exception as e:
+                    logging.error(f"[x] MULTISEARCH failure: {e}")
 
             elif cmd == 'lookup':
                 try:
@@ -817,6 +845,46 @@ class speakQueryListener(ParseTreeListener):
             normalized.append(token)
 
         return normalized
+
+    def run_subsearch(self, tokens, df):
+        """Execute a list of tokens as a pipeline against df."""
+        segments = []
+        current = []
+        for tok in tokens:
+            if tok == '|':
+                if current:
+                    segments.append(current)
+                current = []
+            else:
+                current.append(tok)
+        if current:
+            segments.append(current)
+
+        result_df = df.copy()
+        for seg in segments:
+            if not seg:
+                continue
+            cmd = seg[0].split('(')[0].lower()
+            if cmd in ('stats', 'eventstats', 'streamstats'):
+                result_df = self.stats_handler.run_stats(seg, result_df)
+            elif cmd == 'eval':
+                from handlers.EvalHandler import EvalHandler
+                eval_handler = EvalHandler()
+                result_df = eval_handler.run_eval(seg, result_df)
+            elif cmd in ('head', 'limit'):
+                count = int(seg[1]) if len(seg) > 1 else 5
+                result_df = self.general_handler.head_call(result_df, count, 'head')
+            elif cmd == 'fields':
+                mode = '+'
+                cols = []
+                for t in seg[1:]:
+                    if t.startswith('-'):
+                        mode = '-'
+                        cols.append(t[1:].strip(','))
+                    else:
+                        cols.append(t.strip(','))
+                result_df = self.general_handler.filter_df_columns(result_df, cols, mode)
+        return result_df
 
     # CRITICAL COMPONENT
     def extract_screenshot_of_ctx(self, ctx):
