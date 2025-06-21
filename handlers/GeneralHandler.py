@@ -1640,3 +1640,21 @@ class GeneralHandler:
         df["mvfind"] = df[field].apply(find_index)
         return df
 
+    @staticmethod
+    def execute_coalesce(df: pd.DataFrame, fields: list, result_field: str = "coalesce") -> pd.DataFrame:
+        """Return the first non-null/empty value across the provided fields."""
+        missing = [f for f in fields if f not in df.columns]
+        if missing:
+            logging.error(f"[x] COALESCE failed, missing columns: {missing}")
+            return df
+
+        def pick(row):
+            for f in fields:
+                val = row[f]
+                if pd.notna(val) and val != "":
+                    return val
+            return None
+
+        df[result_field] = df.apply(pick, axis=1)
+        return df
+
