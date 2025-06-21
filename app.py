@@ -71,9 +71,13 @@ os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
 
 
 def allowed_file(filename):
-    """Check if the file has an allowed extension."""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+    """Check if the file has an allowed extension, supporting multi-dot extensions."""
+    filename_lower = filename.lower()
+    for ext in app.config['ALLOWED_EXTENSIONS']:
+        ext_lower = ext.lower()
+        if filename_lower.endswith(f".{ext_lower}"):
+            return True
+    return False
 
 
 def get_db(db_name):
