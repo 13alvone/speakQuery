@@ -240,6 +240,202 @@ class speakQueryListener(ParseTreeListener):
                     logging.error(f"[x] EvalHandler failure on '{seg_str}': {e}")
                     raise
 
+            elif cmd in ('head', 'limit'):
+                try:
+                    count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
+                    self.main_df = self.general_handler.head_call(self.main_df, count, 'head')
+                except Exception as e:
+                    logging.error(f"[x] HEAD/LIMIT failure: {e}")
+
+            elif cmd == 'sort':
+                try:
+                    cols = [c.lstrip('+-').strip(',') for c in seg_tokens[1:]]
+                    direction = '+' if seg_tokens[1].startswith('+') else '-'
+                    self.main_df = self.general_handler.sort_df_by_columns(self.main_df, cols, direction)
+                except Exception as e:
+                    logging.error(f"[x] SORT failure: {e}")
+
+            elif cmd == 'reverse':
+                self.main_df = self.general_handler.reverse_df_rows(self.main_df)
+
+            elif cmd == 'regex':
+                try:
+                    arg = seg_tokens[1]
+                    field, regex = arg.split('=', 1)
+                    self.main_df = self.general_handler.filter_df_by_regex(self.main_df, field, regex)
+                except Exception as e:
+                    logging.error(f"[x] REGEX failure: {e}")
+
+            elif cmd == 'fields':
+                mode = '+'
+                cols = []
+                for tok in seg_tokens[1:]:
+                    if tok.startswith('-'):
+                        mode = '-'
+                        cols.append(tok[1:].strip(','))
+                    else:
+                        cols.append(tok.strip(','))
+                try:
+                    self.main_df = self.general_handler.filter_df_columns(self.main_df, cols, mode)
+                except Exception as e:
+                    logging.error(f"[x] FIELDS failure: {e}")
+
+            elif cmd == 'rename':
+                try:
+                    pairs = [p.strip() for p in ' '.join(seg_tokens[1:]).split(',')]
+                    for pair in pairs:
+                        if 'as' in pair:
+                            old, new = [s.strip() for s in pair.split('as')]
+                            self.main_df = self.general_handler.rename_column(self.main_df, old, new)
+                except Exception as e:
+                    logging.error(f"[x] RENAME failure: {e}")
+
+            elif cmd == 'fieldsummary':
+                try:
+                    self.main_df = self.general_handler.execute_fieldsummary(self.main_df)
+                except Exception as e:
+                    logging.error(f"[x] FIELDSUMMARY failure: {e}")
+
+            elif cmd == 'fillnull':
+                try:
+                    self.main_df = self.general_handler.execute_fillnull(self.main_df, seg_tokens[1:])
+                except Exception as e:
+                    logging.error(f"[x] FILLNULL failure: {e}")
+
+            elif cmd == 'table':
+                cols = [c.strip(',') for c in seg_tokens[1:]]
+                try:
+                    self.main_df = self.general_handler.filter_df_columns(self.main_df, cols, '+')
+                except Exception as e:
+                    logging.error(f"[x] TABLE failure: {e}")
+
+            elif cmd == 'base64':
+                try:
+                    self.main_df = self.general_handler.handle_base64(self.main_df, seg_tokens)
+                except Exception as e:
+                    logging.error(f"[x] BASE64 failure: {e}")
+
+            elif cmd == 'bin':
+                try:
+                    field = seg_tokens[1]
+                    span = seg_tokens[seg_tokens.index('span') + 2] if 'span' in seg_tokens else '1h'
+                    self.main_df = self.general_handler.execute_bin(self.main_df, field, span)
+                except Exception as e:
+                    logging.error(f"[x] BIN failure: {e}")
+
+            elif cmd == 'join':
+                try:
+                    join_type = 'inner'
+                    fields = []
+                    idx = 1
+                    while idx < len(seg_tokens) and seg_tokens[idx] != '[':
+                        tok = seg_tokens[idx]
+                        if tok.startswith('type='):
+                            join_type = tok.split('=',1)[1]
+                        else:
+                            fields.extend([x.strip(',') for x in tok.split(',') if x])
+                        idx += 1
+                    sub_df = None
+                    if '[' in seg_tokens:
+                        start = seg_tokens.index('[') + 1
+                        end = seg_tokens.index(']')
+                        sub_df = process_index_calls(seg_tokens[start:end])
+                    if sub_df is not None:
+                        self.main_df = self.general_handler.execute_join(self.main_df, sub_df, fields, join_type)
+                except Exception as e:
+                    logging.error(f"[x] JOIN failure: {e}")
+
+            elif cmd == 'append':
+                try:
+                    if '[' in seg_tokens:
+                        start = seg_tokens.index('[') + 1
+                        end = seg_tokens.index(']')
+                        add_df = process_index_calls(seg_tokens[start:end])
+                        self.main_df = self.general_handler.execute_append(self.main_df, add_df)
+                except Exception as e:
+                    logging.error(f"[x] APPEND failure: {e}")
+
+            elif cmd == 'lookup':
+                try:
+                    filename = seg_tokens[1]
+                    key = seg_tokens[2]
+                    output_fields = [t.strip(',') for t in seg_tokens[4:]] if 'OUTPUT' in seg_tokens else []
+                    lookup_df = self.lookup_handler.load_data(os.path.join(self.lookup_root, filename))
+                    if lookup_df is not None:
+                        self.main_df = self.general_handler.execute_join(self.main_df, lookup_df, [key], 'left')
+                        if output_fields:
+                            self.main_df = self.general_handler.filter_df_columns(self.main_df, self.main_df.columns.tolist(), '+')
+                except Exception as e:
+                    logging.error(f"[x] LOOKUP failure: {e}")
+
+            elif cmd == 'outputlookup':
+                try:
+                    args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
+                    if isinstance(args, str):
+                        kwargs = {"filename": os.path.join(self.lookup_root, args)}
+                    else:
+                        args['filename'] = os.path.join(self.lookup_root, args.get('filename', 'output.csv'))
+                        kwargs = args
+                    self.general_handler.execute_outputlookup(self.main_df, **kwargs)
+                except Exception as e:
+                    logging.error(f"[x] OUTPUTLOOKUP failure: {e}")
+
+            elif cmd == 'mvexpand':
+                field = seg_tokens[1]
+                self.main_df = self.general_handler.execute_mvexpand(self.main_df, field)
+
+            elif cmd == 'mvreverse':
+                field = seg_tokens[1]
+                self.main_df = self.general_handler.execute_mvreverse(self.main_df, field)
+
+            elif cmd == 'mvcombine':
+                field = None
+                delim = ' '
+                for t in seg_tokens[1:]:
+                    if t.startswith('delim='):
+                        delim = t.split('=',1)[1].strip('"')
+                    else:
+                        field = t.strip(',')
+                if field:
+                    self.main_df = self.general_handler.execute_mvcombine(self.main_df, field, delim)
+
+            elif cmd == 'mvdedup':
+                field = seg_tokens[1]
+                self.main_df = self.general_handler.execute_mvdedup(self.main_df, field)
+
+            elif cmd == 'mvappend':
+                fields = [t.strip(',') for t in seg_tokens[1:]]
+                self.main_df = self.general_handler.execute_mvappend(self.main_df, fields, fields[0])
+
+            elif cmd == 'mvfilter':
+                field = seg_tokens[1]
+                value = seg_tokens[2].split('=')[1] if '=' in seg_tokens[2] else seg_tokens[2]
+                self.main_df = self.general_handler.execute_mvfilter(self.main_df, field, value)
+
+            elif cmd == 'mvcount':
+                field = seg_tokens[1]
+                self.main_df = self.general_handler.execute_mvcount(self.main_df, field, f"{field}_count")
+
+            elif cmd == 'mvdc':
+                field = seg_tokens[1]
+                self.main_df = self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
+
+            elif cmd == 'mvzip':
+                field1 = seg_tokens[1].rstrip(',')
+                field2 = seg_tokens[2].rstrip(',')
+                delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else '_'
+                self.main_df = self.general_handler.execute_mvzip(self.main_df, field1, field2, delim, 'mvzip')
+
+            elif cmd == 'mvjoin':
+                field = seg_tokens[1]
+                delim = seg_tokens[2].split('=')[1] if len(seg_tokens)>2 else ' '
+                self.main_df = self.general_handler.execute_mvjoin(self.main_df, field, delim)
+
+            elif cmd == 'mvindex':
+                field = seg_tokens[1]
+                idxs = [int(i.strip(',')) for i in seg_tokens[2:]]
+                self.main_df = self.general_handler.execute_mvindex(self.main_df, field, idxs, 'mvindex')
+
             else:
                 logging.warning(f"[!] Unhandled transformation '{cmd}', defaulting to eval")
                 from handlers.EvalHandler import EvalHandler

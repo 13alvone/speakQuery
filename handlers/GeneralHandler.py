@@ -1474,3 +1474,148 @@ class GeneralHandler:
             return pd.read_pickle(request_id_file_path)
         else:
             raise FileNotFoundError(f"No saved DataFrame found for request_id: {request_id_file_path}")
+
+    # ------------------------------------------------------------------
+    # New helper functions for directive processing
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def execute_join(main_df: pd.DataFrame, sub_df: pd.DataFrame, fields: list, join_type: str = "inner") -> pd.DataFrame:
+        """Perform a pandas merge using the specified join type and fields."""
+        try:
+            return main_df.merge(sub_df, on=fields, how=join_type)
+        except Exception as e:
+            logging.error(f"[x] JOIN failed: {e}")
+            return main_df
+
+    @staticmethod
+    def execute_append(main_df: pd.DataFrame, add_df: pd.DataFrame) -> pd.DataFrame:
+        """Append rows from add_df to main_df."""
+        try:
+            return pd.concat([main_df, add_df], ignore_index=True)
+        except Exception as e:
+            logging.error(f"[x] APPEND failed: {e}")
+            return main_df
+
+    @staticmethod
+    def execute_spath(df: pd.DataFrame, input_col: str, output_col: str, json_path: str) -> pd.DataFrame:
+        """Extract JSON path from a column into a new column."""
+        try:
+            import json
+
+            def extract(obj):
+                try:
+                    data = obj if isinstance(obj, dict) else json.loads(str(obj))
+                    for part in json_path.split('.'):
+                        if isinstance(data, dict):
+                            data = data.get(part)
+                        else:
+                            return None
+                    return data
+                except Exception:
+                    return None
+
+            df[output_col] = df[input_col].apply(extract)
+        except Exception as e:
+            logging.error(f"[x] SPATH failed: {e}")
+        return df
+
+    @staticmethod
+    def execute_bin(df: pd.DataFrame, field: str, span: str) -> pd.DataFrame:
+        """Bin a field into the provided span using pandas floor."""
+        try:
+            df[field] = pd.to_datetime(df[field], errors="ignore").dt.floor(span)
+        except Exception as e:
+            logging.error(f"[x] BIN failed: {e}")
+        return df
+
+    @staticmethod
+    def execute_mvexpand(df: pd.DataFrame, field: str) -> pd.DataFrame:
+        if field in df.columns:
+            return df.explode(field).reset_index(drop=True)
+        return df
+
+    @staticmethod
+    def execute_mvreverse(df: pd.DataFrame, field: str) -> pd.DataFrame:
+        if field in df.columns:
+            df[field] = df[field].apply(lambda x: list(reversed(x)) if isinstance(x, list) else x)
+        return df
+
+    @staticmethod
+    def execute_mvcombine(df: pd.DataFrame, field: str, delim: str = " ") -> pd.DataFrame:
+        if field in df.columns:
+            df[field] = df[field].apply(lambda x: delim.join(map(str, x)) if isinstance(x, list) else x)
+        return df
+
+    @staticmethod
+    def execute_mvdedup(df: pd.DataFrame, field: str) -> pd.DataFrame:
+        if field in df.columns:
+            df[field] = df[field].apply(lambda x: list(dict.fromkeys(x)) if isinstance(x, list) else x)
+        return df
+
+    @staticmethod
+    def execute_mvappend(df: pd.DataFrame, fields: list, target: str) -> pd.DataFrame:
+        if not fields:
+            return df
+        try:
+            df[target] = df.apply(
+                lambda row: [item for f in fields for item in (row[f] if isinstance(row[f], list) else [row[f]])],
+                axis=1,
+            )
+        except Exception as e:
+            logging.error(f"[x] MVAPPEND failed: {e}")
+        return df
+
+    @staticmethod
+    def execute_mvfilter(df: pd.DataFrame, field: str, value) -> pd.DataFrame:
+        if field in df.columns:
+            df[field] = df[field].apply(lambda x: [v for v in x if str(v) == str(value)] if isinstance(x, list) else x)
+        return df
+
+    @staticmethod
+    def execute_mvcount(df: pd.DataFrame, field: str, result_field: str) -> pd.DataFrame:
+        if field in df.columns:
+            df[result_field] = df[field].apply(lambda x: len(x) if isinstance(x, list) else 0)
+        return df
+
+    @staticmethod
+    def execute_mvdc(df: pd.DataFrame, field: str, result_field: str) -> pd.DataFrame:
+        if field in df.columns:
+            df[result_field] = df[field].apply(lambda x: len(set(x)) if isinstance(x, list) else 0)
+        return df
+
+    @staticmethod
+    def execute_mvzip(df: pd.DataFrame, field1: str, field2: str, delim: str, result_field: str) -> pd.DataFrame:
+        try:
+            df[result_field] = df.apply(
+                lambda r: [f"{a}{delim}{b}" for a, b in zip(
+                    r[field1] if isinstance(r[field1], list) else [r[field1]],
+                    r[field2] if isinstance(r[field2], list) else [r[field2]],
+                )],
+                axis=1,
+            )
+        except Exception as e:
+            logging.error(f"[x] MVZIP failed: {e}")
+        return df
+
+    @staticmethod
+    def execute_mvjoin(df: pd.DataFrame, field: str, delim: str) -> pd.DataFrame:
+        if field in df.columns:
+            df[field] = df[field].apply(lambda x: delim.join(map(str, x)) if isinstance(x, list) else x)
+        return df
+
+    @staticmethod
+    def execute_mvindex(df: pd.DataFrame, field: str, indexes: list, result_field: str) -> pd.DataFrame:
+        def pick(lst):
+            if not isinstance(lst, list):
+                return None
+            res = []
+            for i in indexes:
+                if -len(lst) <= i < len(lst):
+                    res.append(lst[i])
+            return res[0] if len(indexes) == 1 else res
+
+        if field in df.columns:
+            df[result_field] = df[field].apply(pick)
+        return df
+

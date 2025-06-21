@@ -9,6 +9,7 @@ Purpose: Implements evaluation of SPL eval commands. This module supports functi
 import logging
 import numpy as np
 import pandas as pd
+import base64
 
 from handlers.MathematicOperations import MathHandler
 from handlers.StringHandler import StringHandler
@@ -150,9 +151,16 @@ class EvalHandler:
             "trim": lambda x: StringHandler().trim_strings(x, " ", "trim"),
             "ltrim": lambda x: StringHandler().trim_strings(x, " ", "ltrim"),
             "rtrim": lambda x: StringHandler().trim_strings(x, " ", "rtrim"),
-            "randomize": lambda x: self.math_handler.complex_randomize(x) if isinstance(x, (pd.Series, list)) 
+            "randomize": lambda x: self.math_handler.complex_randomize(x) if isinstance(x, (pd.Series, list))
                                      else self.math_handler.complex_randomize(float(x)),
-            "avg": lambda a, b: (a + b) / 2  # example avg definition
+            "avg": lambda a, b: (a + b) / 2,  # example avg definition
+            "coalesce": lambda *args: pd.Series(
+                GeneralHandler.coalesce_lists([self.ensure_series(a, len(df)).tolist() for a in args])
+            ),
+            "base64_encode": lambda x: x.apply(lambda v: base64.b64encode(str(v).encode()).decode())
+            if isinstance(x, pd.Series) else base64.b64encode(str(x).encode()).decode(),
+            "base64_decode": lambda x: x.apply(lambda v: base64.b64decode(str(v)).decode())
+            if isinstance(x, pd.Series) else base64.b64decode(str(x)).decode()
         })
         try:
             result = eval(expr, {"__builtins__": {}}, local_env)
