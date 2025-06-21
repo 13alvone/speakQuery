@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Scheduled Inputs{% endblock %}
+
+{% block extra_css %}
+    <!-- Include Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scheduled_inputs.css') }}">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Scheduled Inputs</h1>
+
+        <!-- Notification Container -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by scheduled_inputs.js -->
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    <!-- Container for horizontal scrolling -->
+                    <div id="scheduled-inputs-container">
+                        <div id="scheduled-inputs-table">
+                            <!-- Placeholder for dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropdown Menus Container -->
+    <!-- Note: We no longer need this container since we're appending dropdowns to the body -->
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/scheduled_inputs.js') }}"></script>
+{% endblock %}

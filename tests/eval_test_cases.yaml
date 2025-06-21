@@ -1,0 +1,280 @@
+- id: 1
+  description: "Test Eval 1: new_field = test + 1"
+  original_query: 'index="output_parquets/test0.parquet" test IN (8 12 13) | eval new_field = test + 1'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\"", "test", "IN", "(", "8", "12", "13", ")"]
+  eval_tokens: ["eval", "new_field", "=", "test", "+", "1"]
+  expected_column: "new_field"
+
+- id: 2
+  description: "Test Eval 2: lower_role = lower(userRole)"
+  original_query: 'index="output_parquets/test1.parquet" userRole="admin" | eval lower_role = lower(userRole)'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\"", "userRole", "=", "\"admin\""]
+  eval_tokens: ["eval", "lower_role", "=", "lower", "(", "userRole", ")"]
+  expected_column: "lower_role"
+
+- id: 3
+  description: "Test Eval 3: combined = concat(userRole, '_', tostring(errorCode))"
+  original_query: 'index="output_parquets/test1.parquet" | eval combined = concat(userRole, "_", tostring(errorCode))'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "combined", "=", "concat", "(", "userRole", ",", "\"_\"", ",", "tostring", "(", "errorCode", ")", ")"]
+  expected_column: "combined"
+
+- id: 4
+  description: "Test Eval 4: new_field = if_(test > 10, \"high\", \"low\")"
+  original_query: 'index="output_parquets/test0.parquet" | eval new_field = if_(test > 10, "high", "low")'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "new_field", "=", "if_", "(", "test", ">", "10", ",", "\"high\"", ",", "\"low\"", ")"]
+  expected_column: "new_field"
+
+- id: 5
+  description: "Test Eval 5: calc = round(test * 1.5)"
+  original_query: 'index="output_parquets/test0.parquet" | eval calc = round(test * 1.5)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "calc", "=", "round", "(", "test", "*", "1.5", ")"]
+  expected_column: "calc"
+
+- id: 6
+  description: "Test Eval 6: upper_and_trim = trim(upper(userRole))"
+  original_query: 'index="output_parquets/test1.parquet" | eval upper_and_trim = trim(upper(userRole))'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "upper_and_trim", "=", "trim", "(", "upper", "(", "userRole", ")", ")"]
+  expected_column: "upper_and_trim"
+
+- id: 7
+  description: "Test Eval 7: conditional_field = case(test > 10, \"big\", test > 5, \"medium\", \"small\")"
+  original_query: 'index="output_parquets/test0.parquet" | eval conditional_field = case(test > 10, "big", test > 5, "medium", "small")'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "conditional_field", "=", "case", "(", "test", ">", "10", ",", "\"big\"", ",", "test", ">", "5", ",", "\"medium\"", ",", "\"small\"", ")"]
+  expected_column: "conditional_field"
+
+- id: 8
+  description: "Test Eval 8: combined2 = concat(upper(userRole), \"_\", tostring(test), \"_\", lower(status))"
+  original_query: 'index="output_parquets/test1.parquet" | eval combined2 = concat(upper(userRole), "_", tostring(test), "_", lower(status))'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "combined2", "=", "concat", "(", "upper", "(", "userRole", ")", ",", "\"_\"", ",", "tostring", "(", "test", ")", ",", "\"_\"", ",", "lower", "(", "status", ")", ")"]
+  expected_column: "combined2"
+
+- id: 9
+  description: "Test Eval 9: math_calc = avg(test, x)"
+  original_query: 'index="output_parquets/test0.parquet" | eval math_calc = avg(test, x)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "math_calc", "=", "avg", "(", "test", ",", "x", ")"]
+  expected_column: "math_calc"
+
+- id: 10
+  description: "Test Eval 10: flag = if_(x > 4, 1, 0)"
+  original_query: 'index="output_parquets/test0.parquet" | eval flag = if_(x > 4, 1, 0)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "flag", "=", "if_", "(", "x", ">", "4", ",", "1", ",", "0", ")"]
+  expected_column: "flag"
+
+- id: 11
+  description: "Test Eval 11: custom_case = case(lower(userRole)==\"admin\", \"A\", lower(userRole)==\"user\", \"B\", \"C\")"
+  original_query: 'index="output_parquets/test1.parquet" | eval custom_case = case(lower(userRole)=="admin", "A", lower(userRole)=="user", "B", "C")'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "custom_case", "=", "case", "(", "lower", "(", "userRole", ")", "==", "\"admin\"", ",", "\"A\"", ",", "lower", "(", "userRole", ")", "==", "\"user\"", ",", "\"B\"", ",", "\"C\"", ")"]
+  expected_column: "custom_case"
+
+- id: 12
+  description: "Test Eval 12: random_field = randomize(x)"
+  original_query: 'index="output_parquets/test0.parquet" | eval random_field = randomize(x)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "random_field", "=", "randomize", "(", "x", ")"]
+  expected_column: "random_field"
+
+- id: 13
+  description: "Test Eval 13: combined3 = concat(tostring(test), \"-\", tostring(z))"
+  original_query: 'index="output_parquets/test0.parquet" | eval combined3 = concat(tostring(test), "-", tostring(z))'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "combined3", "=", "concat", "(", "tostring", "(", "test", ")", ",", "\"-\"", ",", "tostring", "(", "z", ")", ")"]
+  expected_column: "combined3"
+
+- id: 14
+  description: "Test Eval 14: trimmed_field = ltrim(rtrim(userRole))"
+  original_query: 'index="output_parquets/test1.parquet" | eval trimmed_field = ltrim(rtrim(userRole))'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "trimmed_field", "=", "ltrim", "(", "rtrim", "(", "userRole", ")", ")"]
+  expected_column: "trimmed_field"
+
+- id: 15
+  description: "Test Eval 15: complex_math = round(test * 2.5 + x)"
+  original_query: 'index="output_parquets/test0.parquet" | eval complex_math = round(test * 2.5 + x)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "complex_math", "=", "round", "(", "test", "*", "2.5", "+", "x", ")"]
+  expected_column: "complex_math"
+
+- id: 16
+  description: "Test Eval 16: Nested if – inner if on userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eval nested_if = if_(test > 12, if_(userRole == "admin", "admin_high", "user_high"), "low")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "nested_if", "=", "if_", "(", "test", ">", "12", ",", "if_", "(", "userRole", "==", "\"admin\"", ",", "\"admin_high\"", ",", "\"user_high\"", ")", ",", "\"low\"", ")" ]
+  expected_column: "nested_if"
+
+- id: 17
+  description: "Test Eval 17: if with arithmetic – choose between multiplication and addition"
+  original_query: 'index="output_parquets/test0.parquet" | eval calc_if = if_(test > 12, test * 2, test + 2)'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "calc_if", "=", "if_", "(", "test", ">", "12", ",", "test", "*", "2", ",", "test", "+", "2", ")" ]
+  expected_column: "calc_if"
+
+- id: 18
+  description: "Test Eval 18: Double nested if – numeric condition"
+  original_query: 'index="output_parquets/test0.parquet" | eval double_if = if_(test > 12, if_(x > 4, "high", "medium"), "low")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "double_if", "=", "if_", "(", "test", ">", "12", ",", "if_", "(", "x", ">", "4", ",", "\"high\"", ",", "\"medium\"", ")", ",", "\"low\"", ")" ]
+  expected_column: "double_if"
+
+- id: 19
+  description: "Test Eval 19: Nested if with string condition – check uppercase userRole"
+  original_query: 'index="output_parquets/test1.parquet" | eval str_if = if_(upper(userRole) == "ADMIN", if_(test > 12, "big", "small"), "none")'
+  index_tokens: [ "index", "=", "\"output_parquets/test1.parquet\"" ]
+  eval_tokens: [ "eval", "str_if", "=", "if_", "(", "upper", "(", "userRole", ")", "==", "\"ADMIN\"", ",", "if_", "(", "test", ">", "12", ",", "\"big\"", ",", "\"small\"", ")", ",", "\"none\"", ")" ]
+  expected_column: "str_if"
+
+- id: 20
+  description: "Test Eval 20: if with arithmetic and nested condition – multiplication test"
+  original_query: 'index="output_parquets/test0.parquet" | eval mixed_if = if_(test * x > 50, if_(x > 5, "pass", "borderline"), "fail")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "mixed_if", "=", "if_", "(", "test", "*", "x", ">", "50", ",", "if_", "(", "x", ">", "5", ",", "\"pass\"", ",", "\"borderline\"", ")", ",", "\"fail\"", ")" ]
+  expected_column: "mixed_if"
+
+- id: 21
+  description: "Test Eval 21: Deeply nested if – triple nesting with mixed comparisons"
+  original_query: 'index="output_parquets/test0.parquet" | eval deep_if = if_(test > 10, if_(if_(test > 12, "upper", "mid") == "upper", if_(userRole == "admin", "A", "B"), "low"), "none")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "deep_if", "=", "if_", "(", "test", ">", "10", ",", "if_", "(", "if_", "(", "test", ">", "12", ",", "\"upper\"", ",", "\"mid\"", ")", "==", "\"upper\"", ",", "if_", "(", "userRole", "==", "\"admin\"", ",", "\"A\"", ",", "\"B\"", ")", ",", "\"low\"", ")", ",", "\"none\"", ")" ]
+  expected_column: "deep_if"
+
+- id: 22
+  description: "Test Eval 22: if with string concatenation – constant prepended"
+  original_query: 'index="output_parquets/test0.parquet" | eval str_concat_if = concat("Value is: ", if_(test > 12, "high", "low"))'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "str_concat_if", "=", "concat", "(", "\"Value is: \"", ",", "if_", "(", "test", ">", "12", ",", "\"high\"", ",", "\"low\"", ")", ")" ]
+  expected_column: "str_concat_if"
+
+- id: 23
+  description: "Test Eval 23: Multiple nested if – two-level if chain"
+  original_query: 'index="output_parquets/test0.parquet" | eval multi_if = if_(test < 11, "small", if_(test < 14, "medium", "large"))'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "multi_if", "=", "if_", "(", "test", "<", "11", ",", "\"small\"", ",", "if_", "(", "test", "<", "14", ",", "\"medium\"", ",", "\"large\"", ")", ")" ]
+  expected_column: "multi_if"
+
+- id: 24
+  description: "Test Eval 24: if with boolean arithmetic – based on status"
+  original_query: 'index="output_parquets/test1.parquet" | eval bool_if = if_(status == "error", 1, 0)'
+  index_tokens: [ "index", "=", "\"output_parquets/test1.parquet\"" ]
+  eval_tokens: [ "eval", "bool_if", "=", "if_", "(", "status", "==", "\"error\"", ",", "1", ",", "0", ")" ]
+  expected_column: "bool_if"
+
+- id: 25
+  description: "Test Eval 25: Nested if with tonumber and comparison"
+  original_query: 'index="output_parquets/test0.parquet" | eval mix_if = if_(tonumber(test) > 11, if_(x < 5, "low", "high"), "normal")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "mix_if", "=", "if_", "(", "tonumber", "(", "test", ")", ">", "11", ",", "if_", "(", "x", "<", "5", ",", "\"low\"", ",", "\"high\"", ")", ",", "\"normal\"", ")" ]
+  expected_column: "mix_if"
+
+- id: 26
+  description: "Test Eval 26: Simple case – case(test > 12, 'big', 'small')"
+  original_query: 'index="output_parquets/test0.parquet" | eval simple_case = case(test > 12, "big", "small")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "simple_case", "=", "case", "(", "test", ">", "12", ",", "\"big\"", ",", "\"small\"", ")" ]
+  expected_column: "simple_case"
+
+- id: 27
+  description: "Test Eval 27: Multiple conditions case – case(test > 12, 'big', test > 10, 'medium', 'small')"
+  original_query: 'index="output_parquets/test0.parquet" | eval multi_case = case(test > 12, "big", test > 10, "medium", "small")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "multi_case", "=", "case", "(", "test", ">", "12", ",", "\"big\"", ",", "test", ">", "10", ",", "\"medium\"", ",", "\"small\"", ")" ]
+  expected_column: "multi_case"
+
+- id: 28
+  description: "Test Eval 28: Case with default – case(test < 10, 'low', test < 13, 'mid', 'high')"
+  original_query: 'index="output_parquets/test0.parquet" | eval case_default = case(test < 10, "low", test < 13, "mid", "high")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "case_default", "=", "case", "(", "test", "<", "10", ",", "\"low\"", ",", "test", "<", "13", ",", "\"mid\"", ",", "\"high\"", ")" ]
+  expected_column: "case_default"
+
+- id: 29
+  description: "Test Eval 29: Nested case – nested inner cases on userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eval nested_case = case(test > 12, case(userRole == "admin", "admin_big", "user_big"), case(test < 10, "small", "medium"))'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "nested_case", "=", "case", "(", "test", ">", "12", ",", "case", "(", "userRole", "==", "\"admin\"", ",", "\"admin_big\"", ",", "\"user_big\"", ")", ",", "case", "(", "test", "<", "10", ",", "\"small\"", ",", "\"medium\"", ")", ")" ]
+  expected_column: "nested_case"
+
+- id: 30
+  description: "Test Eval 30: Case with boolean expressions – based on status"
+  original_query: 'index="output_parquets/test0.parquet" | eval bool_case = case(status == "error", 1, status == "warning", 2, 0)'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "bool_case", "=", "case", "(", "status", "==", "\"error\"", ",", "1", ",", "status", "==", "\"warning\"", ",", "2", ",", "0", ")" ]
+  expected_column: "bool_case"
+
+- id: 31
+  description: "Test Eval 31: Case with arithmetic – case(test * 2 > 20, test * 3, test * 2 > 15, test + 5, 0)"
+  original_query: 'index="output_parquets/test0.parquet" | eval arith_case = case(test * 2 > 20, test * 3, test * 2 > 15, test + 5, 0)'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "arith_case", "=", "case", "(", "test", "*", "2", ">", "20", ",", "test", "*", "3", ",", "test", "*", "2", ">", "15", ",", "test", "+", "5", ",", "0", ")" ]
+  expected_column: "arith_case"
+
+- id: 32
+  description: "Test Eval 32: Case with nested function call – if userRole is admin then concat, else 'Not Admin'"
+  original_query: 'index="output_parquets/test1.parquet" | eval nested_func_case = case(lower(userRole) == "admin", concat("Admin: ", tostring(test)), "Not Admin")'
+  index_tokens: [ "index", "=", "\"output_parquets/test1.parquet\"" ]
+  eval_tokens: [ "eval", "nested_func_case", "=", "case", "(", "lower", "(", "userRole", ")", "==", "\"admin\"", ",", "concat", "(", "\"Admin: \"", ",", "tostring", "(", "test", ")", ")", ",", "\"Not Admin\"", ")" ]
+  expected_column: "nested_func_case"
+
+- id: 33
+  description: "Test Eval 33: Case with mixed types – return string or number"
+  original_query: 'index="output_parquets/test0.parquet" | eval mix_case = case(test < 12, "low", test >= 12, 100, "unknown")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "mix_case", "=", "case", "(", "test", "<", "12", ",", "\"low\"", ",", "test", ">=", "12", ",", "100", ",", "\"unknown\"", ")" ]
+  expected_column: "mix_case"
+
+- id: 34
+  description: "Test Eval 34: Case with multiple nested conditions – if test < 11 then 'small', if test < 13 then if userRole is admin then 'medium_admin' else 'medium_user', else 'large'"
+  original_query: 'index="output_parquets/test0.parquet" | eval deep_case = case(test < 11, "small", test < 13, if_(userRole == "admin", "medium_admin", "medium_user"), "large")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "deep_case", "=", "case", "(", "test", "<", "11", ",", "\"small\"", ",", "test", "<", "13", ",", "if_", "(", "userRole", "==", "\"admin\"", ",", "\"medium_admin\"", ",", "\"medium_user\"", ")", ",", "\"large\"", ")" ]
+  expected_column: "deep_case"
+
+- id: 35
+  description: "Test Eval 35: Case with function call in condition – using tonumber on test"
+  original_query: 'index="output_parquets/test0.parquet" | eval func_case = case(tonumber(test) >= 12, "big", tonumber(test) < 12, "small")'
+  index_tokens: [ "index", "=", "\"output_parquets/test0.parquet\"" ]
+  eval_tokens: [ "eval", "func_case", "=", "case", "(", "tonumber", "(", "test", ")", ">=", "12", ",", "\"big\"", ",", "tonumber", "(", "test", ")", "<", "12", ",", "\"small\"", ")" ]
+  expected_column: "func_case"
+
+- id: 36
+  description: "Test Eval 36: Multiple assignment - new_field1 = test + 2, new_field2 = test * 3"
+  original_query: 'index="output_parquets/test0.parquet" | eval new_field1 = test + 2, new_field2 = test * 3'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "new_field1", "=", "test", "+", "2", ",", "new_field2", "=", "test", "*", "3"]
+  expected_columns: ["new_field1", "new_field2"]
+
+- id: 37
+  description: "Test Eval 37: Multiple assignment - combined = concat(tostring(test), \"-\", tostring(z)), flag = if_(x > 5, 1, 0)"
+  original_query: 'index="output_parquets/test0.parquet" | eval combined = concat(tostring(test), "-", tostring(z)), flag = if_(x > 5, 1, 0)'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "combined", "=", "concat", "(", "tostring", "(", "test", ")", ",", "\"-\"", ",", "tostring", "(", "z", ")", ")", ",", "flag", "=", "if_", "(", "x", ">", "5", ",", "1", ",", "0", ")"]
+  expected_columns: ["combined", "flag"]
+
+- id: 38
+  description: "Test Eval 38: Multiple assignment - lower_role = lower(userRole), upper_status = upper(status)"
+  original_query: 'index="output_parquets/test1.parquet" | eval lower_role = lower(userRole), upper_status = upper(status)'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "lower_role", "=", "lower", "(", "userRole", ")", ",", "upper_status", "=", "upper", "(", "status", ")"]
+  expected_columns: ["lower_role", "upper_status"]
+
+- id: 39
+  description: "Test Eval 39: Multiple assignment - calc1 = round(test * 1.5), calc2 = round(errorCode / 10)"
+  original_query: 'index="output_parquets/test1.parquet" | eval calc1 = round(test * 1.5), calc2 = round(errorCode / 10)'
+  index_tokens: ["index", "=", "\"output_parquets/test1.parquet\""]
+  eval_tokens: ["eval", "calc1", "=", "round", "(", "test", "*", "1.5", ")", ",", "calc2", "=", "round", "(", "errorCode", "/", "10", ")"]
+  expected_columns: ["calc1", "calc2"]
+
+- id: 40
+  description: "Test Eval 40: Multiple assignment - case_field = case(test > 12, \"high\", \"low\"), mix_field = case(tonumber(test) >= 12, \"big\", \"small\")"
+  original_query: 'index="output_parquets/test0.parquet" | eval case_field = case(test > 12, "high", "low"), mix_field = case(tonumber(test) >= 12, "big", "small")'
+  index_tokens: ["index", "=", "\"output_parquets/test0.parquet\""]
+  eval_tokens: ["eval", "case_field", "=", "case", "(", "test", ">", "12", ",", "\"high\"", ",", "\"low\"", ")", ",", "mix_field", "=", "case", "(", "tonumber", "(", "test", ")", ">=", "12", ",", "\"big\"", ",", "\"small\"", ")"]
+  expected_columns: ["case_field", "mix_field"]
+

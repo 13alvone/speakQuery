@@ -1,0 +1,44 @@
+/* schedule_input.css */
+
+/* Static Code Block Styling */
+.static-code-block {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-height: 300px;
+    border: 1px solid #ccc;
+}
+
+/* JSON Display Styling */
+#json-display-container pre.json-display {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    border: 1px solid #ccc;
+}
+
+/* DataFrame Summary Styling */
+#df-summary-container pre {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    border: 1px solid #ccc;
+}
+
+/* Notification Styles */
+#notification-container .notification {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    /* Bulma is mobile-first and responsive by default */
+    /* Additional custom styles if needed */
+}

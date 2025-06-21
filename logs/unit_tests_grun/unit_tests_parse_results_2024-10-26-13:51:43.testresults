@@ -1,0 +1,5 @@
+2024-10-26 13:51:43,940 - INFO - Deleted existing 'lexers/antlr4_active' directory.
+2024-10-26 13:51:46,793 - INFO - Regenerated the target antlr4 files successfully.
+2024-10-26 13:51:47,268 - INFO - --------------------
+2024-10-26 13:51:47,268 - INFO - Test 0: CATEGORY: [TABLE], COMPLEXITY: [basic], TITLE: [Basic Table Call]
+2024-10-26 13:51:47,275 - ERROR - Syntax Error - line 1:0 mismatched input '|' expecting {'earliest', 'latest', 'index', NOT, '+', '-', '++', '--', '~', '(', 'repeat', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}

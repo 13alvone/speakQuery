@@ -1,0 +1,79 @@
+/* index.css */
+
+/* Ensure parent columns allow overflow */
+.columns,
+.column,
+.field {
+    overflow: visible;
+}
+
+/* Query Textarea Styling */
+#query {
+    font-family: Consolas, monospace;
+    font-size: 10pt;
+    min-height: 150px; /* Approx. 10 lines of text */
+    overflow-y: auto;
+    resize: none; /* Disable manual resizing */
+}
+
+/* Results Container:
+   - 'overflow-x: auto' ensures a horizontal scrollbar
+   - 'width: 100%' allows the container to span the full width of its parent */
+#results-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* Results Table:
+   - 'width: 100%' makes it fill the container horizontally
+   - 'min-width: 1000px' ensures a scrollbar if columns exceed the container width */
+#results table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+/* Directory Tree Styling */
+#directory-tree ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+#directory-tree li {
+    margin: 5px 0;
+}
+
+#directory-tree li a {
+    text-decoration: none;
+    color: #3273dc; /* Bulma's primary color */
+}
+
+#directory-tree li a:hover {
+    text-decoration: underline;
+}
+
+#tree-toggle {
+    cursor: pointer;
+}
+
+#tree-toggle:hover {
+    text-decoration: underline;
+}
+
+/* Syntax Example Styling */
+#syntax-example {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-left: 5px solid #3273dc; /* Bulma's primary color */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Notification Styles */
+#notification-container .notification {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Responsive Design */
+/* Bulma is mobile-first and responsive by default */

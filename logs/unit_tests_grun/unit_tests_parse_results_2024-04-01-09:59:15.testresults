@@ -1,0 +1,746 @@
+2024-04-01 09:59:15,930 - INFO - Deleted existing 'antlr4_active' directory.
+2024-04-01 09:59:16,601 - INFO - Regenerated the target antlr4 files successfully.
+2024-04-01 09:59:16,730 - INFO - --------------------
+2024-04-01 09:59:16,730 - INFO - Test 0: CATEGORY: [TABLE], COMPLEXITY: [basic], TITLE: [Basic Table Call]
+2024-04-01 09:59:16,732 - INFO - --------------------
+2024-04-01 09:59:16,733 - INFO - Test 1: CATEGORY: [TABLE], COMPLEXITY: [basic], TITLE: [Basic Table Call with Timerange]
+2024-04-01 09:59:16,734 - INFO - --------------------
+2024-04-01 09:59:16,734 - INFO - Test 2: CATEGORY: [COMMENTS], COMPLEXITY: [basic], TITLE: [Basic Comments]
+2024-04-01 09:59:16,735 - INFO - --------------------
+2024-04-01 09:59:16,735 - INFO - Test 3: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic search]
+2024-04-01 09:59:16,763 - INFO - --------------------
+2024-04-01 09:59:16,763 - INFO - Test 4: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic search with NOT Expression]
+2024-04-01 09:59:16,765 - INFO - --------------------
+2024-04-01 09:59:16,765 - INFO - Test 5: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic search with multiple Expressions (no commas)]
+2024-04-01 09:59:16,775 - INFO - --------------------
+2024-04-01 09:59:16,775 - INFO - Test 6: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic search with multiple Expressions (commas)]
+2024-04-01 09:59:16,812 - INFO - --------------------
+2024-04-01 09:59:16,812 - INFO - Test 7: CATEGORY: [WHERE], COMPLEXITY: [basic], TITLE: [Basic WHERE]
+2024-04-01 09:59:16,815 - INFO - --------------------
+2024-04-01 09:59:16,815 - INFO - Test 8: CATEGORY: [WHERE], COMPLEXITY: [basic], TITLE: [Basic WHERE with NOT Expression]
+2024-04-01 09:59:16,816 - INFO - --------------------
+2024-04-01 09:59:16,816 - INFO - Test 9: CATEGORY: [WHERE], COMPLEXITY: [basic], TITLE: [Basic WHERE with multiple Expressions (no commas)]
+2024-04-01 09:59:16,818 - INFO - --------------------
+2024-04-01 09:59:16,818 - INFO - Test 10: CATEGORY: [WHERE], COMPLEXITY: [basic], TITLE: [Basic WHERE with multiple Expressions (commas)]
+2024-04-01 09:59:16,821 - INFO - --------------------
+2024-04-01 09:59:16,821 - INFO - Test 11: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Basic EVAL:: variable EQUALS NUMBER, variable EQUALS STRING, variable EQUALS BOOLEAN]
+2024-04-01 09:59:16,844 - INFO - --------------------
+2024-04-01 09:59:16,844 - INFO - Test 12: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Basic EVAL:: variable EQUALS arithmeticNumericExpr (2 values only)]
+2024-04-01 09:59:16,847 - INFO - --------------------
+2024-04-01 09:59:16,847 - INFO - Test 13: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Basic EVAL:: variable EQUALS arithmeticNumericExpr (3 or more values, addition and subtraction mixed)]
+2024-04-01 09:59:16,849 - INFO - --------------------
+2024-04-01 09:59:16,849 - INFO - Test 14: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Basic EVAL:: variable EQUALS muldivNumericExpr (2 values only)]
+2024-04-01 09:59:16,852 - INFO - --------------------
+2024-04-01 09:59:16,852 - INFO - Test 15: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Basic EVAL:: variable EQUALS muldivNumericExpr (3 or more values, multiplication and division mixed)]
+2024-04-01 09:59:16,854 - INFO - --------------------
+2024-04-01 09:59:16,854 - INFO - Test 16: CATEGORY: [EVAL], COMPLEXITY: [complex], TITLE: [Complex EVAL:: variable EQUALS muldivNumericExpr AND arithmeticNumericExpr (DOUBLE_QUOTATION_MARKS used in place of variable)]
+2024-04-01 09:59:16,858 - INFO - --------------------
+2024-04-01 09:59:16,858 - INFO - Test 17: CATEGORY: [EVAL], COMPLEXITY: [complex], TITLE: [Complex EVAL:: variable EQUALS muldivNumericExpr AND arithmeticNumericExpr (with Parenthesis)]
+2024-04-01 09:59:16,867 - INFO - --------------------
+2024-04-01 09:59:16,867 - INFO - Test 18: CATEGORY: [EVAL], COMPLEXITY: [complex], TITLE: [Complex EVAL:: variable EQUALS muldivNumericExpr AND arithmeticNumericExpr (with Parenthesis & Unary)]
+2024-04-01 09:59:16,881 - INFO - --------------------
+2024-04-01 09:59:16,881 - INFO - Test 19: CATEGORY: [EVAL], COMPLEXITY: [complex], TITLE: [Complex EVAL:: variable EQUALS muldivNumericExpr AND arithmeticNumericExpr (with Parenthesis & Unary & TOSTRING function)]
+2024-04-01 09:59:16,902 - INFO - --------------------
+2024-04-01 09:59:16,902 - INFO - Test 20: CATEGORY: [CASE], COMPLEXITY: [basic], TITLE: [Basic case statement with 2 simple entries and the required catchall (strings only & NO newlines)]
+2024-04-01 09:59:16,980 - INFO - --------------------
+2024-04-01 09:59:16,980 - INFO - Test 21: CATEGORY: [CASE], COMPLEXITY: [basic], TITLE: [Basic case statement with 2 simple entries and the required catchall (strings only & WITH newlines)]
+2024-04-01 09:59:16,983 - INFO - --------------------
+2024-04-01 09:59:16,983 - INFO - Test 22: CATEGORY: [CASE], COMPLEXITY: [complex], TITLE: [Complex case statement with inExpression and the required catchall (strings & numbers & booleans WITH newlines)]
+2024-04-01 09:59:17,008 - INFO - --------------------
+2024-04-01 09:59:17,008 - INFO - Test 23: CATEGORY: [CASE], COMPLEXITY: [complex], TITLE: [Complex case statement with ALL comparisonExpression and the required catchall (EQUALS_EQUALS | NOT_EQUALS | GT | LT | GTEQ | LTEQ)]
+2024-04-01 09:59:17,017 - INFO - --------------------
+2024-04-01 09:59:17,018 - INFO - Test 24: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Basic stats usage (NO newlines, values() only, NO by clause)]
+2024-04-01 09:59:17,037 - INFO - --------------------
+2024-04-01 09:59:17,037 - INFO - Test 25: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Basic stats usage (WITH newlines, values() only, NO by clause)]
+2024-04-01 09:59:17,039 - INFO - --------------------
+2024-04-01 09:59:17,039 - INFO - Test 26: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Basic stats usage (NO newlines, values() only, WITH by clause)]
+2024-04-01 09:59:17,042 - INFO - --------------------
+2024-04-01 09:59:17,042 - INFO - Test 27: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Basic stats usage (WITH newlines, values() only, NO by clause, and BY clause)]
+2024-04-01 09:59:17,043 - INFO - --------------------
+2024-04-01 09:59:17,043 - INFO - Test 28: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with LATEST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,047 - INFO - --------------------
+2024-04-01 09:59:17,047 - INFO - Test 29: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with EARLIEST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,051 - INFO - --------------------
+2024-04-01 09:59:17,051 - INFO - Test 30: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with FIRST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,055 - INFO - --------------------
+2024-04-01 09:59:17,055 - INFO - Test 31: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with LAST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,058 - INFO - --------------------
+2024-04-01 09:59:17,058 - INFO - Test 32: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with DCOUNT (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,061 - INFO - --------------------
+2024-04-01 09:59:17,061 - INFO - Test 33: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with ROUND (WITH newlines, WITH by clause + Second Stats)]
+2024-04-01 09:59:17,120 - INFO - --------------------
+2024-04-01 09:59:17,120 - INFO - Test 34: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with MIN (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,122 - INFO - --------------------
+2024-04-01 09:59:17,122 - INFO - Test 35: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with MAX (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,123 - INFO - --------------------
+2024-04-01 09:59:17,123 - INFO - Test 36: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with AVG (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,124 - INFO - --------------------
+2024-04-01 09:59:17,124 - INFO - Test 37: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with SUM (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,126 - INFO - --------------------
+2024-04-01 09:59:17,126 - INFO - Test 38: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with RANGE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,128 - INFO - --------------------
+2024-04-01 09:59:17,128 - INFO - Test 39: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with MEDIAN (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,129 - INFO - --------------------
+2024-04-01 09:59:17,129 - INFO - Test 40: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with MODE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,131 - INFO - --------------------
+2024-04-01 09:59:17,131 - INFO - Test 41: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with MODE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,133 - INFO - --------------------
+2024-04-01 09:59:17,133 - INFO - Test 42: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with SQRT (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,134 - INFO - --------------------
+2024-04-01 09:59:17,134 - INFO - Test 43: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with ABS (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,136 - INFO - --------------------
+2024-04-01 09:59:17,136 - INFO - Test 44: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with RANDOM WITH NO PARAMETERS (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,137 - INFO - --------------------
+2024-04-01 09:59:17,137 - INFO - Test 45: CATEGORY: [STATS], COMPLEXITY: [basic], TITLE: [Stats with RANDOM WITH start_number, end_number, and step_number (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,140 - INFO - --------------------
+2024-04-01 09:59:17,140 - INFO - Test 46: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [Basic eventstats usage (NO newlines, values() only, NO by clause)]
+2024-04-01 09:59:17,143 - INFO - --------------------
+2024-04-01 09:59:17,143 - INFO - Test 47: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [Basic eventstats usage (WITH newlines, values() only, NO by clause)]
+2024-04-01 09:59:17,145 - INFO - --------------------
+2024-04-01 09:59:17,145 - INFO - Test 48: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [Basic eventstats usage (NO newlines, values() only, WITH by clause)]
+2024-04-01 09:59:17,147 - INFO - --------------------
+2024-04-01 09:59:17,147 - INFO - Test 49: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats usage (WITH newlines, values() only, NO by clause, and BY clause)]
+2024-04-01 09:59:17,149 - INFO - --------------------
+2024-04-01 09:59:17,149 - INFO - Test 50: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with LATEST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,150 - INFO - --------------------
+2024-04-01 09:59:17,150 - INFO - Test 51: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with EARLIEST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,152 - INFO - --------------------
+2024-04-01 09:59:17,152 - INFO - Test 52: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with FIRST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,153 - INFO - --------------------
+2024-04-01 09:59:17,153 - INFO - Test 53: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with LAST (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,155 - INFO - --------------------
+2024-04-01 09:59:17,155 - INFO - Test 54: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with DCOUNT (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,156 - INFO - --------------------
+2024-04-01 09:59:17,156 - INFO - Test 55: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with ROUND (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,159 - INFO - --------------------
+2024-04-01 09:59:17,159 - INFO - Test 56: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with MIN (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,160 - INFO - --------------------
+2024-04-01 09:59:17,160 - INFO - Test 57: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with MAX (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,161 - INFO - --------------------
+2024-04-01 09:59:17,161 - INFO - Test 58: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with AVG (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,162 - INFO - --------------------
+2024-04-01 09:59:17,163 - INFO - Test 59: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with SUM (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,164 - INFO - --------------------
+2024-04-01 09:59:17,164 - INFO - Test 60: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with RANGE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,166 - INFO - --------------------
+2024-04-01 09:59:17,166 - INFO - Test 61: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with MEDIAN (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,167 - INFO - --------------------
+2024-04-01 09:59:17,167 - INFO - Test 62: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with MODE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,169 - INFO - --------------------
+2024-04-01 09:59:17,169 - INFO - Test 63: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with MODE (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,170 - INFO - --------------------
+2024-04-01 09:59:17,170 - INFO - Test 64: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with SQRT (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,172 - INFO - --------------------
+2024-04-01 09:59:17,172 - INFO - Test 65: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with ABS (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,173 - INFO - --------------------
+2024-04-01 09:59:17,173 - INFO - Test 66: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [Stats with RANDOM WITH NO PARAMETERS (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,174 - INFO - --------------------
+2024-04-01 09:59:17,174 - INFO - Test 67: CATEGORY: [EVENTSTATS], COMPLEXITY: [basic], TITLE: [eventstats with RANDOM WITH start_number, end_number, and step_number (WITH newlines, WITH by clause)]
+2024-04-01 09:59:17,177 - INFO - --------------------
+2024-04-01 09:59:17,177 - INFO - Test 68: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [Basic RENAME with single variable to variable]
+2024-04-01 09:59:17,178 - INFO - --------------------
+2024-04-01 09:59:17,178 - INFO - Test 69: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [Basic RENAME with single variable to double-quoted string]
+2024-04-01 09:59:17,178 - INFO - --------------------
+2024-04-01 09:59:17,178 - INFO - Test 70: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables to variables without commas]
+2024-04-01 09:59:17,179 - INFO - --------------------
+2024-04-01 09:59:17,179 - INFO - Test 71: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables to double-quoted strings without commas]
+2024-04-01 09:59:17,179 - INFO - --------------------
+2024-04-01 09:59:17,179 - INFO - Test 72: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables, mixed variable and double-quoted string targets without commas]
+2024-04-01 09:59:17,180 - INFO - --------------------
+2024-04-01 09:59:17,180 - INFO - Test 73: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables to variables with commas]
+2024-04-01 09:59:17,180 - INFO - --------------------
+2024-04-01 09:59:17,180 - INFO - Test 74: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables to double-quoted strings with commas]
+2024-04-01 09:59:17,181 - INFO - --------------------
+2024-04-01 09:59:17,181 - INFO - Test 75: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [RENAME with multiple variables, mixed variable and double-quoted string targets with commas]
+2024-04-01 09:59:17,181 - INFO - --------------------
+2024-04-01 09:59:17,181 - INFO - Test 76: CATEGORY: [RENAME], COMPLEXITY: [complex], TITLE: [Complex RENAME with many variables to variables mixed with double-quoted strings]
+2024-04-01 09:59:17,182 - INFO - --------------------
+2024-04-01 09:59:17,182 - INFO - Test 77: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS with a single variable (implicitly adding)]
+2024-04-01 09:59:17,183 - INFO - --------------------
+2024-04-01 09:59:17,183 - INFO - Test 78: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS excluding a single variable]
+2024-04-01 09:59:17,183 - INFO - --------------------
+2024-04-01 09:59:17,183 - INFO - Test 79: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS including a single variable explicitly]
+2024-04-01 09:59:17,183 - INFO - --------------------
+2024-04-01 09:59:17,183 - INFO - Test 80: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS with multiple variables without commas (implicitly adding)]
+2024-04-01 09:59:17,183 - INFO - --------------------
+2024-04-01 09:59:17,183 - INFO - Test 81: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS excluding multiple variables without commas]
+2024-04-01 09:59:17,184 - INFO - --------------------
+2024-04-01 09:59:17,184 - INFO - Test 82: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS including multiple variables explicitly without commas]
+2024-04-01 09:59:17,184 - INFO - --------------------
+2024-04-01 09:59:17,184 - INFO - Test 83: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS with multiple variables with commas (implicitly adding)]
+2024-04-01 09:59:17,184 - INFO - --------------------
+2024-04-01 09:59:17,184 - INFO - Test 84: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS excluding multiple variables with commas]
+2024-04-01 09:59:17,184 - INFO - --------------------
+2024-04-01 09:59:17,184 - INFO - Test 85: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [FIELDS including multiple variables explicitly with commas]
+2024-04-01 09:59:17,198 - INFO - --------------------
+2024-04-01 09:59:17,198 - INFO - Test 86: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with a single variable]
+2024-04-01 09:59:17,198 - INFO - --------------------
+2024-04-01 09:59:17,198 - INFO - Test 87: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with two variables without commas]
+2024-04-01 09:59:17,198 - INFO - --------------------
+2024-04-01 09:59:17,198 - INFO - Test 88: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with three variables without commas]
+2024-04-01 09:59:17,199 - INFO - --------------------
+2024-04-01 09:59:17,199 - INFO - Test 89: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with two variables with commas]
+2024-04-01 09:59:17,199 - INFO - --------------------
+2024-04-01 09:59:17,199 - INFO - Test 90: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with three variables with commas]
+2024-04-01 09:59:17,199 - INFO - --------------------
+2024-04-01 09:59:17,199 - INFO - Test 91: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [MAKETABLE with multiple variables, mixed with and without commas]
+2024-04-01 09:59:17,200 - INFO - --------------------
+2024-04-01 09:59:17,200 - INFO - Test 92: CATEGORY: [LOOKUP], COMPLEXITY: [basic], TITLE: [LOOKUP with file and variable]
+2024-04-01 09:59:17,200 - INFO - --------------------
+2024-04-01 09:59:17,200 - INFO - Test 93: CATEGORY: [LOOKUP], COMPLEXITY: [basic], TITLE: [LOOKUP with file and variable, using AS for aliasing to another variable]
+2024-04-01 09:59:17,201 - INFO - --------------------
+2024-04-01 09:59:17,201 - INFO - Test 94: CATEGORY: [LOOKUP], COMPLEXITY: [basic], TITLE: [LOOKUP with file and variable, using AS for aliasing to a double-quoted string]
+2024-04-01 09:59:17,201 - INFO - --------------------
+2024-04-01 09:59:17,201 - INFO - Test 95: CATEGORY: [LOOKUP], COMPLEXITY: [basic], TITLE: [LOOKUP with file, variable and OUTPUTNEW to a new variable]
+2024-04-01 09:59:17,202 - INFO - --------------------
+2024-04-01 09:59:17,202 - INFO - Test 96: CATEGORY: [LOOKUP], COMPLEXITY: [basic], TITLE: [LOOKUP with file, variable and OUTPUTNEW to a double-quoted string]
+2024-04-01 09:59:17,202 - INFO - --------------------
+2024-04-01 09:59:17,202 - INFO - Test 97: CATEGORY: [LOOKUP], COMPLEXITY: [complex], TITLE: [LOOKUP with file, variable using AS and OUTPUTNEW combined to new variables]
+2024-04-01 09:59:17,202 - INFO - --------------------
+2024-04-01 09:59:17,202 - INFO - Test 98: CATEGORY: [LOOKUP], COMPLEXITY: [complex], TITLE: [LOOKUP with file, variable using AS and OUTPUTNEW combined to a double-quoted string]
+2024-04-01 09:59:17,203 - INFO - --------------------
+2024-04-01 09:59:17,203 - INFO - Test 99: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [HEAD with a small number]
+2024-04-01 09:59:17,203 - INFO - --------------------
+2024-04-01 09:59:17,203 - INFO - Test 100: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [HEAD with a larger number]
+2024-04-01 09:59:17,203 - INFO - --------------------
+2024-04-01 09:59:17,203 - INFO - Test 101: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [LIMIT with a small number]
+2024-04-01 09:59:17,204 - INFO - --------------------
+2024-04-01 09:59:17,204 - INFO - Test 102: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [LIMIT with a very large number]
+2024-04-01 09:59:17,204 - INFO - --------------------
+2024-04-01 09:59:17,204 - INFO - Test 103: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [HEAD with the minimum allowable number (assuming 1)]
+2024-04-01 09:59:17,204 - INFO - --------------------
+2024-04-01 09:59:17,204 - INFO - Test 104: CATEGORY: [HEAD/LIMIT], COMPLEXITY: [basic], TITLE: [LIMIT with the minimum allowable number (assuming 1)]
+2024-04-01 09:59:17,204 - INFO - --------------------
+2024-04-01 09:59:17,204 - INFO - Test 105: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a simple time interval]
+2024-04-01 09:59:17,205 - INFO - --------------------
+2024-04-01 09:59:17,205 - INFO - Test 106: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a more precise time interval]
+2024-04-01 09:59:17,206 - INFO - --------------------
+2024-04-01 09:59:17,206 - INFO - Test 107: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a day time interval]
+2024-04-01 09:59:17,206 - INFO - --------------------
+2024-04-01 09:59:17,206 - INFO - Test 108: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a week time interval]
+2024-04-01 09:59:17,206 - INFO - --------------------
+2024-04-01 09:59:17,206 - INFO - Test 109: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a minute time interval]
+2024-04-01 09:59:17,207 - INFO - --------------------
+2024-04-01 09:59:17,207 - INFO - Test 110: CATEGORY: [BIN], COMPLEXITY: [basic], TITLE: [BIN with a month time interval]
+2024-04-01 09:59:17,207 - INFO - --------------------
+2024-04-01 09:59:17,207 - INFO - Test 111: CATEGORY: [REVERSE], COMPLEXITY: [basic], TITLE: [REVERSE command usage]
+2024-04-01 09:59:17,208 - INFO - --------------------
+2024-04-01 09:59:17,208 - INFO - Test 112: CATEGORY: [DEDUP], COMPLEXITY: [basic], TITLE: [DEDUP command usage]
+2024-04-01 09:59:17,208 - INFO - --------------------
+2024-04-01 09:59:17,208 - INFO - Test 113: CATEGORY: [SORT], COMPLEXITY: [basic], TITLE: [SORT with ascending order]
+2024-04-01 09:59:17,208 - INFO - --------------------
+2024-04-01 09:59:17,209 - INFO - Test 114: CATEGORY: [SORT], COMPLEXITY: [basic], TITLE: [SORT with descending order]
+2024-04-01 09:59:17,209 - INFO - --------------------
+2024-04-01 09:59:17,209 - INFO - Test 115: CATEGORY: [SORT], COMPLEXITY: [complex], TITLE: [SORT with multiple variables ascending and commas]
+2024-04-01 09:59:17,209 - INFO - --------------------
+2024-04-01 09:59:17,209 - INFO - Test 116: CATEGORY: [SORT], COMPLEXITY: [complex], TITLE: [SORT with multiple variables descending, no commmas]
+2024-04-01 09:59:17,209 - INFO - --------------------
+2024-04-01 09:59:17,209 - INFO - Test 117: CATEGORY: [REX], COMPLEXITY: [basic], TITLE: [REX basic usage for field extraction]
+2024-04-01 09:59:17,210 - INFO - --------------------
+2024-04-01 09:59:17,210 - INFO - Test 118: CATEGORY: [REX], COMPLEXITY: [basic], TITLE: [REX with SED mode for simple substitution, no extractions]
+2024-04-01 09:59:17,210 - INFO - --------------------
+2024-04-01 09:59:17,210 - INFO - Test 119: CATEGORY: [REX], COMPLEXITY: [complex], TITLE: [REX for complex pattern extraction]
+2024-04-01 09:59:17,210 - INFO - --------------------
+2024-04-01 09:59:17,210 - INFO - Test 120: CATEGORY: [REX], COMPLEXITY: [complex], TITLE: [REX with SED mode for complex substitution, no extractions]
+2024-04-01 09:59:17,211 - INFO - --------------------
+2024-04-01 09:59:17,211 - INFO - Test 121: CATEGORY: [REGEX], COMPLEXITY: [basic], TITLE: [REGEX simple match]
+2024-04-01 09:59:17,211 - INFO - --------------------
+2024-04-01 09:59:17,211 - INFO - Test 122: CATEGORY: [REGEX], COMPLEXITY: [basic], TITLE: [REGEX simple non-match]
+2024-04-01 09:59:17,212 - INFO - --------------------
+2024-04-01 09:59:17,212 - INFO - Test 123: CATEGORY: [REGEX], COMPLEXITY: [complex], TITLE: [REGEX match with special characters]
+2024-04-01 09:59:17,212 - INFO - --------------------
+2024-04-01 09:59:17,212 - INFO - Test 124: CATEGORY: [REGEX], COMPLEXITY: [complex], TITLE: [REGEX non-match with variable comparison]
+2024-04-01 09:59:17,212 - INFO - --------------------
+2024-04-01 09:59:17,212 - INFO - Test 125: CATEGORY: [REGEX], COMPLEXITY: [complex], TITLE: [REGEX match with complex pattern]
+2024-04-01 09:59:17,213 - INFO - --------------------
+2024-04-01 09:59:17,213 - INFO - Test 126: CATEGORY: [BASE64], COMPLEXITY: [basic], TITLE: [BASE64 encode a single variable]
+2024-04-01 09:59:17,213 - INFO - --------------------
+2024-04-01 09:59:17,213 - INFO - Test 127: CATEGORY: [BASE64], COMPLEXITY: [basic], TITLE: [BASE64 decode a single variable]
+2024-04-01 09:59:17,214 - INFO - --------------------
+2024-04-01 09:59:17,214 - INFO - Test 128: CATEGORY: [BASE64], COMPLEXITY: [complex], TITLE: [BASE64 encode multiple variables]
+2024-04-01 09:59:17,214 - INFO - --------------------
+2024-04-01 09:59:17,214 - INFO - Test 129: CATEGORY: [BASE64], COMPLEXITY: [complex], TITLE: [BASE64 decode multiple variables]
+2024-04-01 09:59:17,214 - INFO - --------------------
+2024-04-01 09:59:17,214 - INFO - Test 130: CATEGORY: [BASE64], COMPLEXITY: [basic], TITLE: [BASE64 encode a literal string]
+2024-04-01 09:59:17,215 - INFO - --------------------
+2024-04-01 09:59:17,215 - INFO - Test 131: CATEGORY: [BASE64], COMPLEXITY: [basic], TITLE: [BASE64 decode a literal string]
+2024-04-01 09:59:17,215 - INFO - --------------------
+2024-04-01 09:59:17,215 - INFO - Test 132: CATEGORY: [BASE64], COMPLEXITY: [complex], TITLE: [BASE64 encode mixed variables and literal strings]
+2024-04-01 09:59:17,216 - INFO - --------------------
+2024-04-01 09:59:17,216 - INFO - Test 133: CATEGORY: [BASE64], COMPLEXITY: [complex], TITLE: [BASE64 decode mixed variables and literal strings]
+2024-04-01 09:59:17,216 - INFO - --------------------
+2024-04-01 09:59:17,216 - INFO - Test 134: CATEGORY: [SPECIAL_FUNCTION], COMPLEXITY: [basic], TITLE: [SPECIAL_FUNCTION with a simple ID]
+2024-04-01 09:59:17,217 - INFO - --------------------
+2024-04-01 09:59:17,217 - INFO - Test 135: CATEGORY: [SPECIAL_FUNCTION], COMPLEXITY: [basic], TITLE: [SPECIAL_FUNCTION with a numeric ID]
+2024-04-01 09:59:17,217 - INFO - --------------------
+2024-04-01 09:59:17,217 - INFO - Test 136: CATEGORY: [SPECIAL_FUNCTION], COMPLEXITY: [basic], TITLE: [SPECIAL_FUNCTION with a complex ID including underscores]
+2024-04-01 09:59:17,218 - INFO - --------------------
+2024-04-01 09:59:17,218 - INFO - Test 137: CATEGORY: [SPECIAL_FUNCTION], COMPLEXITY: [basic], TITLE: [SPECIAL_FUNCTION with an ID containing numbers and letters]
+2024-04-01 09:59:17,218 - INFO - --------------------
+2024-04-01 09:59:17,218 - INFO - Test 138: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [FILLNULL for a single variable]
+2024-04-01 09:59:17,219 - INFO - --------------------
+2024-04-01 09:59:17,219 - INFO - Test 139: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [FILLNULL for multiple variables without commas]
+2024-04-01 09:59:17,219 - INFO - --------------------
+2024-04-01 09:59:17,219 - INFO - Test 140: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [FILLNULL for multiple variables with commas]
+2024-04-01 09:59:17,219 - INFO - --------------------
+2024-04-01 09:59:17,219 - INFO - Test 141: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [FILLNULL with a string as a value for multiple variables]
+2024-04-01 09:59:17,220 - INFO - --------------------
+2024-04-01 09:59:17,220 - INFO - Test 142: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [FILLNULL with a numeric value for multiple variables]
+2024-04-01 09:59:17,220 - INFO - --------------------
+2024-04-01 09:59:17,220 - INFO - Test 143: CATEGORY: [LOADJOB], COMPLEXITY: [basic], TITLE: [LOADJOB with a simple job ID]
+2024-04-01 09:59:17,221 - INFO - --------------------
+2024-04-01 09:59:17,221 - INFO - Test 144: CATEGORY: [LOADJOB], COMPLEXITY: [basic], TITLE: [LOADJOB with a complex job ID]
+2024-04-01 09:59:17,221 - INFO - --------------------
+2024-04-01 09:59:17,221 - INFO - Test 145: CATEGORY: [INPUTLOOKUP], COMPLEXITY: [basic], TITLE: [INPUTLOOKUP with a CSV file]
+2024-04-01 09:59:17,222 - INFO - --------------------
+2024-04-01 09:59:17,222 - INFO - Test 146: CATEGORY: [INPUTLOOKUP], COMPLEXITY: [basic], TITLE: [INPUTLOOKUP with a KV Store collection]
+2024-04-01 09:59:17,222 - INFO - --------------------
+2024-04-01 09:59:17,222 - INFO - Test 147: CATEGORY: [SPATH], COMPLEXITY: [basic], TITLE: [SPATH to extract a field from JSON]
+2024-04-01 09:59:17,222 - INFO - --------------------
+2024-04-01 09:59:17,222 - INFO - Test 148: CATEGORY: [SPATH], COMPLEXITY: [basic], TITLE: [SPATH to extract a nested field from JSON]
+2024-04-01 09:59:17,222 - INFO - --------------------
+2024-04-01 09:59:17,222 - INFO - Test 149: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [basic], TITLE: [OUTPUTLOOKUP to a file without any flags]
+2024-04-01 09:59:17,223 - INFO - --------------------
+2024-04-01 09:59:17,223 - INFO - Test 150: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [basic], TITLE: [OUTPUTLOOKUP with OVERWRITE enabled]
+2024-04-01 09:59:17,224 - INFO - --------------------
+2024-04-01 09:59:17,224 - INFO - Test 151: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [basic], TITLE: [OUTPUTLOOKUP with CREATE_EMPTY enabled]
+2024-04-01 09:59:17,224 - INFO - --------------------
+2024-04-01 09:59:17,224 - INFO - Test 152: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [basic], TITLE: [OUTPUTLOOKUP with OVERWRITE_IF_EMPTY enabled]
+2024-04-01 09:59:17,225 - INFO - --------------------
+2024-04-01 09:59:17,225 - INFO - Test 153: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [complex], TITLE: [OUTPUTLOOKUP with all flags enabled]
+2024-04-01 09:59:17,225 - INFO - --------------------
+2024-04-01 09:59:17,225 - INFO - Test 154: CATEGORY: [JOIN], COMPLEXITY: [basic], TITLE: [JOIN with LEFT type and basic table lookup]
+2024-04-01 09:59:17,226 - INFO - --------------------
+2024-04-01 09:59:17,226 - INFO - Test 155: CATEGORY: [JOIN], COMPLEXITY: [complex], TITLE: [JOIN with CENTER type and table lookup with search]
+2024-04-01 09:59:17,228 - INFO - --------------------
+2024-04-01 09:59:17,228 - INFO - Test 156: CATEGORY: [JOIN], COMPLEXITY: [complex], TITLE: [JOIN with RIGHT type, dedup and sort operations]
+2024-04-01 09:59:17,228 - INFO - --------------------
+2024-04-01 09:59:17,229 - INFO - Test 157: CATEGORY: [JOIN], COMPLEXITY: [complex], TITLE: [JOIN with LEFT type, rex extraction and base64 encoding]
+2024-04-01 09:59:17,229 - INFO - --------------------
+2024-04-01 09:59:17,229 - INFO - Test 158: CATEGORY: [JOIN], COMPLEXITY: [complex], TITLE: [JOIN with CENTER type, fillnull, eval case, and outputlookup]
+2024-04-01 09:59:17,233 - INFO - --------------------
+2024-04-01 09:59:17,233 - INFO - Test 159: CATEGORY: [MIN], COMPLEXITY: [basic], TITLE: [MIN of a single variable]
+2024-04-01 09:59:17,241 - INFO - --------------------
+2024-04-01 09:59:17,241 - INFO - Test 160: CATEGORY: [MAX], COMPLEXITY: [basic], TITLE: [MAX of a variable]
+2024-04-01 09:59:17,250 - INFO - --------------------
+2024-04-01 09:59:17,250 - INFO - Test 161: CATEGORY: [AVG], COMPLEXITY: [basic], TITLE: [AVG of a variable]
+2024-04-01 09:59:17,258 - INFO - --------------------
+2024-04-01 09:59:17,258 - INFO - Test 162: CATEGORY: [SUM], COMPLEXITY: [basic], TITLE: [SUM of a variable]
+2024-04-01 09:59:17,266 - INFO - --------------------
+2024-04-01 09:59:17,266 - INFO - Test 163: CATEGORY: [RANGE], COMPLEXITY: [basic], TITLE: [RANGE of a variable]
+2024-04-01 09:59:17,274 - INFO - --------------------
+2024-04-01 09:59:17,274 - INFO - Test 164: CATEGORY: [MEDIAN], COMPLEXITY: [basic], TITLE: [MEDIAN of a variable]
+2024-04-01 09:59:17,281 - INFO - --------------------
+2024-04-01 09:59:17,281 - INFO - Test 165: CATEGORY: [MODE], COMPLEXITY: [basic], TITLE: [MODE of a variable]
+2024-04-01 09:59:17,289 - INFO - --------------------
+2024-04-01 09:59:17,289 - INFO - Test 166: CATEGORY: [SQRT], COMPLEXITY: [basic], TITLE: [SQRT of a variable]
+2024-04-01 09:59:17,298 - INFO - --------------------
+2024-04-01 09:59:17,298 - INFO - Test 167: CATEGORY: [ABS], COMPLEXITY: [basic], TITLE: [ABS of a variable]
+2024-04-01 09:59:17,306 - INFO - --------------------
+2024-04-01 09:59:17,306 - INFO - Test 168: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [ROUND a variable to nearest whole number]
+2024-04-01 09:59:17,317 - INFO - --------------------
+2024-04-01 09:59:17,317 - INFO - Test 169: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [ROUND a variable to two decimal places]
+2024-04-01 09:59:17,326 - INFO - --------------------
+2024-04-01 09:59:17,326 - INFO - Test 170: CATEGORY: [ROUND], COMPLEXITY: [complex], TITLE: [ROUND a variable with dynamic precision from another variable]
+2024-04-01 09:59:17,381 - INFO - --------------------
+2024-04-01 09:59:17,381 - INFO - Test 171: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [ROUND a negative variable to nearest whole number]
+2024-04-01 09:59:17,386 - INFO - --------------------
+2024-04-01 09:59:17,386 - INFO - Test 172: CATEGORY: [ROUND], COMPLEXITY: [complex], TITLE: [ROUND a variable with high precision specified]
+2024-04-01 09:59:17,393 - INFO - --------------------
+2024-04-01 09:59:17,393 - INFO - Test 173: CATEGORY: [RANDOM], COMPLEXITY: [basic], TITLE: [RANDOM without parameters]
+2024-04-01 09:59:17,401 - INFO - --------------------
+2024-04-01 09:59:17,401 - INFO - Test 174: CATEGORY: [RANDOM], COMPLEXITY: [complex], TITLE: [RANDOM with start, end, and fidelity variables]
+2024-04-01 09:59:17,415 - INFO - --------------------
+2024-04-01 09:59:17,415 - INFO - Test 175: CATEGORY: [RANDOM], COMPLEXITY: [complex], TITLE: [RANDOM with numeric values for start, end, and fidelity]
+2024-04-01 09:59:17,428 - INFO - --------------------
+2024-04-01 09:59:17,428 - INFO - Test 176: CATEGORY: [RANDOM], COMPLEXITY: [complex], TITLE: [RANDOM with mixed variables and numeric expressions]
+2024-04-01 09:59:17,438 - INFO - --------------------
+2024-04-01 09:59:17,438 - INFO - Test 177: CATEGORY: [RANDOM], COMPLEXITY: [complex], TITLE: [RANDOM with mixed variables and numeric expressions that also have variables]
+2024-04-01 09:59:17,447 - INFO - --------------------
+2024-04-01 09:59:17,447 - INFO - Test 178: CATEGORY: [RANDOM], COMPLEXITY: [complex], TITLE: [RANDOM with all numeric expressions]
+2024-04-01 09:59:17,465 - INFO - --------------------
+2024-04-01 09:59:17,465 - INFO - Test 179: CATEGORY: [UPPER], COMPLEXITY: [basic], TITLE: [UPPER to convert a variable to uppercase]
+2024-04-01 09:59:17,488 - INFO - --------------------
+2024-04-01 09:59:17,488 - INFO - Test 180: CATEGORY: [LOWER], COMPLEXITY: [basic], TITLE: [LOWER to convert a string to lowercase]
+2024-04-01 09:59:17,500 - INFO - --------------------
+2024-04-01 09:59:17,500 - INFO - Test 181: CATEGORY: [CAPITALIZE], COMPLEXITY: [basic], TITLE: [CAPITALIZE to capitalize a variable string]
+2024-04-01 09:59:17,511 - INFO - --------------------
+2024-04-01 09:59:17,511 - INFO - Test 182: CATEGORY: [LEN], COMPLEXITY: [basic], TITLE: [LEN to get the length of a string variable]
+2024-04-01 09:59:17,522 - INFO - --------------------
+2024-04-01 09:59:17,522 - INFO - Test 183: CATEGORY: [TOSTRING], COMPLEXITY: [basic], TITLE: [TOSTRING to convert a numeric variable to string]
+2024-04-01 09:59:17,535 - INFO - --------------------
+2024-04-01 09:59:17,535 - INFO - Test 184: CATEGORY: [URLENCODE], COMPLEXITY: [basic], TITLE: [URLENCODE to encode a string variable]
+2024-04-01 09:59:17,546 - INFO - --------------------
+2024-04-01 09:59:17,546 - INFO - Test 185: CATEGORY: [URLDECODE], COMPLEXITY: [basic], TITLE: [URLDECODE to decode an encoded string variable]
+2024-04-01 09:59:17,558 - INFO - --------------------
+2024-04-01 09:59:17,558 - INFO - Test 186: CATEGORY: [DEFANG], COMPLEXITY: [basic], TITLE: [DEFANG to defang a URL contained in a variable]
+2024-04-01 09:59:17,569 - INFO - --------------------
+2024-04-01 09:59:17,569 - INFO - Test 187: CATEGORY: [TRIM], COMPLEXITY: [basic], TITLE: [TRIM whitespace from a variable]
+2024-04-01 09:59:17,577 - INFO - --------------------
+2024-04-01 09:59:17,577 - INFO - Test 188: CATEGORY: [TRIM], COMPLEXITY: [basic], TITLE: [TRIM specific characters from a string variable]
+2024-04-01 09:59:17,588 - INFO - --------------------
+2024-04-01 09:59:17,588 - INFO - Test 189: CATEGORY: [RTRIM], COMPLEXITY: [basic], TITLE: [RTRIM whitespace from a string literal]
+2024-04-01 09:59:17,598 - INFO - --------------------
+2024-04-01 09:59:17,598 - INFO - Test 190: CATEGORY: [RTRIM], COMPLEXITY: [basic], TITLE: [RTRIM specific characters from a string variable]
+2024-04-01 09:59:17,608 - INFO - --------------------
+2024-04-01 09:59:17,608 - INFO - Test 191: CATEGORY: [LTRIM], COMPLEXITY: [basic], TITLE: [LTRIM whitespace from a string literal]
+2024-04-01 09:59:17,617 - INFO - --------------------
+2024-04-01 09:59:17,617 - INFO - Test 192: CATEGORY: [LTRIM], COMPLEXITY: [basic], TITLE: [LTRIM specific characters from a string variable]
+2024-04-01 09:59:17,628 - INFO - --------------------
+2024-04-01 09:59:17,629 - INFO - Test 193: CATEGORY: [TRIM & RTRIM], COMPLEXITY: [complex], TITLE: [Combining TRIM and RTRIM on separate variables]
+2024-04-01 09:59:17,647 - INFO - --------------------
+2024-04-01 09:59:17,647 - INFO - Test 194: CATEGORY: [LTRIM & RTRIM], COMPLEXITY: [complex], TITLE: [Sequentially applying LTRIM and RTRIM to the same variable]
+2024-04-01 09:59:17,663 - INFO - --------------------
+2024-04-01 09:59:17,663 - INFO - Test 195: CATEGORY: [TRIM & LTRIM & RTRIM], COMPLEXITY: [complex], TITLE: [Applying TRIM, then LTRIM, and finally RTRIM on the same string]
+2024-04-01 09:59:17,695 - INFO - --------------------
+2024-04-01 09:59:17,695 - INFO - Test 196: CATEGORY: [LTRIM & TRIM], COMPLEXITY: [complex], TITLE: [LTRIM followed by TRIM for specific character removal and whitespace cleanup]
+2024-04-01 09:59:17,714 - INFO - --------------------
+2024-04-01 09:59:17,714 - INFO - Test 197: CATEGORY: [RTRIM & TRIM], COMPLEXITY: [complex], TITLE: [RTRIM to remove specific characters then TRIM to clean up remaining whitespace]
+2024-04-01 09:59:17,729 - INFO - --------------------
+2024-04-01 09:59:17,729 - INFO - Test 198: CATEGORY: [CONCAT], COMPLEXITY: [basic], TITLE: [CONCAT two string variables]
+2024-04-01 09:59:17,741 - INFO - --------------------
+2024-04-01 09:59:17,741 - INFO - Test 199: CATEGORY: [CONCAT], COMPLEXITY: [basic], TITLE: [CONCAT a variable and a string literal]
+2024-04-01 09:59:17,747 - INFO - --------------------
+2024-04-01 09:59:17,747 - INFO - Test 200: CATEGORY: [CONCAT], COMPLEXITY: [basic], TITLE: [CONCAT multiple string literals]
+2024-04-01 09:59:17,758 - INFO - --------------------
+2024-04-01 09:59:17,758 - INFO - Test 201: CATEGORY: [CONCAT], COMPLEXITY: [complex], TITLE: [CONCAT a mix of variables and string literals]
+2024-04-01 09:59:17,768 - INFO - --------------------
+2024-04-01 09:59:17,768 - INFO - Test 202: CATEGORY: [CONCAT], COMPLEXITY: [complex], TITLE: [CONCAT several variables into a single string]
+2024-04-01 09:59:17,793 - INFO - --------------------
+2024-04-01 09:59:17,793 - INFO - Test 203: CATEGORY: [SUBSTR], COMPLEXITY: [basic], TITLE: [SUBSTR from a variable starting position]
+2024-04-01 09:59:17,808 - INFO - --------------------
+2024-04-01 09:59:17,808 - INFO - Test 204: CATEGORY: [SUBSTR], COMPLEXITY: [basic], TITLE: [SUBSTR from a string literal with start and end positions]
+2024-04-01 09:59:17,817 - INFO - --------------------
+2024-04-01 09:59:17,817 - INFO - Test 205: CATEGORY: [SUBSTR], COMPLEXITY: [complex], TITLE: [SUBSTR from a variable with all parameters as variables]
+2024-04-01 09:59:17,828 - INFO - --------------------
+2024-04-01 09:59:17,828 - INFO - Test 206: CATEGORY: [SUBSTR], COMPLEXITY: [basic], TITLE: [SUBSTR from a string literal, specifying only the start]
+2024-04-01 09:59:17,835 - INFO - --------------------
+2024-04-01 09:59:17,835 - INFO - Test 207: CATEGORY: [SUBSTR], COMPLEXITY: [basic], TITLE: [SUBSTR from a variable, specifying start and length as literals]
+2024-04-01 09:59:17,841 - INFO - --------------------
+2024-04-01 09:59:17,841 - INFO - Test 208: CATEGORY: [MATCH], COMPLEXITY: [basic], TITLE: [MATCH to check pattern in a variable]
+2024-04-01 09:59:17,846 - INFO - --------------------
+2024-04-01 09:59:17,846 - INFO - Test 209: CATEGORY: [MATCH], COMPLEXITY: [basic], TITLE: [NOT MATCH to verify pattern is not in a string literal]
+2024-04-01 09:59:17,847 - INFO - --------------------
+2024-04-01 09:59:17,847 - INFO - Test 210: CATEGORY: [MATCH], COMPLEXITY: [complex], TITLE: [MATCH with regular expression in a variable]
+2024-04-01 09:59:17,848 - INFO - --------------------
+2024-04-01 09:59:17,848 - INFO - Test 211: CATEGORY: [MATCH], COMPLEXITY: [complex], TITLE: [NOT MATCH using variable against a fixed pattern]
+2024-04-01 09:59:17,849 - INFO - --------------------
+2024-04-01 09:59:17,849 - INFO - Test 212: CATEGORY: [MATCH], COMPLEXITY: [basic], TITLE: [MATCH to find substring in a variable using literal pattern]
+2024-04-01 09:59:17,850 - INFO - --------------------
+2024-04-01 09:59:17,850 - INFO - Test 213: CATEGORY: [REPLACE], COMPLEXITY: [basic], TITLE: [REPLACE in a variable with literal strings]
+2024-04-01 09:59:17,881 - INFO - --------------------
+2024-04-01 09:59:17,881 - INFO - Test 214: CATEGORY: [REPLACE], COMPLEXITY: [basic], TITLE: [REPLACE in a string literal using variables for pattern and replacement]
+2024-04-01 09:59:17,889 - INFO - --------------------
+2024-04-01 09:59:17,889 - INFO - Test 215: CATEGORY: [REPLACE], COMPLEXITY: [complex], TITLE: [REPLACE using variables for all parameters]
+2024-04-01 09:59:17,896 - INFO - --------------------
+2024-04-01 09:59:17,896 - INFO - Test 216: CATEGORY: [REPLACE], COMPLEXITY: [complex], TITLE: [REPLACE in a variable, complex pattern and replacement]
+2024-04-01 09:59:17,904 - INFO - --------------------
+2024-04-01 09:59:17,904 - INFO - Test 217: CATEGORY: [REPLACE], COMPLEXITY: [basic], TITLE: [REPLACE multiple occurrences in a variable]
+2024-04-01 09:59:17,912 - INFO - --------------------
+2024-04-01 09:59:17,912 - INFO - Test 218: CATEGORY: [NULL], COMPLEXITY: [basic], TITLE: [NULL command usage]
+2024-04-01 09:59:17,916 - INFO - --------------------
+2024-04-01 09:59:17,916 - INFO - Test 219: CATEGORY: [ISNULL], COMPLEXITY: [basic], TITLE: [ISNULL to check a variable]
+2024-04-01 09:59:17,921 - INFO - --------------------
+2024-04-01 09:59:17,921 - INFO - Test 220: CATEGORY: [ISNULL], COMPLEXITY: [basic], TITLE: [NOT ISNULL to validate variable is not null]
+2024-04-01 09:59:17,922 - INFO - --------------------
+2024-04-01 09:59:17,922 - INFO - Test 221: CATEGORY: [TO_CRON], COMPLEXITY: [complex], TITLE: [TO_CRON to convert a natural language expression to CRON]
+2024-04-01 09:59:17,926 - INFO - --------------------
+2024-04-01 09:59:17,926 - INFO - Test 222: CATEGORY: [FROM_CRON], COMPLEXITY: [complex], TITLE: [FROM_CRON to interpret a CRON expression]
+2024-04-01 09:59:17,931 - INFO - --------------------
+2024-04-01 09:59:17,931 - INFO - Test 223: CATEGORY: [FIELDSUMMARY], COMPLEXITY: [basic], TITLE: [FIELDSUMMARY to generate field statistics]
+2024-04-01 09:59:17,932 - INFO - --------------------
+2024-04-01 09:59:17,932 - INFO - Test 224: CATEGORY: [COALESCE], COMPLEXITY: [basic], TITLE: [COALESCE to select the first non-null variable]
+2024-04-01 09:59:17,936 - INFO - --------------------
+2024-04-01 09:59:17,936 - INFO - Test 225: CATEGORY: [MVJOIN], COMPLEXITY: [basic], TITLE: [MVJOIN to concatenate multivalue fields]
+2024-04-01 09:59:17,945 - INFO - --------------------
+2024-04-01 09:59:17,945 - INFO - Test 226: CATEGORY: [MVINDEX], COMPLEXITY: [basic], TITLE: [MVINDEX to access a specific value in a multivalue field]
+2024-04-01 09:59:17,953 - INFO - --------------------
+2024-04-01 09:59:17,953 - INFO - Test 227: CATEGORY: [MVREVERSE], COMPLEXITY: [basic], TITLE: [MVREVERSE to reverse the order of values in a multivalue field]
+2024-04-01 09:59:17,961 - INFO - --------------------
+2024-04-01 09:59:17,962 - INFO - Test 228: CATEGORY: [MVFIND], COMPLEXITY: [basic], TITLE: [MVFIND to find a string within a multivalue field]
+2024-04-01 09:59:17,970 - INFO - --------------------
+2024-04-01 09:59:17,970 - INFO - Test 229: CATEGORY: [MVDEDUP], COMPLEXITY: [basic], TITLE: [MVDEDUP to deduplicate entries in a multivalue field]
+2024-04-01 09:59:17,978 - INFO - --------------------
+2024-04-01 09:59:17,979 - INFO - Test 230: CATEGORY: [MVAPPEND], COMPLEXITY: [basic], TITLE: [MVAPPEND to add new values to a multivalue field]
+2024-04-01 09:59:17,996 - INFO - --------------------
+2024-04-01 09:59:17,996 - INFO - Test 231: CATEGORY: [MVFILTER], COMPLEXITY: [complex], TITLE: [MVFILTER to remove items from a multivalue field based on a condition]
+2024-04-01 09:59:18,006 - INFO - --------------------
+2024-04-01 09:59:18,006 - INFO - Test 232: CATEGORY: [MVEXPAND], COMPLEXITY: [basic], TITLE: [MVEXPAND to expand a multivalue field into separate events]
+2024-04-01 09:59:18,014 - INFO - --------------------
+2024-04-01 09:59:18,014 - INFO - Test 233: CATEGORY: [MVCOMBINE], COMPLEXITY: [basic], TITLE: [MVCOMBINE to concatenate multivalue entries with a delimiter]
+2024-04-01 09:59:18,022 - INFO - --------------------
+2024-04-01 09:59:18,022 - INFO - Test 234: CATEGORY: [MVCOUNT], COMPLEXITY: [basic], TITLE: [MVCOUNT to count the number of items in a multivalue field]
+2024-04-01 09:59:18,031 - INFO - --------------------
+2024-04-01 09:59:18,031 - INFO - Test 235: CATEGORY: [MVDCOUNT], COMPLEXITY: [basic], TITLE: [MVDCOUNT for distinct count of multivalue field entries]
+2024-04-01 09:59:18,034 - INFO - --------------------
+2024-04-01 09:59:18,034 - INFO - Test 236: CATEGORY: [MVZIP], COMPLEXITY: [complex], TITLE: [MVZIP to join two multivalue fields by a delimiter]
+2024-04-01 09:59:18,043 - INFO - --------------------
+2024-04-01 09:59:18,043 - INFO - Test 237: CATEGORY: [MACRO], COMPLEXITY: [complex], TITLE: [MACRO to execute a reusable code segment]
+2024-04-01 09:59:18,048 - INFO - --------------------
+2024-04-01 09:59:18,048 - INFO - Test 238: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Compute moving average over a series of events]
+2024-04-01 09:59:18,051 - INFO - --------------------
+2024-04-01 09:59:18,051 - INFO - Test 239: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Calculate running total of bytes by host]
+2024-04-01 09:59:18,052 - INFO - --------------------
+2024-04-01 09:59:18,052 - INFO - Test 240: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Running total with reset_after specific action]
+2024-04-01 09:59:18,054 - INFO - --------------------
+2024-04-01 09:59:18,054 - INFO - Test 241: CATEGORY: [STREAMSTATS], COMPLEXITY: [basic], TITLE: [Applying a count to each event]
+2024-04-01 09:59:18,054 - INFO - --------------------
+2024-04-01 09:59:18,054 - INFO - Test 242: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Compute moving average excluding the current event]
+2024-04-01 09:59:18,056 - INFO - --------------------
+2024-04-01 09:59:18,056 - INFO - Test 243: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Running total by host with reset_after REBOOT, excluding current event]
+2024-04-01 09:59:18,057 - INFO - --------------------
+2024-04-01 09:59:18,057 - INFO - Test 244: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Running total with multiple resets conditions]
+2024-04-01 09:59:18,058 - INFO - --------------------
+2024-04-01 09:59:18,058 - INFO - Test 245: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Compute distinct count of actions by host]
+2024-04-01 09:59:18,058 - INFO - --------------------
+2024-04-01 09:59:18,058 - INFO - Test 246: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Compute moving average with dynamic window size]
+2024-04-01 09:59:18,059 - INFO - --------------------
+2024-04-01 09:59:18,059 - INFO - Test 247: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Reset running total based on a numeric condition]
+2024-04-01 09:59:18,060 - INFO - --------------------
+2024-04-01 09:59:18,060 - INFO - Test 248: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Apply multiple aggregations with different reset conditions]
+2024-04-01 09:59:18,063 - INFO - --------------------
+2024-04-01 09:59:18,063 - INFO - Test 249: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Combining CURRENT, WINDOW, BY, and RESET_AFTER options]
+2024-04-01 09:59:18,064 - INFO - --------------------
+2024-04-01 09:59:18,064 - INFO - Test 250: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Using AS to rename aggregation results, with COUNT and BY clause]
+2024-04-01 09:59:18,065 - INFO - --------------------
+2024-04-01 09:59:18,065 - INFO - Test 251: CATEGORY: [STREAMSTATS], COMPLEXITY: [complex], TITLE: [Dynamic WINDOW size based on another field, with BY clause]
+2024-04-01 09:59:18,067 - INFO - --------------------
+2024-04-01 09:59:18,067 - INFO - Test 252: CATEGORY: [IF], COMPLEXITY: [basic], TITLE: [Using ifExpression within eval for simple comparison]
+2024-04-01 09:59:18,072 - INFO - --------------------
+2024-04-01 09:59:18,072 - INFO - Test 253: CATEGORY: [IF], COMPLEXITY: [basic], TITLE: [Using inExpression within eval to check inclusion]
+2024-04-01 09:59:18,089 - INFO - --------------------
+2024-04-01 09:59:18,089 - INFO - Test 254: CATEGORY: [IF], COMPLEXITY: [basic], TITLE: [Using NOT with inExpression within eval]
+2024-04-01 09:59:18,096 - INFO - --------------------
+2024-04-01 09:59:18,096 - INFO - Test 255: CATEGORY: [IF], COMPLEXITY: [complex], TITLE: [Check multiple inclusion conditions within eval]
+2024-04-01 09:59:18,106 - INFO - --------------------
+2024-04-01 09:59:18,106 - INFO - Test 256: CATEGORY: [CASE], COMPLEXITY: [complex], TITLE: [Nested caseExpression within eval for detailed evaluation]
+2024-04-01 09:59:18,112 - INFO - --------------------
+2024-04-01 09:59:18,112 - INFO - Test 257: CATEGORY: [CASE], COMPLEXITY: [complex], TITLE: [Using caseExpression with boolean logic]
+2024-04-01 09:59:18,117 - INFO - --------------------
+2024-04-01 09:59:18,117 - INFO - Test 258: CATEGORY: [CASE], COMPLEXITY: [complex], TITLE: [Combining NOT with comparisonExpression for exclusion]
+2024-04-01 09:59:18,171 - INFO - --------------------
+2024-04-01 09:59:18,171 - INFO - Test 259: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Dynamically determining status with ifExpression]
+2024-04-01 09:59:18,173 - INFO - --------------------
+2024-04-01 09:59:18,173 - INFO - Test 260: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Evaluating multiple conditions with inExpression and comparisonExpression]
+2024-04-01 09:59:18,201 - INFO - --------------------
+2024-04-01 09:59:18,201 - INFO - Test 261: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Multiple nested conditions with caseExpression and inExpression]
+2024-04-01 09:59:18,229 - INFO - --------------------
+2024-04-01 09:59:18,229 - INFO - Test 262: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Multiple nested conditions...1]
+2024-04-01 09:59:18,250 - INFO - --------------------
+2024-04-01 09:59:18,250 - INFO - Test 263: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Multiple nested conditions...2]
+2024-04-01 09:59:18,297 - INFO - --------------------
+2024-04-01 09:59:18,297 - INFO - Test 264: CATEGORY: [CONDITIONAL], COMPLEXITY: [basic], TITLE: [Variable Plus a Number]
+2024-04-01 09:59:18,298 - INFO - --------------------
+2024-04-01 09:59:18,298 - INFO - Test 265: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [Multiple nested conditions...3]
+2024-04-01 09:59:18,334 - INFO - --------------------
+2024-04-01 09:59:18,334 - INFO - Test 266: CATEGORY: [CONDITIONAL], COMPLEXITY: [complex], TITLE: [String, Match, and Numeric Mixed together]
+2024-04-01 09:59:18,374 - INFO - --------------------
+2024-04-01 09:59:18,374 - INFO - Test 267: CATEGORY: [CONDITIONAL], COMPLEXITY: [Basic], TITLE: [String Functions Tests (MOST)]
+2024-04-01 09:59:18,406 - ERROR - Syntax Error - line 15:34 no viable alternative at input 'random(test_len)'
+2024-04-01 09:59:18,420 - ERROR - FAILED QUERY:
+| table file="477457c9-17d3-4e0b-ab5d-b3d55d906480"
+| timerange("11/20/2019 03:00:00", "11/28/2019 04:00:00", TIMESTAMP)
+| eval test=3 + 2
+| eval test2=upper(header_0)
+| eval test3=upper(header_3)
+| eval test4=lower(test3)
+| eval test=upper(header_0)
+| eval test_len=len(header_0)
+| eval test_sum=sum(test_len)
+| eval test_min=range(test_sum)
+| eval test_sqrt = sqrt(test_min)
+| eval test_median=median(test_len)
+| eval test_mode=mode(test_len)
+| eval test_round=round(test_len, 1)
+| eval test_random=random(test_len)
+| eval test_max=max(test_len)
+| eval test_max1=max(test_median)
+| eval test_range=range(test_len)
+| eval test2=upper(header_0)
+| eval test3=upper(header_3)
+
+2024-04-01 09:59:18,420 - INFO - --------------------
+2024-04-01 09:59:18,420 - INFO - Test 268: CATEGORY: [CONDITIONAL], COMPLEXITY: [Basic], TITLE: [String Functions Tests (replace and concat)]
+2024-04-01 09:59:18,435 - INFO - --------------------
+2024-04-01 09:59:18,435 - INFO - Test 269: CATEGORY: [CONDITIONAL], COMPLEXITY: [Basic], TITLE: [String Functions Tests (CRON TESTS INCLUDED)]
+2024-04-01 09:59:18,474 - ERROR - Syntax Error - line 8:24 mismatched input '(' expecting NEWLINE
+2024-04-01 09:59:18,474 - ERROR - FAILED QUERY:
+| table file="477457c9-17d3-4e0b-ab5d-b3d55d906480"
+| eval test_concat=concat(header_1, "_testing")
+| eval test_concat2=concat(header_2, "_testing", header_0)
+| eval test_concat3=concat(test_concat, test_concat2, " 3")
+| eval test2=concat(test, " ", test_median)
+| eval test3=trim(test, "t")
+| eval test=to_cron(TIMESTAMP)
+| eval test75=from_cron(TIMESTAMP, "ts format goes here")
+
+Total Tests: 270
+Passed: 268
+Failed: 2
+Pass %: 99.0 %
+
+Details by Category:
+                      passed  failed
+TABLE                      2       0
+COMMENTS                   1       0
+SEARCH                     4       0
+WHERE                      4       0
+EVAL                       9       0
+CASE                       7       0
+STATS                     22       0
+EVENTSTATS                22       0
+RENAME                     9       0
+FIELDS                     9       0
+MAKETABLE                  6       0
+LOOKUP                     7       0
+HEAD/LIMIT                 6       0
+BIN                        6       0
+REVERSE                    1       0
+DEDUP                      1       0
+SORT                       4       0
+REX                        4       0
+REGEX                      5       0
+BASE64                     8       0
+SPECIAL_FUNCTION           4       0
+FILLNULL                   5       0
+LOADJOB                    2       0
+INPUTLOOKUP                2       0
+SPATH                      2       0
+OUTPUTLOOKUP               5       0
+JOIN                       5       0
+MIN                        1       0
+MAX                        1       0
+AVG                        1       0
+SUM                        1       0
+RANGE                      1       0
+MEDIAN                     1       0
+MODE                       1       0
+SQRT                       1       0
+ABS                        1       0
+ROUND                      5       0
+RANDOM                     6       0
+UPPER                      1       0
+LOWER                      1       0
+CAPITALIZE                 1       0
+LEN                        1       0
+TOSTRING                   1       0
+URLENCODE                  1       0
+URLDECODE                  1       0
+DEFANG                     1       0
+TRIM                       2       0
+RTRIM                      2       0
+LTRIM                      2       0
+TRIM & RTRIM               1       0
+LTRIM & RTRIM              1       0
+TRIM & LTRIM & RTRIM       1       0
+LTRIM & TRIM               1       0
+RTRIM & TRIM               1       0
+CONCAT                     5       0
+SUBSTR                     5       0
+MATCH                      5       0
+REPLACE                    5       0
+NULL                       1       0
+ISNULL                     2       0
+TO_CRON                    1       0
+FROM_CRON                  1       0
+FIELDSUMMARY               1       0
+COALESCE                   1       0
+MVJOIN                     1       0
+MVINDEX                    1       0
+MVREVERSE                  1       0
+MVFIND                     1       0
+MVDEDUP                    1       0
+MVAPPEND                   1       0
+MVFILTER                   1       0
+MVEXPAND                   1       0
+MVCOMBINE                  1       0
+MVCOUNT                    1       0
+MVDCOUNT                   1       0
+MVZIP                      1       0
+MACRO                      1       0
+STREAMSTATS               14       0
+IF                         4       0
+CONDITIONAL                9       2
+
+Details of Complexity:
+                      passed  failed
+TABLE                      2       0
+COMMENTS                   1       0
+SEARCH                     4       0
+WHERE                      4       0
+EVAL                       9       0
+CASE                       7       0
+STATS                     22       0
+EVENTSTATS                22       0
+RENAME                     9       0
+FIELDS                     9       0
+MAKETABLE                  6       0
+LOOKUP                     7       0
+HEAD/LIMIT                 6       0
+BIN                        6       0
+REVERSE                    1       0
+DEDUP                      1       0
+SORT                       4       0
+REX                        4       0
+REGEX                      5       0
+BASE64                     8       0
+SPECIAL_FUNCTION           4       0
+FILLNULL                   5       0
+LOADJOB                    2       0
+INPUTLOOKUP                2       0
+SPATH                      2       0
+OUTPUTLOOKUP               5       0
+JOIN                       5       0
+MIN                        1       0
+MAX                        1       0
+AVG                        1       0
+SUM                        1       0
+RANGE                      1       0
+MEDIAN                     1       0
+MODE                       1       0
+SQRT                       1       0
+ABS                        1       0
+ROUND                      5       0
+RANDOM                     6       0
+UPPER                      1       0
+LOWER                      1       0
+CAPITALIZE                 1       0
+LEN                        1       0
+TOSTRING                   1       0
+URLENCODE                  1       0
+URLDECODE                  1       0
+DEFANG                     1       0
+TRIM                       2       0
+RTRIM                      2       0
+LTRIM                      2       0
+TRIM & RTRIM               1       0
+LTRIM & RTRIM              1       0
+TRIM & LTRIM & RTRIM       1       0
+LTRIM & TRIM               1       0
+RTRIM & TRIM               1       0
+CONCAT                     5       0
+SUBSTR                     5       0
+MATCH                      5       0
+REPLACE                    5       0
+NULL                       1       0
+ISNULL                     2       0
+TO_CRON                    1       0
+FROM_CRON                  1       0
+FIELDSUMMARY               1       0
+COALESCE                   1       0
+MVJOIN                     1       0
+MVINDEX                    1       0
+MVREVERSE                  1       0
+MVFIND                     1       0
+MVDEDUP                    1       0
+MVAPPEND                   1       0
+MVFILTER                   1       0
+MVEXPAND                   1       0
+MVCOMBINE                  1       0
+MVCOUNT                    1       0
+MVDCOUNT                   1       0
+MVZIP                      1       0
+MACRO                      1       0
+STREAMSTATS               14       0
+IF                         4       0
+CONDITIONAL                9       2

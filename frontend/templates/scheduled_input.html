@@ -1,0 +1,107 @@
+<!-- scheduled_input.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Edit Scheduled Input{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scheduled_input.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Edit Scheduled Input</h1>
+        <div class="columns">
+            <div class="column is-half">
+                <div class="box">
+                    <form id="scheduledInputForm" data-input-id="{{ input_id }}">
+                        <!-- Title Field -->
+                        <div class="field">
+                            <label class="label" for="title">Title</label>
+                            <div class="control">
+                                <input class="input" type="text" id="title" name="title" value="{{ input.title }}" required aria-label="Title">
+                            </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="field">
+                            <label class="label" for="description">Description</label>
+                            <div class="control">
+                                <textarea class="textarea" id="description" name="description" required aria-label="Description">{{ input.description }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Code Field -->
+                        <div class="field">
+                            <label class="label" for="code">Code</label>
+                            <div class="control">
+                                <textarea class="textarea" id="code" name="code" required aria-label="Code">{{ input.code }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Cron Schedule Field -->
+                        <div class="field">
+                            <label class="label" for="cron_schedule">Cron Schedule</label>
+                            <div class="control">
+                                <input class="input" type="text" id="cron_schedule" name="cron_schedule" value="{{ input.cron_schedule }}" required aria-label="Cron Schedule">
+                            </div>
+                        </div>
+
+                        <!-- Overwrite Field -->
+                        <div class="field">
+                            <label class="label" for="overwrite">Overwrite</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="overwrite" name="overwrite" required aria-label="Overwrite">
+                                        <option value="Yes" {% if overwrite_options.yes_selected %}selected{% endif %}>Yes</option>
+                                        <option value="No" {% if overwrite_options.no_selected %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subdirectory Field -->
+                        <div class="field">
+                            <label class="label" for="subdirectory">Subdirectory</label>
+                            <div class="control">
+                                <input class="input" type="text" id="subdirectory" name="subdirectory" value="{{ input.subdirectory }}" required aria-label="Subdirectory">
+                            </div>
+                        </div>
+
+                        <!-- Created At Field (Read-Only) -->
+                        <div class="field">
+                            <label class="label" for="created_at">Created At</label>
+                            <div class="control">
+                                <input class="input" type="text" id="created_at" name="created_at" value="{{ input.created_at }}" readonly aria-label="Created At">
+                            </div>
+                        </div>
+
+                        <!-- Disabled Field -->
+                        <div class="field">
+                            <label class="checkbox" for="disabled">
+                                <input type="checkbox" id="disabled" name="disabled" {{ disabled_checked }} aria-label="Disabled">
+                                Disabled
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button type="submit" class="button is-link">Save Changes</button>
+                            </div>
+                            <div class="control">
+                                <a href="/scheduled_inputs.html" class="button is-light">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/scheduled_input.js') }}"></script>
+{% endblock %}

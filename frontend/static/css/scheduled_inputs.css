@@ -1,0 +1,93 @@
+/* scheduled_inputs.css */
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    position: fixed;
+    z-index: 1000;
+    display: none; /* Hidden by default */
+}
+
+.dropdown-menu.is-active {
+    display: block;
+}
+
+.dropdown-content {
+    background-color: white;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    min-width: 150px;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* Ensure parent containers allow overflow */
+.columns,
+.column,
+.field,
+.box {
+    overflow: visible;
+}
+
+/* Table Container */
+#scheduled-inputs-container {
+    overflow-x: auto;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    /* Set min-width to trigger horizontal scroll when needed */
+    min-width: 1200px; /* Adjust based on the number of columns */
+}
+
+.table th,
+.table td {
+    padding: 12px 15px;
+    text-align: left;
+    position: relative;
+}
+
+.table th {
+    background-color: #f5f5f5;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Status Indicator Styles */
+.status-enabled {
+    color: green;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.status-disabled {
+    color: red;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+/* Notification Container Styles */
+#notification-container .notification {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #scheduled-inputs-container {
+        overflow-x: scroll;
+    }
+
+    .table {
+        min-width: 800px; /* Adjust as needed for smaller screens */
+    }
+}

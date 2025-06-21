@@ -1,0 +1,269 @@
+- id: 1
+  description: "Test Stats 1: count all events"
+  original_query: 'index="output_parquets/test0.parquet" | stats count() as total'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","count()","as","total"]
+  expected_columns: ["total"]
+  expected_values:
+    total: 5
+
+- id: 2
+  description: "Test Stats 2: sum of x values"
+  original_query: 'index="output_parquets/test0.parquet" | stats sum(x) as sum_x'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","sum(x)","as","sum_x"]
+  expected_columns: ["sum_x"]
+  expected_values:
+    sum_x: 23
+
+- id: 3
+  description: "Test Stats 3: average of z values"
+  original_query: 'index="output_parquets/test0.parquet" | stats avg(z) as avg_z'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","avg(z)","as","avg_z"]
+  expected_columns: ["avg_z"]
+  expected_values:
+    avg_z: 7
+
+- id: 4
+  description: "Test Stats 4: minimum test value"
+  original_query: 'index="output_parquets/test0.parquet" | stats min(test) as min_test'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","min(test)","as","min_test"]
+  expected_columns: ["min_test"]
+  expected_values:
+    min_test: 10
+
+- id: 5
+  description: "Test Stats 5: maximum test value"
+  original_query: 'index="output_parquets/test0.parquet" | stats max(test) as max_test'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","max(test)","as","max_test"]
+  expected_columns: ["max_test"]
+  expected_values:
+    max_test: 14
+
+- id: 6
+  description: "Test Stats 6: median of x values"
+  original_query: 'index="output_parquets/test0.parquet" | stats median(x) as med_x'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","median(x)","as","med_x"]
+  expected_columns: ["med_x"]
+  expected_values:
+    med_x: 4
+
+- id: 7
+  description: "Test Stats 7: distinct count of userRole"
+  original_query: 'index="output_parquets/test0.parquet" | stats dc(userRole) as unique_roles'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","dc(userRole)","as","unique_roles"]
+  expected_columns: ["unique_roles"]
+  expected_values:
+    unique_roles: 3
+
+- id: 8
+  description: "Test Stats 8: unique levels in test1"
+  original_query: 'index="output_parquets/test1.parquet" | stats values(level) as levels'
+  index_tokens: ["index","=","\"output_parquets/test1.parquet\""]
+  stats_tokens: ["stats","values(level)","as","levels"]
+  expected_columns: ["levels"]
+  expected_values:
+    levels: ["INFO","ERROR"]
+
+- id: 9
+  description: "Test Stats 9: first x value in test1"
+  original_query: 'index="output_parquets/test1.parquet" | stats first(x) as first_x'
+  index_tokens: ["index","=","\"output_parquets/test1.parquet\""]
+  stats_tokens: ["stats","first(x)","as","first_x"]
+  expected_columns: ["first_x"]
+  expected_values:
+    first_x: 4
+
+- id: 10
+  description: "Test Stats 10: last z value in test1"
+  original_query: 'index="output_parquets/test1.parquet" | stats last(z) as last_z'
+  index_tokens: ["index","=","\"output_parquets/test1.parquet\""]
+  stats_tokens: ["stats","last(z)","as","last_z"]
+  expected_columns: ["last_z"]
+  expected_values:
+    last_z: 7
+
+- id: 11
+  description: "Test Eventstats 1: count by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats count() as cnt by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","count()","as","cnt","by","userRole"]
+  expected_columns: ["cnt"]
+  expected_values:
+    cnt: 2
+
+- id: 12
+  description: "Test Eventstats 2: sum of x by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats sum(x) as sum_x by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","sum(x)","as","sum_x","by","userRole"]
+  expected_columns: ["sum_x"]
+  expected_values:
+    sum_x: 8
+
+- id: 13
+  description: "Test Eventstats 3: avg of z by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats avg(z) as avg_z by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","avg(z)","as","avg_z","by","userRole"]
+  expected_columns: ["avg_z"]
+  expected_values:
+    avg_z: 6.5
+
+- id: 14
+  description: "Test Eventstats 4: min test by status"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats min(test) as min_test by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","min(test)","as","min_test","by","status"]
+  expected_columns: ["min_test"]
+  expected_values:
+    min_test: 10
+
+- id: 15
+  description: "Test Eventstats 5: max z by status"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats max(z) as max_z by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","max(z)","as","max_z","by","status"]
+  expected_columns: ["max_z"]
+  expected_values:
+    max_z: 5
+
+- id: 16
+  description: "Test Eventstats 6: distinct userRole count by status"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats dc(userRole) as dc_role by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","dc(userRole)","as","dc_role","by","status"]
+  expected_columns: ["dc_role"]
+  expected_values:
+    dc_role: 1
+
+- id: 17
+  description: "Test Eventstats 7: unique levels by status"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats values(level) as levels by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","values(level)","as","levels","by","status"]
+  expected_columns: ["levels"]
+  expected_values:
+    levels: ["DEBUG"]
+
+- id: 18
+  description: "Test Eventstats 8: first message by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats first(message) as first_msg by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","first(message)","as","first_msg","by","userRole"]
+  expected_columns: ["first_msg"]
+  expected_values:
+    first_msg: "Debug message"
+
+- id: 19
+  description: "Test Eventstats 9: last message by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats last(message) as last_msg by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","last(message)","as","last_msg","by","userRole"]
+  expected_columns: ["last_msg"]
+  expected_values:
+    last_msg: "Error message"
+
+- id: 20
+  description: "Test Eventstats 10: median of z by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | eventstats median(z) as med_z by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["eventstats","median(z)","as","med_z","by","userRole"]
+  expected_columns: ["med_z"]
+  expected_values:
+    med_z: 6.5
+
+- id: 21
+  description: "Test Streamstats 1: sequence by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats count() as seq by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","count()","as","seq","by","userRole"]
+  expected_columns: ["seq"]
+  expected_values:
+    seq: 1
+
+- id: 22
+  description: "Test Streamstats 2: running sum of x by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats sum(x) as run_sum_x by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","sum(x)","as","run_sum_x","by","userRole"]
+  expected_columns: ["run_sum_x"]
+  expected_values:
+    run_sum_x: 4
+
+- id: 23
+  description: "Test Streamstats 3: running avg of z by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats avg(z) as run_avg_z by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","avg(z)","as","run_avg_z","by","userRole"]
+  expected_columns: ["run_avg_z"]
+  expected_values:
+    run_avg_z: 5
+
+- id: 24
+  description: "Test Streamstats 4: running min(test) by status"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats min(test) as run_min_test by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","min(test)","as","run_min_test","by","status"]
+  expected_columns: ["run_min_test"]
+  expected_values:
+    run_min_test: 10
+
+- id: 25
+  description: "Test Streamstats 5: running max(z) by status"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats max(z) as run_max_z by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","max(z)","as","run_max_z","by","status"]
+  expected_columns: ["run_max_z"]
+  expected_values:
+    run_max_z: 5
+
+- id: 26
+  description: "Test Streamstats 6: running median(x) by status"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats median(x) as run_med_x by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","median(x)","as","run_med_x","by","status"]
+  expected_columns: ["run_med_x"]
+  expected_values:
+    run_med_x: 4
+
+- id: 27
+  description: "Test Streamstats 7: running distinct count of userRole by status"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats dc(userRole) as run_dc by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","dc(userRole)","as","run_dc","by","status"]
+  expected_columns: ["run_dc"]
+  expected_values:
+    run_dc: 1
+
+- id: 28
+  description: "Test Streamstats 8: running earliest(z) by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats earliest(z) as run_earliest_z by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","earliest(z)","as","run_earliest_z","by","userRole"]
+  expected_columns: ["run_earliest_z"]
+  expected_values:
+    run_earliest_z: 5
+
+- id: 29
+  description: "Test Streamstats 9: running latest(z) by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats latest(z) as run_latest_z by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","latest(z)","as","run_latest_z","by","userRole"]
+  expected_columns: ["run_latest_z"]
+  expected_values:
+    run_latest_z: 5
+
+- id: 30
+  description: "Test Streamstats 10: running unique levels by status"
+  original_query: 'index="output_parquets/test0.parquet" | streamstats values(level) as run_levels by status'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["streamstats","values(level)","as","run_levels","by","status"]
+  expected_columns: ["run_levels"]
+  expected_values:
+    run_levels: ["DEBUG"]

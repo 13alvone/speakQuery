@@ -1,0 +1,51 @@
+/* frontend/static/css/settings.css */
+
+/* Readonly Field Styling */
+input[readonly] {
+    background-color: #f5f5f5; /* Light grey background for readonly fields */
+    color: #7a7a7a;
+}
+
+/* Hidden Fields */
+.is-hidden {
+    display: none !important;
+}
+
+/* Notification Container Styles */
+#notification-container .notification {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Additional Styling */
+textarea {
+    resize: vertical;
+}
+
+.button.is-primary {
+    margin-top: 20px;
+}
+
+/* Help Text Styling */
+.help {
+    font-size: 0.85em;
+    color: #4a4a4a;
+    margin-top: 0.25em;
+}
+
+/* Spacing Between Fields */
+.spaced-field {
+    margin-bottom: 1.5rem; /* Approximately 1-2 visual spaces */
+}
+
+/* Monospaced Font for Inputs */
+.monospaced-input {
+    font-family: 'Courier New', Courier, monospace;
+    /* Optional: Adjust font size for better readability */
+    font-size: 1rem;
+}
+
+/* Transition for Input Width Changes */
+.input.monospaced-input {
+    transition: width 0.2s ease;
+}

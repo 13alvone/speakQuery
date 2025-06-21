@@ -1,0 +1,2961 @@
+- "id": "0"
+  "category": "INDEX"
+  "title": "Basic Index Call"
+  "complexity": "basic"
+  "query": |
+      index="logs/main.log"
+
+- "id": "1"
+  "category": "EVAL"
+  "title": "Evaluate New Field"
+  "complexity": "basic"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="logs/main.log"
+      | table "datafile1.parquet" some_other_field
+      | eval total=price * quantity
+
+- "id": "2"
+  "category": "FILTER"
+  "title": "Basic Search with Filter"
+  "complexity": "basic"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="logs/main.log"
+      | search status=200
+
+- "id": "3"
+  "category": "WHERE"
+  "title": "Using WHERE Clause"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-01-01"
+      index="sales/data.parquet"
+      | where revenue > 1000
+
+- "id": "4"
+  "category": "STATS"
+  "title": "Statistics with STATS"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-01-01" latest="2024-10-31"
+      index="metrics/parquet"
+      | stats avg(responseTime) as avg_resp by endpoint
+
+- "id": "5"
+  "category": "JOIN"
+  "title": "Joining Two Datasets"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-01-01" index="users/data.parquet"
+      | join userID [ search index="profiles/data.parquet" | table userID, userName ]
+
+- "id": "6"
+  "category": "APPEND"
+  "title": "Appending Results from Another Search"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-01-01" latest="2024-10-11"
+      index="output_parquets/test0.parquet"
+      | append [ search index="output_parquets/test1.parquet" ]
+
+- "id": "7"
+  "category": "SORT"
+  "title": "Sorting Results"
+  "complexity": "basic"
+  "query": |
+      index="transactions/parquet"
+      | sort -amount, date
+
+- "id": "8"
+  "category": "RENAME"
+  "title": "Renaming Fields"
+  "complexity": "basic"
+  "query": |
+      index="logs/parquet"
+      | rename src_ip as sourceIP, dest_ip as destinationIP
+
+- "id": "9"
+  "category": "REX"
+  "title": "Using Regular Expressions"
+  "complexity": "advanced"
+  "query": |
+      index="web_logs/parquet"
+      | rex "user=(?<userID>\d+)"
+      | table userID, action
+
+- "id": "10"
+  "category": "EVENTSTATS"
+  "title": "Event Statistics with EVENTSTATS"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-02-01" latest="2024-08-31"
+      index="events/parquet"
+      | eventstats count as event_count by userID
+
+- "id": "11"
+  "category": "STREAMSTATS"
+  "title": "Stream Statistics with STREAMSTATS"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-03-01"
+      index="stream_data/parquet"
+      | streamstats avg(responseTime) as avg_resp by sessionID reset_after=10
+
+- "id": "12"
+  "category": "APPENDPIPE"
+  "title": "Appending with APPENDPIPE"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="primary/parquet"
+      | appendpipe [ stats sum(sales) as total_sales by region ]
+
+- "id": "13"
+  "category": "TIMECHART"
+  "title": "Time-Based Chart with TIMECHART"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="traffic/parquet"
+      | timechart span=1d count by pageURL
+
+- "id": "14"
+  "category": "FIELDS"
+  "title": "Selecting Specific Fields with FIELDS"
+  "complexity": "basic"
+  "query": |
+      index="user_logs/parquet"
+      | fields userID, action, timestamp
+
+- "id": "15"
+  "category": "MAKETABLE"
+  "title": "Creating a Table with MAKETABLE"
+  "complexity": "basic"
+  "query": |
+      index="inventory/parquet"
+      | maketable productID, productName, stockLevel
+
+- "id": "16"
+  "category": "MVEXPAND"
+  "title": "Expanding Multivalue Fields with MVEXPAND"
+  "complexity": "intermediate"
+  "query": |
+      index="session_logs/parquet"
+      | mvexpand actions
+      | table sessionID, actions
+
+- "id": "17"
+  "category": "LOOKUP"
+  "title": "Performing a Lookup with LOOKUP"
+  "complexity": "intermediate"
+  "query": |
+      index="transactions/parquet"
+      | lookup user_info.csv userID OUTPUT userName, userEmail
+
+- "id": "18"
+  "category": "FIELDSUMMARY"
+  "title": "Field Summary with FIELDSUMMARY"
+  "complexity": "advanced"
+  "query": |
+      index="survey_data/parquet"
+      | fieldsummary()
+
+- "id": "19"
+  "category": "HEAD"
+  "title": "Limiting Results with HEAD"
+  "complexity": "basic"
+  "query": |
+      index="error_logs/parquet"
+      | head 50
+
+- "id": "20"
+  "category": "IF"
+  "title": "Conditional Evaluation with IF"
+  "complexity": "advanced"
+  "query": |
+      index="user_data/parquet"
+      | eval status=if(age > 30, "Senior", "Junior")
+      | table userID, age, status
+
+- "id": "21"
+  "category": "CASE"
+  "title": "Using CASE for Multiple Conditions"
+  "complexity": "advanced"
+  "query": |
+      index="performance_logs/parquet"
+      | eval performance=case(score >= 90, "Excellent", score >= 75, "Good", score >= 60, "Average", 1=1, "Poor")
+      | table userID, score, performance
+
+- "id": "22"
+  "category": "BIN"
+  "title": "Binning Data with BIN"
+  "complexity": "intermediate"
+  "query": |
+      index="metrics/parquet"
+      | bin _time span=1h
+      | stats avg(responseTime) as avg_resp by _time
+
+- "id": "23"
+  "category": "MVJOIN"
+  "title": "Joining Multivalue Fields with MVJOIN"
+  "complexity": "advanced"
+  "query": |
+      index="session_logs/parquet"
+      | mvjoin actions delim=", "
+      | table sessionID, actions
+
+- "id": "24"
+  "category": "SPATH"
+  "title": "Extracting JSON Fields with SPATH"
+  "complexity": "intermediate"
+  "query": |
+      index="json_logs/parquet"
+      | spath input=jsonField output=extractedField path=details.info
+      | table extractedField
+
+- "id": "25"
+  "category": "STREAMSTATS"
+  "title": "Calculating Running Totals with STREAMSTATS"
+  "complexity": "advanced"
+  "query": |
+      index="sales/parquet"
+      | streamstats sum(amount) as running_total by region
+      | table region, amount, running_total
+
+- "id": "26"
+  "category": "COALESCE"
+  "title": "Handling Null Values with COALESCE"
+  "complexity": "intermediate"
+  "query": |
+      index="user_profiles/parquet"
+      | eval contact=coalesce(email, phone, "No Contact")
+      | table userID, contact
+
+- "id": "27"
+  "category": "MVFILTER"
+  "title": "Filtering Multivalue Fields with MVFILTER"
+  "complexity": "advanced"
+  "query": |
+      index="logs/parquet"
+      | mvfilter(status="error")
+      | table eventID, status
+
+- "id": "28"
+  "category": "FILLNULL"
+  "title": "Filling Null Values in Multiple Fields"
+  "complexity": "basic"
+  "query": |
+      index="inventory/parquet"
+      | fillnull value="Unknown" supplier, category
+      | table productID, supplier, category
+
+- "id": "29"
+  "category": "URLENCODE"
+  "title": "Encoding URLs with URLENCODE"
+  "complexity": "intermediate"
+  "query": |
+      index="web_logs/parquet"
+      | eval encodedURL=urlencode(pageURL)
+      | table userID, pageURL, encodedURL
+
+- "id": "30"
+  "category": "REVERSE"
+  "title": "Reversing Event Order"
+  "complexity": "basic"
+  "query": |
+      index="application_logs/parquet"
+      | reverse
+
+- "id": "31"
+  "category": "DEDUPE"
+  "title": "Removing Duplicate Events"
+  "complexity": "intermediate"
+  "query": |
+      index="transactions/parquet"
+      | dedup transactionID, userID
+
+- "id": "32"
+  "category": "SORT"
+  "title": "Sorting with Multiple Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="employee_data/parquet"
+      | sort +department, -salary
+
+- "id": "33"
+  "category": "REX"
+  "title": "Extracting Fields with REX"
+  "complexity": "advanced"
+  "query": |
+      index="access_logs/parquet"
+      | rex "user=(?<username>\w+)"
+      | table username, action
+
+- "id": "34"
+  "category": "REGEX"
+  "title": "Filtering with REGEX"
+  "complexity": "advanced"
+  "query": |
+      index="error_logs/parquet"
+      | regex errorMessage=".*timeout.*"
+
+- "id": "35"
+  "category": "BASE64"
+  "title": "Encoding and Decoding with BASE64"
+  "complexity": "intermediate"
+  "query": |
+      index="secure_logs/parquet"
+      | eval encoded=base64_encode(userData)
+      | eval decoded=base64_decode(encoded)
+
+- "id": "36"
+  "category": "FILLNULL"
+  "title": "Filling Null Values"
+  "complexity": "basic"
+  "query": |
+      index="sales/parquet"
+      | fillnull value="N/A" region, salesRep
+
+- "id": "37"
+  "category": "OUTPUTLOOKUP"
+  "title": "Outputting to a Lookup Table"
+  "complexity": "intermediate"
+  "query": |
+      index="user_activity/parquet"
+      | outputlookup user_activity_backup.csv
+
+- "id": "38"
+  "category": "JOIN"
+  "title": "Joining with Type Specification"
+  "complexity": "advanced"
+  "query": |
+      index="orders/parquet"
+      | join type=left orderID [ search index="shipments/parquet" | table orderID, shipmentDate ]
+
+- "id": "39"
+  "category": "CASE"
+  "title": "Using CASE for Conditional Evaluation"
+  "complexity": "advanced"
+  "query": |
+      index="performance_logs/parquet"
+      | eval performance=case(score > 90, "Excellent", score > 75, "Good", score > 60, "Average", 1=1, "Poor")
+      | table userID, score, performance
+
+- "id": "40"
+  "category": "MVREVERSE"
+  "title": "Reversing Multivalue Fields with MVREVERSE"
+  "complexity": "advanced"
+  "query": |
+      index="multivalue_logs/parquet"
+      | mvreverse tags
+      | table eventID, tags
+
+- "id": "41"
+  "category": "MVCOMBINE"
+  "title": "Combining Multivalue Fields with MVCOMBINE"
+  "complexity": "advanced"
+  "query": |
+      index="sensor_data/parquet"
+      | mvcombine delim=";" readings
+      | table sensorID, readings
+
+- "id": "42"
+  "category": "SUBSTR"
+  "title": "Extracting Substrings with SUBSTR"
+  "complexity": "intermediate"
+  "query": |
+      index="user_logs/parquet"
+      | eval shortURL=substr(pageURL, 0, 20)
+      | table userID, shortURL
+
+- "id": "43"
+  "category": "MVINDEX"
+  "title": "Indexing Multivalue Fields with MVINDEX"
+  "complexity": "advanced"
+  "query": |
+      index="event_logs/parquet"
+      | mvindex actions 0,2
+      | table eventID, actions
+
+- "id": "44"
+  "category": "DECODE"
+  "title": "Decoding Encoded Fields with DECODE"
+  "complexity": "intermediate"
+  "query": |
+      index="encoded_logs/parquet"
+      | eval decodedField=decode(encodedField)
+      | table eventID, decodedField
+
+- "id": "45"
+  "category": "ENCODE"
+  "title": "Encoding Fields with ENCODE"
+  "complexity": "intermediate"
+  "query": |
+      index="plaintext_logs/parquet"
+      | eval encodedField=encode(message)
+      | table eventID, encodedField
+
+- "id": "46"
+  "category": "COUNT"
+  "title": "Counting Events with COUNT"
+  "complexity": "basic"
+  "query": |
+      index="login_logs/parquet"
+      | stats count as total_logins
+
+- "id": "47"
+  "category": "SUM"
+  "title": "Summing Values with SUM"
+  "complexity": "basic"
+  "query": |
+      index="sales/parquet"
+      | stats sum(amount) as total_sales by region
+
+- "id": "48"
+  "category": "AVG"
+  "title": "Averaging Values with AVG"
+  "complexity": "basic"
+  "query": |
+      index="performance_logs/parquet"
+      | stats avg(score) as average_score by department
+
+- "id": "49"
+  "category": "MAX"
+  "title": "Finding Maximum Values with MAX"
+  "complexity": "basic"
+  "query": |
+      index="sensor_data/parquet"
+      | stats max(temperature) as max_temp by sensorID
+
+- "id": "50"
+  "category": "MIN"
+  "title": "Finding Minimum Values with MIN"
+  "complexity": "basic"
+  "query": |
+      index="temperature_logs/parquet"
+      | stats min(temperature) as min_temp by location
+
+- "id": "51"
+  "category": "MEDIAN"
+  "title": "Calculating Median with MEDIAN"
+  "complexity": "intermediate"
+  "query": |
+      index="response_logs/parquet"
+      | stats median(responseTime) as median_resp by endpoint
+
+- "id": "52"
+  "category": "MODE"
+  "title": "Finding Mode with MODE"
+  "complexity": "advanced"
+  "query": |
+      index="survey_results/parquet"
+      | stats mode(choice) as most_common_choice by questionID
+
+- "id": "53"
+  "category": "SQRT"
+  "title": "Calculating Square Root with SQRT"
+  "complexity": "intermediate"
+  "query": |
+      index="math_logs/parquet"
+      | eval sqrt_value=sqrt(number)
+      | table eventID, number, sqrt_value
+
+- "id": "54"
+  "category": "ABS"
+  "title": "Calculating Absolute Values with ABS"
+  "complexity": "basic"
+  "query": |
+      index="finance_logs/parquet"
+      | eval abs_change=abs(change)
+      | table transactionID, change, abs_change
+
+- "id": "55"
+  "category": "REPEAT"
+  "title": "Repeating Strings with REPEAT"
+  "complexity": "intermediate"
+  "query": |
+      index="string_logs/parquet"
+      | eval repeated=repeat(word, 3)
+      | table eventID, word, repeated
+
+- "id": "56"
+  "category": "REPLACE"
+  "title": "Replacing Substrings with REPLACE"
+  "complexity": "intermediate"
+  "query": |
+      index="text_logs/parquet"
+      | eval cleaned_text=replace(rawText, "error", "warning")
+      | table eventID, rawText, cleaned_text
+
+- "id": "57"
+  "category": "CONCAT"
+  "title": "Concatenating Fields with CONCAT"
+  "complexity": "basic"
+  "query": |
+      index="user_logs/parquet"
+      | eval fullName=concat(firstName, " ", lastName)
+      | table userID, fullName
+
+- "id": "58"
+  "category": "LOWER"
+  "title": "Converting to Lowercase with LOWER"
+  "complexity": "basic"
+  "query": |
+      index="text_logs/parquet"
+      | eval lowerCaseField=lower(caseField)
+      | table eventID, caseField, lowerCaseField
+
+- "id": "59"
+  "category": "UPPER"
+  "title": "Converting to Uppercase with UPPER"
+  "complexity": "basic"
+  "query": |
+      index="text_logs/parquet"
+      | eval upperCaseField=upper(caseField)
+      | table eventID, caseField, upperCaseField
+
+- "id": "60"
+  "category": "CAPITALIZE"
+  "title": "Capitalizing Text with CAPITALIZE"
+  "complexity": "basic"
+  "query": |
+      index="text_logs/parquet"
+      | eval capitalized=capitalize(word)
+      | table eventID, word, capitalized
+
+- "id": "61"
+  "category": "LTRIM"
+  "title": "Trimming Left Spaces with LTRIM"
+  "complexity": "basic"
+  "query": |
+      index="string_logs/parquet"
+      | eval trimmed= ltrim(rawText)
+      | table eventID, rawText, trimmed
+
+- "id": "62"
+  "category": "RTRIM"
+  "title": "Trimming Right Spaces with RTRIM"
+  "complexity": "basic"
+  "query": |
+      index="string_logs/parquet"
+      | eval trimmed= rtrim(rawText)
+      | table eventID, rawText, trimmed
+
+- "id": "63"
+  "category": "TRIM"
+  "title": "Trimming Spaces with TRIM"
+  "complexity": "basic"
+  "query": |
+      index="string_logs/parquet"
+      | eval trimmed= trim(rawText)
+      | table eventID, rawText, trimmed
+
+- "id": "64"
+  "category": "SUBSTR"
+  "title": "Extracting Substrings with SUBSTR"
+  "complexity": "intermediate"
+  "query": |
+      index="user_logs/parquet"
+      | eval first_three=substr(username, 0, 3)
+      | table userID, username, first_three
+
+- "id": "65"
+  "category": "LEN"
+  "title": "Calculating Length with LEN"
+  "complexity": "basic"
+  "query": |
+      index="message_logs/parquet"
+      | eval message_length=len(message)
+      | table eventID, message, message_length
+
+- "id": "66"
+  "category": "CONSECUTIVE"
+  "title": "Consecutive Duplicate Removal with CONSECUTIVE"
+  "complexity": "advanced"
+  "query": |
+      index="event_logs/parquet"
+      | dedup sessionID consecutive=true
+      | table sessionID, eventType
+
+- "id": "67"
+  "category": "ISNULL"
+  "title": "Checking for Null Values with ISNULL"
+  "complexity": "intermediate"
+  "query": |
+      index="user_data/parquet"
+      | eval email_status=if(isnull(email), "No Email", "Has Email")
+      | table userID, email, email_status
+
+- "id": "68"
+  "category": "ISNOTNULL"
+  "title": "Checking for Non-Null Values with ISNOTNULL"
+  "complexity": "intermediate"
+  "query": |
+      index="user_data/parquet"
+      | eval phone_status=if(isnotnull(phone), "Has Phone", "No Phone")
+      | table userID, phone, phone_status
+
+- "id": "69"
+  "category": "RANGE"
+  "title": "Filtering Within a Range with RANGE"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="metrics/parquet"
+      | where responseTime in range(100, 500)
+      | table eventID, responseTime
+
+- "id": "70"
+  "category": "MVDCOUNT"
+  "title": "Counting Multivalue Fields with MVDCOUNT"
+  "complexity": "advanced"
+  "query": |
+      index="multivalue_logs/parquet"
+      | eval action_count=mvdcount(actions)
+      | table eventID, actions, action_count
+
+- "id": "71"
+  "category": "MVZIP"
+  "title": "Zipping Multivalue Fields with MVZIP"
+  "complexity": "advanced"
+  "query": |
+      index="sensor_logs/parquet"
+      | mvzip(sensorIDs, sensorNames, ",") as zipped
+      | table eventID, zipped
+
+- "id": "72"
+  "category": "MVAPPEND"
+  "title": "Appending Multivalue Fields with MVAPPEND"
+  "complexity": "advanced"
+  "query": |
+      index="session_logs/parquet"
+      | mvappend actions1, actions2, actions3
+      | table sessionID, actions1, actions2, actions3
+
+- "id": "73"
+  "category": "MVFIND"
+  "title": "Finding Values in Multivalue Fields with MVFIND"
+  "complexity": "advanced"
+  "query": |
+      index="inventory_logs/parquet"
+      | eval found=mvfind(tags, "urgent")
+      | table eventID, tags, found
+
+- "id": "74"
+  "category": "SEARCH"
+  "title": "Basic Search Command"
+  "complexity": "basic"
+  "query": |
+      index="application_logs/parquet"
+      | search status=error
+
+- "id": "75"
+  "category": "DEFANG"
+  "title": "Defanging URLs with DEFANG"
+  "complexity": "intermediate"
+  "query": |
+      index="url_logs/parquet"
+      | eval safeURL=defang(url)
+      | table eventID, url, safeURL
+
+- "id": "76"
+  "category": "FANG"
+  "title": "Fanging URLs with FANG"
+  "complexity": "intermediate"
+  "query": |
+      index="safe_logs/parquet"
+      | eval originalURL=fang(safeURL)
+      | table eventID, safeURL, originalURL
+
+- "id": "77"
+  "category": "ROUND"
+  "title": "Rounding Numbers with ROUND"
+  "complexity": "basic"
+  "query": |
+      index="finance_logs/parquet"
+      | eval roundedAmount=round(amount, 2)
+      | table transactionID, amount, roundedAmount
+
+- "id": "78"
+  "category": "MAX_MATCH"
+  "title": "Limiting Matches with MAX_MATCH"
+  "complexity": "advanced"
+  "query": |
+      index="regex_logs/parquet"
+      | rex max_match=5 "pattern=(?<matched>\w+)"
+      | table eventID, matched
+
+- "id": "79"
+  "category": "FANG"
+  "title": "Fanging with Custom Replacement"
+  "complexity": "advanced"
+  "query": |
+      index="url_logs/parquet"
+      | eval safeURL=replace(url, "http", "hxxp")
+      | table eventID, url, safeURL
+
+- "id": "80"
+  "category": "OUTPUTNEW"
+  "title": "Outputting New Fields with OUTPUTNEW"
+  "complexity": "intermediate"
+  "query": |
+      index="new_fields_logs/parquet"
+      | eval newField=concat(firstName, " ", lastName)
+      | outputnew new_fields_backup.csv
+
+- "id": "81"
+  "category": "MVREVERSE"
+  "title": "Reversing Multivalue Fields with MVREVERSE"
+  "complexity": "advanced"
+  "query": |
+      index="multivalue_logs/parquet"
+      | mvreverse tags
+      | table eventID, tags
+
+- "id": "82"
+  "category": "JOIN"
+  "title": "Joining with Multiple Fields"
+  "complexity": "advanced"
+  "query": |
+      index="orders/parquet"
+      | join type=inner orderID, customerID [ search index="customers/parquet" | table orderID, customerID, customerName ]
+
+- "id": "83"
+  "category": "SPECIAL_FUNC"
+  "title": "Using Special Functions"
+  "complexity": "advanced"
+  "query": |
+      index="special_logs/parquet"
+      | `custom_special_func`
+      | table eventID, specialField
+
+- "id": "84"
+  "category": "EVAL"
+  "title": "Evaluating Multiple Fields with EVAL"
+  "complexity": "intermediate"
+  "query": |
+      index="metrics/parquet"
+      | eval total=price * quantity, profit=total - cost
+      | table productID, price, quantity, total, profit
+
+- "id": "85"
+  "category": "RESET_AFTER"
+  "title": "Resetting Stats with RESET_AFTER"
+  "complexity": "advanced"
+  "query": |
+      index="stream_data/parquet"
+      | streamstats sum(amount) as running_total by sessionID reset_after=5
+      | table sessionID, amount, running_total
+
+- "id": "86"
+  "category": "EVENTSTATS"
+  "title": "Enhancing Events with EVENTSTATS"
+  "complexity": "intermediate"
+  "query": |
+      index="user_events/parquet"
+      | eventstats avg(duration) as avg_duration by userID
+      | table userID, eventID, duration, avg_duration
+
+- "id": "87"
+  "category": "MVCOUNT"
+  "title": "Counting Multivalue Entries with MVCOUNT"
+  "complexity": "advanced"
+  "query": |
+      index="data_logs/parquet"
+      | eval count_tags=mvcount(tags)
+      | table eventID, tags, count_tags
+
+- "id": "88"
+  "category": "FIELDSUMMARY"
+  "title": "Generating Field Summaries"
+  "complexity": "advanced"
+  "query": |
+      index="survey_data/parquet"
+      | fieldsummary()
+      | table field, type, distinct_count
+
+- "id": "89"
+  "category": "DCOUNT"
+  "title": "Distinct Counting with DCOUNT"
+  "complexity": "intermediate"
+  "query": |
+      index="unique_logs/parquet"
+      | stats dcount(userID) as unique_users by region
+      | table region, unique_users
+
+- "id": "90"
+  "category": "LOOKUP"
+  "title": "Performing Multiple Lookups"
+  "complexity": "advanced"
+  "query": |
+      index="user_activity/parquet"
+      | lookup user_info.csv userID OUTPUT userName, userEmail
+      | lookup user_roles.csv userID OUTPUT role
+      | table userID, userName, userEmail, role
+
+- "id": "91"
+  "category": "MVAPPEND"
+  "title": "Appending Multiple Multivalue Fields"
+  "complexity": "advanced"
+  "query": |
+      index="log_data/parquet"
+      | mvappend errors, warnings, infos
+      | table eventID, errors, warnings, infos
+
+- "id": "92"
+  "category": "REVERSE"
+  "title": "Reversing Results Order"
+  "complexity": "basic"
+  "query": |
+      index="order_logs/parquet"
+      | reverse
+      | table orderID, timestamp
+
+- "id": "93"
+  "category": "REPLACE"
+  "title": "Replacing Patterns with REPLACE"
+  "complexity": "intermediate"
+  "query": |
+      index="message_logs/parquet"
+      | eval cleanMessage=replace(rawMessage, "ERROR", "ERR")
+      | table eventID, rawMessage, cleanMessage
+
+- "id": "94"
+  "category": "BIN"
+  "title": "Binning Numerical Data with BIN"
+  "complexity": "intermediate"
+  "query": |
+      index="metrics/parquet"
+      | bin responseTime span=50
+      | stats count by responseTime
+      | table responseTime, count
+
+- "id": "95"
+  "category": "MATCH"
+  "title": "Matching Patterns with MATCH"
+  "complexity": "advanced"
+  "query": |
+      index="regex_logs/parquet"
+      | eval isMatch=match(message, "failure")
+      | table eventID, message, isMatch
+
+- "id": "96"
+  "category": "MVFIND"
+  "title": "Finding Specific Values in Multivalue Fields with MVFIND"
+  "complexity": "advanced"
+  "query": |
+      index="session_logs/parquet"
+      | eval found=mvfind(actions, "login")
+      | table sessionID, actions, found
+
+- "id": "97"
+  "category": "ROUND"
+  "title": "Rounding to Nearest Integer with ROUND"
+  "complexity": "basic"
+  "query": |
+      index="financial_logs/parquet"
+      | eval roundedProfit=round(profit)
+      | table transactionID, profit, roundedProfit
+
+- "id": "98"
+  "category": "SEARCH"
+  "title": "Advanced Search with Multiple Conditions"
+  "complexity": "advanced"
+  "query": |
+      index="security_logs/parquet"
+      | search (eventType="login" AND status="success") OR (eventType="logout" AND status="failure")
+      | table eventID, eventType, status
+
+- "id": "99"
+  "category": "COUNT"
+  "title": "Counting Unique Users with COUNT"
+  "complexity": "intermediate"
+  "query": |
+      index="user_logs/parquet"
+      | stats count by userID
+      | table userID, count
+
+- "id": "100"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Index Filters with AND and OR"
+  "complexity": "advanced"
+  "query": |
+      (
+          earliest="2024-05-01" latest="2024-05-31"
+          (status=200 AND responseTime < 300) OR errorCode=500
+          index="web_logs/parquet,api_logs/parquet"
+      ) OR 
+      (
+          earliest="2023-06-01" latest="2023-06-30"
+          userRole="admin"
+          index="admin_logs/parquet"
+      )
+
+- "id": "101"
+  "category": "UNGROUPED_INDEX_FILTERS"
+  "title": "Ungrouped Index Filters with Multiple Conditions"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-07-01" latest="2024-07-31"
+      (action="login" AND success=true) OR (action="logout" AND success=false)
+      index="user_activity/parquet,session_logs/parquet"
+      earliest="2023-08-01" latest="2023-08-31"
+      loginAttempts >= 5
+      index="security_logs/parquet"
+
+- "id": "102"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Filters with NOT and OR"
+  "complexity": "advanced"
+  "query": |
+      (
+          earliest="2024-09-01" latest="2024-09-30"
+          NOT (status=404 OR status=503)
+          index="error_logs/parquet,system_logs/parquet"
+      ) OR 
+      (
+          earliest="2023-10-01" latest="2023-10-31"
+          diskUsage > 80
+          index="performance_logs/parquet"
+      )
+
+- "id": "103"
+  "category": "UNGROUPED_INDEX_FILTERS"
+  "title": "Ungrouped Filters with Mixed Logical Operators"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-11-01" latest="2024-11-30"
+      (cpuLoad > 90 AND memoryUsage > 75) OR (cpuLoad > 95 AND memoryUsage > 80)
+      index="server_metrics/parquet,application_metrics/parquet"
+      earliest="2023-12-01" latest="2023-12-31"
+      uptime < 99.9
+      index="availability_logs/parquet"
+
+- "id": "104"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Filters with Multiple AND Conditions"
+  "complexity": "intermediate"
+  "query": |
+      (
+          earliest="2024-02-01" latest="2024-02-28"
+          (region="US" AND sales > 10000) AND (productCategory="Electronics")
+          index="sales_data/parquet,inventory_data/parquet"
+      ) OR 
+      (
+          earliest="2023-03-01" latest="2023-03-31"
+          region="EU" AND sales > 15000
+          index="sales_data_eu/parquet"
+      )
+
+- "id": "105"
+  "category": "UNGROUPED_INDEX_FILTERS"
+  "title": "Ungrouped Filters with NOT Conditions"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-04-01" latest="2024-04-30"
+      NOT (status="inactive" OR status="pending")
+      index="user_status/parquet,activity_logs/parquet"
+      earliest="2023-05-01" latest="2023-05-31"
+      active=true
+      index="active_users/parquet"
+
+- "id": "106"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Filters with Nested Parentheses"
+  "complexity": "advanced"
+  "query": |
+      (
+          earliest="2024-06-01" latest="2024-06-30"
+          ((type="error" AND severity>=3) OR (type="warning" AND severity=2))
+          index="system_errors/parquet,application_errors/parquet"
+      ) OR 
+      (
+          earliest="2023-07-01" latest="2023-07-31"
+          type="info" AND source="monitoring"
+          index="info_logs/parquet"
+      )
+
+- "id": "107"
+  "category": "UNGROUPED_INDEX_FILTERS"
+  "title": "Ungrouped Filters with Sequential Index Calls"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-08-01" latest="2024-08-31"
+      (metric="cpu" AND value > 75) OR (metric="memory" AND value > 80)
+      index="resource_metrics/parquet,system_metrics/parquet"
+      alertTriggered=true
+
+- "id": "108"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Filters with Combined Logical Operators"
+  "complexity": "intermediate"
+  "query": |
+      (
+          earliest="2024-10-01" latest="2024-10-31"
+          (region="APAC" AND (sales > 5000 OR salesGrowth > 10)) AND active=true
+          index="sales_apac/parquet,performance_apac/parquet"
+      ) OR 
+      (
+          earliest="2023-11-01" latest="2023-11-30"
+          region="LATAM" AND sales > 7000
+          index="sales_latam/parquet"
+      )
+
+- "id": "109"
+  "category": "UNGROUPED_INDEX_FILTERS"
+  "title": "Ungrouped Filters with Multiple OR Conditions"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-12-01" latest="2024-12-31"
+      (eventType="login" OR eventType="signup" OR eventType="password_reset")
+      index="user_events/parquet,auth_logs/parquet"
+      earliest="2023-01-01" latest="2023-01-31"
+      attempts >= 3
+      index="security_logs/parquet"
+
+- "id": "108"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Grouped Filters with Combined Logical Operators"
+  "complexity": "intermediate"
+  "query": |
+      (
+          earliest="2024-10-01" latest="2024-10-31"
+          s=4
+          index="sales_apac/parquet,performance_apac/parquet"
+      ) OR 
+      (
+          earliest="2023-11-01" latest="2023-11-30"
+          region="LATAM" AND sales > 7000
+          index="sales_latam/parquet"
+      )
+
+- "id": "109"
+  "category": "EVAL"
+  "title": "Calculating Discounted Prices"
+  "complexity": "intermediate"
+  "query": |
+      index="products/data.parquet"
+      | eval discounted_price = price * 0.85
+      | table productID, price, discounted_price
+
+- "id": "110"
+  "category": "STATS"
+  "title": "Total Sales by Category"
+  "complexity": "intermediate"
+  "query": |
+      earliest="2024-01-01"
+      index="sales/data.parquet"
+      | stats sum(amount) as total_sales by category
+      | table category, total_sales
+
+- "id": "111"
+  "category": "FILTER"
+  "title": "Filtering Successful Transactions"
+  "complexity": "basic"
+  "query": |
+      index="transactions/parquet"
+      | search status="success"
+      | table transactionID, status
+
+- "id": "112"
+  "category": "WHERE"
+  "title": "Filtering High Revenue Orders"
+  "complexity": "intermediate"
+  "query": |
+      index="orders/data.parquet"
+      | where revenue > 5000
+      | table orderID, revenue
+
+- "id": "113"
+  "category": "JOIN"
+  "title": "Joining Orders with Customer Data"
+  "complexity": "advanced"
+  "query": |
+      index="orders/parquet"
+      | join customerID [ search index="customers/parquet" | table customerID, customerName ]
+      | table orderID, customerName
+
+- "id": "114"
+  "category": "APPEND"
+  "title": "Combining Logs from Different Sources"
+  "complexity": "intermediate"
+  "query": |
+      index="logs/app1.parquet"
+      | append [ search index="logs/app2.parquet" ]
+      | table eventID, message
+
+- "id": "115"
+  "category": "SORT"
+  "title": "Sorting Products by Popularity"
+  "complexity": "basic"
+  "query": |
+      index="product_views/parquet"
+      | stats count by productID
+      | sort -count
+      | table productID, count
+
+- "id": "116"
+  "category": "REX"
+  "title": "Extracting IP Addresses"
+  "complexity": "advanced"
+  "query": |
+      index="network_logs/parquet"
+      | rex "src_ip=(?<sourceIP>\d{1,3}(?:\.\d{1,3}){3})"
+      | table eventID, sourceIP
+
+- "id": "117"
+  "category": "EVAL"
+  "title": "Calculating Profit Margin"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | eval profit_margin = (revenue - cost) / revenue * 100
+      | table productID, profit_margin
+
+- "id": "118"
+  "category": "FIELDS"
+  "title": "Selecting Essential Fields"
+  "complexity": "basic"
+  "query": |
+      index="employee_records/parquet"
+      | fields employeeID, name, department
+      | table employeeID, name, department
+
+- "id": "119"
+  "category": "APPENDPIPE"
+  "title": "Calculating Total and Average Sales"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | stats sum(amount) as total_sales
+      | appendpipe [ stats avg(amount) as average_sales ]
+      | table total_sales, average_sales
+
+- "id": "120"
+  "category": "STREAMSTATS"
+  "title": "Calculating Running Totals"
+  "complexity": "advanced"
+  "query": |
+      index="donations/parquet"
+      | streamstats sum(amount) as cumulative_donations
+      | table donorID, amount, cumulative_donations
+
+- "id": "121"
+  "category": "HEAD"
+  "title": "Displaying Recent Entries"
+  "complexity": "basic"
+  "query": |
+      index="system_logs/parquet"
+      | head 20
+      | table timestamp, message
+
+- "id": "122"
+  "category": "MVEXPAND"
+  "title": "Exploding Multivalue Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="orders/parquet"
+      | mvexpand items
+      | table orderID, items
+
+- "id": "123"
+  "category": "EVAL"
+  "title": "Categorizing Customers by Spending"
+  "complexity": "advanced"
+  "query": |
+      index="customer_spending/parquet"
+      | eval spending_category = case(total_spent > 10000, "Platinum", total_spent > 5000, "Gold", total_spent > 1000, "Silver", 1=1, "Bronze")
+      | table customerID, spending_category
+
+- "id": "124"
+  "category": "STATS"
+  "title": "Average Session Duration"
+  "complexity": "intermediate"
+  "query": |
+      index="session_logs/parquet"
+      | stats avg(duration) as avg_duration by userID
+      | table userID, avg_duration
+
+- "id": "125"
+  "category": "FILLNULL"
+  "title": "Handling Missing Data"
+  "complexity": "basic"
+  "query": |
+      index="patient_records/parquet"
+      | fillnull value="Unknown" diagnosis
+      | table patientID, diagnosis
+
+- "id": "126"
+  "category": "DEDUP"
+  "title": "Eliminating Duplicate Records"
+  "complexity": "intermediate"
+  "query": |
+      index="inventory/parquet"
+      | dedup productID
+      | table productID, stockLevel
+
+- "id": "127"
+  "category": "TIMECHART"
+  "title": "Visualizing Data Over Time"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-01-01" latest="2024-06-30"
+      index="website_traffic/parquet"
+      | timechart span=1d count by page
+      | table _time, page, count
+
+- "id": "128"
+  "category": "RENAME"
+  "title": "Updating Field Names"
+  "complexity": "basic"
+  "query": |
+      index="financial_data/parquet"
+      | rename income as revenue, expense as cost
+      | table revenue, cost
+
+- "id": "129"
+  "category": "REVERSE"
+  "title": "Analyzing Data in Reverse"
+  "complexity": "basic"
+  "query": |
+      index="chat_logs/parquet"
+      | reverse
+      | table messageID, timestamp, message
+
+- "id": "130"
+  "category": "COALESCE"
+  "title": "Merging Contact Information"
+  "complexity": "intermediate"
+  "query": |
+      index="contacts/parquet"
+      | eval primary_contact = coalesce(phone, email, "No Contact Info")
+      | table contactID, primary_contact
+
+- "id": "131"
+  "category": "APPEND"
+  "title": "Combining Monthly Data"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/2024_01.parquet"
+      | append [ search index="sales/2024_02.parquet" ]
+      | table saleID, amount
+
+- "id": "132"
+  "category": "EVAL"
+  "title": "Calculating Age from Date of Birth"
+  "complexity": "intermediate"
+  "query": |
+      index="user_profiles/parquet"
+      | eval age = 2024 - birth_year
+      | table userID, age
+
+- "id": "133"
+  "category": "WHERE"
+  "title": "Filtering Recent Activity"
+  "complexity": "intermediate"
+  "query": |
+      index="activity_logs/parquet"
+      | where timestamp >= relative_time(now(), "-7d")
+      | table userID, action
+
+- "id": "134"
+  "category": "JOIN"
+  "title": "Combining Employee and Department Data"
+  "complexity": "advanced"
+  "query": |
+      index="employees/parquet"
+      | join departmentID [ search index="departments/parquet" | table departmentID, departmentName ]
+      | table employeeID, name, departmentName
+
+- "id": "135"
+  "category": "FIELDSUMMARY"
+  "title": "Analyzing Field Statistics"
+  "complexity": "advanced"
+  "query": |
+      index="survey_responses/parquet"
+      | fieldsummary
+      | table field, distinct_count, null_count
+
+- "id": "136"
+  "category": "LOOKUP"
+  "title": "Augmenting Data with External Lookup"
+  "complexity": "intermediate"
+  "query": |
+      index="orders/parquet"
+      | lookup product_info.csv productID OUTPUT productName, category
+      | table orderID, productName, category
+
+- "id": "137"
+  "category": "SORT"
+  "title": "Ranking Customers by Purchases"
+  "complexity": "basic"
+  "query": |
+      index="purchases/parquet"
+      | stats sum(amount) as total_spent by customerID
+      | sort -total_spent
+      | table customerID, total_spent
+
+- "id": "138"
+  "category": "MVJOIN"
+  "title": "Combining Tags into a String"
+  "complexity": "advanced"
+  "query": |
+      index="articles/parquet"
+      | eval all_tags = mvjoin(tags, ", ")
+      | table articleID, all_tags
+
+- "id": "139"
+  "category": "REX"
+  "title": "Extracting HTTP Status Codes"
+  "complexity": "advanced"
+  "query": |
+      index="access_logs/parquet"
+      | rex "status=(?<statusCode>\d{3})"
+      | table eventID, statusCode
+
+- "id": "140"
+  "category": "FIELDS"
+  "title": "Removing Unnecessary Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="financial_records/parquet"
+      | fields -internalNotes
+      | table *
+
+- "id": "141"
+  "category": "STREAMSTATS"
+  "title": "Calculating Moving Average"
+  "complexity": "advanced"
+  "query": |
+      index="temperature_readings/parquet"
+      | streamstats window=5 avg(temperature) as moving_avg
+      | table timestamp, temperature, moving_avg
+
+- "id": "142"
+  "category": "DEDUP"
+  "title": "Eliminating Consecutive Duplicates"
+  "complexity": "intermediate"
+  "query": |
+      index="sensor_logs/parquet"
+      | dedup sensorID consecutive=true
+      | table sensorID, reading
+
+- "id": "143"
+  "category": "FILLNULL"
+  "title": "Replacing Nulls with Default Values"
+  "complexity": "advanced"
+  "query": |
+      index="product_catalog/parquet"
+      | fillnull value="N/A" description
+      | table productID, description
+
+- "id": "144"
+  "category": "EVAL"
+  "title": "Converting Currency"
+  "complexity": "intermediate"
+  "query": |
+      index="international_sales/parquet"
+      | eval amount_usd = amount_eur * 1.1
+      | table saleID, amount_usd
+
+- "id": "145"
+  "category": "APPENDPIPE"
+  "title": "Adding Total Count to Results"
+  "complexity": "intermediate"
+  "query": |
+      index="events/parquet"
+      | stats count by eventType
+      | appendpipe [ stats sum(count) as total_events ]
+      | table eventType, count, total_events
+
+- "id": "146"
+  "category": "WHERE"
+  "title": "Filtering Based on Computed Values"
+  "complexity": "intermediate"
+  "query": |
+      index="stocks/parquet"
+      | eval price_change = close - open
+      | where price_change > 5
+      | table stockSymbol, price_change
+
+- "id": "147"
+  "category": "STATS"
+  "title": "Calculating Maximum Temperature"
+  "complexity": "intermediate"
+  "query": |
+      index="weather_data/parquet"
+      | stats max(temperature) as max_temp by city
+      | table city, max_temp
+
+- "id": "148"
+  "category": "MVEXPAND"
+  "title": "Expanding Multiselect Responses"
+  "complexity": "advanced"
+  "query": |
+      index="feedback_forms/parquet"
+      | mvexpand selected_options
+      | stats count by selected_options
+
+- "id": "149"
+  "category": "REVERSE"
+  "title": "Reviewing Logs in Reverse"
+  "complexity": "basic"
+  "query": |
+      index="error_logs/parquet"
+      | reverse
+      | table eventID, timestamp, errorMessage
+
+- "id": "150"
+  "category": "EVAL"
+  "title": "Creating Full Names"
+  "complexity": "basic"
+  "query": |
+      index="user_profiles/parquet"
+      | eval full_name = firstName . " " . lastName
+      | table userID, full_name
+
+- "id": "151"
+  "category": "EVAL"
+  "title": "Calculating Percentage Change"
+  "complexity": "intermediate"
+  "query": |
+      index="financial_data/parquet"
+      | eval percent_change = (current_value - previous_value) / previous_value * 100
+      | table itemID, percent_change
+
+- "id": "152"
+  "category": "JOIN"
+  "title": "Joining Sales with Targets"
+  "complexity": "advanced"
+  "query": |
+      index="sales/parquet"
+      | join region [ search index="targets/parquet" | table region, target_amount ]
+      | table region, total_sales, target_amount
+
+- "id": "153"
+  "category": "LOOKUP"
+  "title": "Enhancing Data with Department Info"
+  "complexity": "intermediate"
+  "query": |
+      index="employee_records/parquet"
+      | lookup departments.csv departmentID OUTPUT departmentName
+      | table employeeID, name, departmentName
+
+- "id": "154"
+  "category": "SORT"
+  "title": "Ordering Events Chronologically"
+  "complexity": "basic"
+  "query": |
+      index="activity_logs/parquet"
+      | sort +timestamp
+      | table timestamp, action
+
+- "id": "155"
+  "category": "FIELDS"
+  "title": "Including Specific Fields Only"
+  "complexity": "intermediate"
+  "query": |
+      index="data/parquet"
+      | fields +field1, +field2, +field3
+      | table field1, field2, field3
+
+- "id": "156"
+  "category": "EVAL"
+  "title": "Standardizing Text Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="comments/parquet"
+      | eval comment_lower = lower(comment)
+      | table commentID, comment_lower
+
+- "id": "157"
+  "category": "REX"
+  "title": "Parsing Log Levels"
+  "complexity": "advanced"
+  "query": |
+      index="system_logs/parquet"
+      | rex "\[(?<log_level>[A-Z]+)\]"
+      | table eventID, log_level
+
+- "id": "158"
+  "category": "APPEND"
+  "title": "Merging Datasets from Different Years"
+  "complexity": "intermediate"
+  "query": |
+      index="sales_2023/parquet"
+      | append [ search index="sales_2024/parquet" ]
+      | table saleID, amount
+
+- "id": "159"
+  "category": "COALESCE"
+  "title": "Consolidating Multiple Identifiers"
+  "complexity": "intermediate"
+  "query": |
+      index="customer_data/parquet"
+      | eval customer_ref = coalesce(customerID, email, phone)
+      | table customer_ref, name
+
+- "id": "160"
+  "category": "DEDUP"
+  "title": "Removing Duplicate Entries"
+  "complexity": "intermediate"
+  "query": |
+      index="orders/parquet"
+      | dedup orderID
+      | table orderID, customerID
+
+- "id": "161"
+  "category": "FILLNULL"
+  "title": "Replacing Null Values with Zeros"
+  "complexity": "basic"
+  "query": |
+      index="financial_records/parquet"
+      | fillnull value=0 amount
+      | table transactionID, amount
+
+- "id": "162"
+  "category": "STATS"
+  "title": "Computing Sum and Average"
+  "complexity": "intermediate"
+  "query": |
+      index="expenses/parquet"
+      | stats sum(cost) as total_cost, avg(cost) as average_cost
+      | table total_cost, average_cost
+
+- "id": "163"
+  "category": "MVJOIN"
+  "title": "Concatenating List of Authors"
+  "complexity": "advanced"
+  "query": |
+      index="publications/parquet"
+      | eval authors_list = mvjoin(authors, "; ")
+      | table publicationID, authors_list
+
+- "id": "164"
+  "category": "APPENDPIPE"
+  "title": "Adding Aggregate Metrics"
+  "complexity": "intermediate"
+  "query": |
+      index="website_visits/parquet"
+      | stats count by pageURL
+      | appendpipe [ stats sum(count) as total_visits ]
+      | table pageURL, count, total_visits
+
+- "id": "165"
+  "category": "STREAMSTATS"
+  "title": "Calculating Running Maximum"
+  "complexity": "advanced"
+  "query": |
+      index="stock_prices/parquet"
+      | streamstats max(price) as max_price_so_far
+      | table timestamp, price, max_price_so_far
+
+- "id": "166"
+  "category": "EVAL"
+  "title": "Deriving New Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="logs/parquet"
+      | eval user_agent = if(like(userAgent, "%Mobile%"), "Mobile", "Desktop")
+      | table eventID, user_agent
+
+- "id": "167"
+  "category": "SORT"
+  "title": "Sorting by Multiple Criteria"
+  "complexity": "intermediate"
+  "query": |
+      index="students/parquet"
+      | sort -grade, +lastName
+      | table studentID, lastName, grade
+
+- "id": "168"
+  "category": "WHERE"
+  "title": "Excluding Specific Records"
+  "complexity": "intermediate"
+  "query": |
+      index="transactions/parquet"
+      | where NOT (status="failed" OR status="pending")
+      | table transactionID, status
+
+- "id": "169"
+  "category": "FIELDSUMMARY"
+  "title": "Summarizing Survey Responses"
+  "complexity": "advanced"
+  "query": |
+      index="surveys/parquet"
+      | fieldsummary
+      | table field, count, distinct_count
+
+- "id": "170"
+  "category": "LOOKUP"
+  "title": "Mapping Product IDs to Names"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | lookup products.csv productID OUTPUT productName
+      | table saleID, productName
+
+- "id": "171"
+  "category": "EVAL"
+  "title": "Formatting Dates"
+  "complexity": "intermediate"
+  "query": |
+      index="events/parquet"
+      | eval formatted_date = strftime(timestamp, "%Y-%m-%d")
+      | table eventID, formatted_date
+
+- "id": "172"
+  "category": "REX"
+  "title": "Extracting Domains from Emails"
+  "complexity": "advanced"
+  "query": |
+      index="users/parquet"
+      | rex field=email "(?<domain>@\w+\.\w+)"
+      | table userID, domain
+
+- "id": "173"
+  "category": "COALESCE"
+  "title": "Prioritizing Data Sources"
+  "complexity": "intermediate"
+  "query": |
+      index="profiles/parquet"
+      | eval preferred_name = coalesce(nickname, firstName)
+      | table userID, preferred_name
+
+- "id": "174"
+  "category": "APPEND"
+  "title": "Appending Historical Data"
+  "complexity": "intermediate"
+  "query": |
+      index="current_data/parquet"
+      | append [ search index="archive_data/parquet" ]
+      | table recordID, data
+
+- "id": "175"
+  "category": "FIELDS"
+  "title": "Displaying All but One Field"
+  "complexity": "intermediate"
+  "query": |
+      index="data/parquet"
+      | fields -sensitiveInfo
+      | table *
+
+- "id": "176"
+  "category": "MVEXPAND"
+  "title": "Analyzing Multiple Choices"
+  "complexity": "advanced"
+  "query": |
+      index="quiz_results/parquet"
+      | mvexpand selected_answers
+      | stats count by selected_answers
+
+- "id": "177"
+  "category": "STATS"
+  "title": "Computing Statistical Measures"
+  "complexity": "intermediate"
+  "query": |
+      index="measurements/parquet"
+      | stats avg(value) as average, min(value) as minimum, max(value) as maximum
+      | table average, minimum, maximum
+
+- "id": "178"
+  "category": "DEDUP"
+  "title": "Ensuring Unique Sessions"
+  "complexity": "intermediate"
+  "query": |
+      index="session_logs/parquet"
+      | dedup sessionID
+      | table sessionID, userID
+
+- "id": "179"
+  "category": "RENAME"
+  "title": "Simplifying Field Names"
+  "complexity": "basic"
+  "query": |
+      index="analytics/parquet"
+      | rename pageURL as url, userAgent as ua
+      | table url, ua
+
+- "id": "181"
+  "category": "EVAL"
+  "title": "Calculating BMI"
+  "complexity": "intermediate"
+  "query": |
+      index="health_records/parquet"
+      | eval bmi = weight / (height * height)
+      | table patientID, bmi
+
+- "id": "182"
+  "category": "STATS"
+  "title": "Average Age by City"
+  "complexity": "intermediate"
+  "query": |
+      index="demographics/parquet"
+      | stats avg(age) as average_age by city
+      | table city, average_age
+
+- "id": "183"
+  "category": "FILTER"
+  "title": "Filtering Out Spam Emails"
+  "complexity": "basic"
+  "query": |
+      index="emails/parquet"
+      | search NOT subject="*SPAM*"
+      | table emailID, subject
+
+- "id": "184"
+  "category": "REX"
+  "title": "Extracting Phone Numbers"
+  "complexity": "advanced"
+  "query": |
+      index="contacts/parquet"
+      | rex field=notes "Phone:\s*(?<phone_number>\d{3}-\d{3}-\d{4})"
+      | table contactID, phone_number
+
+- "id": "185"
+  "category": "TIMECHART"
+  "title": "Visualizing Sales Over Time"
+  "complexity": "advanced"
+  "query": |
+      earliest="2024-01-01" latest="2024-12-31"
+      index="sales/parquet"
+      | timechart span=1mon sum(amount) as monthly_sales
+      | table _time, monthly_sales
+
+- "id": "186"
+  "category": "COALESCE"
+  "title": "Prioritizing Contact Methods"
+  "complexity": "intermediate"
+  "query": |
+      index="customer_info/parquet"
+      | eval preferred_contact = coalesce(email, phone, address)
+      | table customerID, preferred_contact
+
+- "id": "187"
+  "category": "STATS"
+  "title": "Calculating Total Visitors by Country"
+  "complexity": "intermediate"
+  "query": |
+      index="website_visits/parquet"
+      | stats count as total_visitors by country
+      | table country, total_visitors
+
+- "id": "188"
+  "category": "EVAL"
+  "title": "Converting Temperatures"
+  "complexity": "intermediate"
+  "query": |
+      index="weather_data/parquet"
+      | eval temp_celsius = (temp_fahrenheit - 32) * 5 / 9
+      | table location, temp_celsius
+
+- "id": "189"
+  "category": "APPENDPIPE"
+  "title": "Adding Summary Statistics"
+  "complexity": "intermediate"
+  "query": |
+      index="exam_scores/parquet"
+      | stats avg(score) as average_score by subject
+      | appendpipe [ stats max(score) as highest_score ]
+      | table subject, average_score, highest_score
+
+- "id": "190"
+  "category": "RENAME"
+  "title": "Renaming Columns for Clarity"
+  "complexity": "basic"
+  "query": |
+      index="transactions/parquet"
+      | rename transID as transactionID, custID as customerID
+      | table transactionID, customerID
+
+- "id": "191"
+  "category": "STREAMSTATS"
+  "title": "Calculating Cumulative Counts"
+  "complexity": "advanced"
+  "query": |
+      index="page_views/parquet"
+      | streamstats count as cumulative_views by userID
+      | table userID, pageURL, cumulative_views
+
+- "id": "192"
+  "category": "DEDUP"
+  "title": "Removing Duplicates by Multiple Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="employee_records/parquet"
+      | dedup employeeID, date
+      | table employeeID, date, status
+
+- "id": "193"
+  "category": "MVEXPAND"
+  "title": "Breaking Down Multivalued Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="orders/parquet"
+      | mvexpand products
+      | table orderID, products
+
+- "id": "194"
+  "category": "EVAL"
+  "title": "Tagging High-Value Customers"
+  "complexity": "advanced"
+  "query": |
+      index="sales/parquet"
+      | eval customer_value = if(total_spent > 10000, "High Value", "Regular")
+      | table customerID, customer_value
+
+- "id": "195"
+  "category": "STATS"
+  "title": "Counting Errors by Type"
+  "complexity": "intermediate"
+  "query": |
+      index="error_logs/parquet"
+      | stats count by errorType
+      | table errorType, count
+
+- "id": "196"
+  "category": "TIMECHART"
+  "title": "Monitoring CPU Usage Over Time"
+  "complexity": "advanced"
+  "query": |
+      index="system_metrics/parquet"
+      | timechart span=5m avg(cpu_usage) as avg_cpu_usage
+      | table _time, avg_cpu_usage
+
+- "id": "197"
+  "category": "COALESCE"
+  "title": "Using Alternative Identifiers"
+  "complexity": "intermediate"
+  "query": |
+      index="user_data/parquet"
+      | eval identifier = coalesce(username, email, userID)
+      | table identifier, action
+
+- "id": "198"
+  "category": "FIELDS"
+  "title": "Selecting a Subset of Fields"
+  "complexity": "basic"
+  "query": |
+      index="inventory/parquet"
+      | fields productID, quantity, location
+      | table productID, quantity, location
+
+- "id": "199"
+  "category": "SORT"
+  "title": "Sorting Events by Severity"
+  "complexity": "basic"
+  "query": |
+      index="event_logs/parquet"
+      | sort -severity
+      | table eventID, severity
+
+- "id": "200"
+  "category": "EVAL"
+  "title": "Flagging Late Deliveries"
+  "complexity": "intermediate"
+  "query": |
+      index="shipments/parquet"
+      | eval status = if(delivery_date > expected_date, "Late", "On Time")
+      | table shipmentID, status
+
+- "id": "201"
+  "category": "APPEND"
+  "title": "Combining Data from Multiple Regions"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/region1.parquet"
+      | append [ search index="sales/region2.parquet" ]
+      | table saleID, amount, region
+
+- "id": "202"
+  "category": "MVJOIN"
+  "title": "Listing Skills per Employee"
+  "complexity": "advanced"
+  "query": |
+      index="employee_skills/parquet"
+      | eval skills_list = mvjoin(skills, ", ")
+      | table employeeID, skills_list
+
+- "id": "203"
+  "category": "REX"
+  "title": "Extracting Status Codes"
+  "complexity": "advanced"
+  "query": |
+      index="http_logs/parquet"
+      | rex field=message "status=(?<status_code>\d{3})"
+      | table eventID, status_code
+
+- "id": "204"
+  "category": "FIELDSUMMARY"
+  "title": "Analyzing Data Fields"
+  "complexity": "advanced"
+  "query": |
+      index="dataset/parquet"
+      | fieldsummary
+      | table field, type, distinct_count
+
+- "id": "205"
+  "category": "STATS"
+  "title": "Calculating Revenue by Month"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | eval month = strftime(_time, "%Y-%m")
+      | stats sum(amount) as total_revenue by month
+      | table month, total_revenue
+
+- "id": "206"
+  "category": "EVAL"
+  "title": "Normalizing Scores"
+  "complexity": "advanced"
+  "query": |
+      index="test_scores/parquet"
+      | eventstats avg(score) as avg_score, stdev(score) as stdev_score
+      | eval normalized_score = (score - avg_score) / stdev_score
+      | table studentID, normalized_score
+
+- "id": "207"
+  "category": "APPENDPIPE"
+  "title": "Combining Counts and Totals"
+  "complexity": "intermediate"
+  "query": |
+      index="transactions/parquet"
+      | stats count as total_transactions
+      | appendpipe [ stats sum(amount) as total_amount ]
+      | table total_transactions, total_amount
+
+- "id": "208"
+  "category": "FILTER"
+  "title": "Excluding Certain Categories"
+  "complexity": "basic"
+  "query": |
+      index="products/parquet"
+      | search NOT category="Obsolete"
+      | table productID, category
+
+- "id": "209"
+  "category": "DEDUP"
+  "title": "Keeping Latest Records"
+  "complexity": "intermediate"
+  "query": |
+      index="device_status/parquet"
+      | dedup deviceID sortby -_time
+      | table deviceID, status
+
+- "id": "210"
+  "category": "TIMECHART"
+  "title": "Visualizing Error Rates"
+  "complexity": "advanced"
+  "query": |
+      index="app_logs/parquet"
+      | timechart span=1h count(eval(status="error")) as error_count
+      | table _time, error_count
+
+- "id": "211"
+  "category": "EVAL"
+  "title": "Classifying Age Groups"
+  "complexity": "intermediate"
+  "query": |
+      index="users/parquet"
+      | eval age_group = case(age < 18, "Minor", age < 65, "Adult", 1=1, "Senior")
+      | table userID, age_group
+
+- "id": "212"
+  "category": "LOOKUP"
+  "title": "Adding Geographic Data"
+  "complexity": "intermediate"
+  "query": |
+      index="ip_logs/parquet"
+      | lookup geoip.csv ip_address OUTPUT city, country
+      | table ip_address, city, country
+
+- "id": "213"
+  "category": "STATS"
+  "title": "Summarizing Feedback Ratings"
+  "complexity": "intermediate"
+  "query": |
+      index="feedback/parquet"
+      | stats avg(rating) as average_rating by productID
+      | table productID, average_rating
+
+- "id": "214"
+  "category": "RENAME"
+  "title": "Standardizing Field Names"
+  "complexity": "basic"
+  "query": |
+      index="data/parquet"
+      | rename value1 as metric1, value2 as metric2
+      | table metric1, metric2
+
+- "id": "215"
+  "category": "SORT"
+  "title": "Sorting Employees by Tenure"
+  "complexity": "basic"
+  "query": |
+      index="employee_data/parquet"
+      | sort -hire_date
+      | table employeeID, hire_date
+
+- "id": "216"
+  "category": "FIELDS"
+  "title": "Hiding Sensitive Information"
+  "complexity": "intermediate"
+  "query": |
+      index="user_accounts/parquet"
+      | fields -password, -security_answer
+      | table *
+
+- "id": "217"
+  "category": "MVJOIN"
+  "title": "Combining Multiple Addresses"
+  "complexity": "advanced"
+  "query": |
+      index="customers/parquet"
+      | eval all_addresses = mvjoin(addresses, "; ")
+      | table customerID, all_addresses
+
+- "id": "218"
+  "category": "REX"
+  "title": "Parsing Dates from Text"
+  "complexity": "advanced"
+  "query": |
+      index="notes/parquet"
+      | rex field=note_text "Date:\s*(?<date>\d{4}-\d{2}-\d{2})"
+      | table noteID, date
+
+- "id": "219"
+  "category": "EVAL"
+  "title": "Computing Discount Percentages"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | eval discount_percentage = ((original_price - sale_price) / original_price) * 100
+      | table productID, discount_percentage
+
+- "id": "220"
+  "category": "APPEND"
+  "title": "Aggregating Data Across Years"
+  "complexity": "intermediate"
+  "query": |
+      index="data_2023/parquet"
+      | append [ search index="data_2024/parquet" ]
+      | table recordID, value
+
+- "id": "221"
+  "category": "FIELDSUMMARY"
+  "title": "Understanding Data Distribution"
+  "complexity": "advanced"
+  "query": |
+      index="survey_responses/parquet"
+      | fieldsummary
+      | table field, count, distinct_count
+
+- "id": "222"
+  "category": "DEDUP"
+  "title": "Removing Redundant Data"
+  "complexity": "intermediate"
+  "query": |
+      index="attendance_records/parquet"
+      | dedup studentID, date
+      | table studentID, date, status
+
+- "id": "223"
+  "category": "TIMECHART"
+  "title": "Tracking User Registrations"
+  "complexity": "advanced"
+  "query": |
+      index="user_registrations/parquet"
+      | timechart span=1w count as registrations
+      | table _time, registrations
+
+- "id": "224"
+  "category": "STATS"
+  "title": "Finding Top Products by Sales"
+  "complexity": "intermediate"
+  "query": |
+      index="sales/parquet"
+      | stats sum(amount) as total_sales by productID
+      | sort -total_sales
+      | table productID, total_sales
+
+- "id": "225"
+  "category": "EVAL"
+  "title": "Calculating Age in Days"
+  "complexity": "intermediate"
+  "query": |
+      index="birth_records/parquet"
+      | eval age_in_days = (now() - birth_date) / 86400
+      | table personID, age_in_days
+
+- "id": "226"
+  "category": "FILTER"
+  "title": "Selecting Active Users"
+  "complexity": "basic"
+  "query": |
+      index="users/parquet"
+      | search status="active"
+      | table userID, status
+
+- "id": "227"
+  "category": "REX"
+  "title": "Extracting Error Messages"
+  "complexity": "advanced"
+  "query": |
+      index="application_logs/parquet"
+      | rex field=log_entry "ERROR:\s*(?<error_message>.+)"
+      | table eventID, error_message
+
+- "id": "228"
+  "category": "COALESCE"
+  "title": "Filling Missing Data"
+  "complexity": "intermediate"
+  "query": |
+      index="customer_data/parquet"
+      | eval contact_info = coalesce(email, phone, "No Contact Info")
+      | table customerID, contact_info
+
+- "id": "229"
+  "category": "SORT"
+  "title": "Ordering Transactions by Amount"
+  "complexity": "basic"
+  "query": |
+      index="transactions/parquet"
+      | sort -amount
+      | table transactionID, amount
+
+- "id": "230"
+  "category": "EVAL"
+  "title": "Generating Usernames"
+  "complexity": "intermediate"
+  "query": |
+      index="employees/parquet"
+      | eval username = lower(substr(firstName, 0, 1) . lastName)
+      | table employeeID, username
+
+- "id": "231"
+  "category": "LOOKUP"
+  "title": "Adding Product Details"
+  "complexity": "intermediate"
+  "query": |
+      index="order_items/parquet"
+      | lookup product_catalog.csv productID OUTPUT productName, category
+      | table orderID, productName, category
+
+- "id": "232"
+  "category": "FIELDS"
+  "title": "Including Additional Fields"
+  "complexity": "basic"
+  "query": |
+      index="logins/parquet"
+      | fields userID, timestamp, ip_address
+      | table userID, timestamp, ip_address
+
+- "id": "233"
+  "category": "STATS"
+  "title": "Computing Median Response Times"
+  "complexity": "intermediate"
+  "query": |
+      index="web_requests/parquet"
+      | stats median(response_time) as median_response by endpoint
+      | table endpoint, median_response
+
+- "id": "234"
+  "category": "APPENDPIPE"
+  "title": "Calculating Totals and Averages"
+  "complexity": "intermediate"
+  "query": |
+      index="expenses/parquet"
+      | stats sum(cost) as total_cost
+      | appendpipe [ stats avg(cost) as average_cost ]
+      | table total_cost, average_cost
+
+- "id": "235"
+  "category": "DEDUP"
+  "title": "Eliminating Duplicate Sessions"
+  "complexity": "intermediate"
+  "query": |
+      index="session_logs/parquet"
+      | dedup sessionID
+      | table sessionID, userID
+
+- "id": "236"
+  "category": "MVEXPAND"
+  "title": "Analyzing Survey Selections"
+  "complexity": "advanced"
+  "query": |
+      index="survey_responses/parquet"
+      | mvexpand choices
+      | stats count by choices
+
+- "id": "237"
+  "category": "REX"
+  "title": "Extracting Usernames from Emails"
+  "complexity": "advanced"
+  "query": |
+      index="users/parquet"
+      | rex field=email "(?<username>^[^@]+)"
+      | table userID, username
+
+- "id": "238"
+  "category": "TIMECHART"
+  "title": "Observing Trends Over Time"
+  "complexity": "advanced"
+  "query": |
+      index="search_queries/parquet"
+      | timechart span=1d count by query_type
+      | table _time, query_type, count
+
+- "id": "239"
+  "category": "STATS"
+  "title": "Calculating Standard Deviation"
+  "complexity": "intermediate"
+  "query": |
+      index="measurements/parquet"
+      | stats stdev(value) as std_deviation
+      | table std_deviation
+
+- "id": "240"
+  "category": "EVAL"
+  "title": "Deriving New Metrics"
+  "complexity": "intermediate"
+  "query": |
+      index="metrics/parquet"
+      | eval efficiency = output / input
+      | table measurementID, efficiency
+
+- "id": "241"
+  "category": "APPEND"
+  "title": "Merging Logs from Different Environments"
+  "complexity": "intermediate"
+  "query": |
+      index="logs/prod.parquet"
+      | append [ search index="logs/staging.parquet" ]
+      | table eventID, message
+
+- "id": "242"
+  "category": "SORT"
+  "title": "Arranging Data by Multiple Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="inventory/parquet"
+      | sort location, -quantity
+      | table productID, location, quantity
+
+- "id": "243"
+  "category": "EVAL"
+  "title": "Evaluating Boolean Conditions"
+  "complexity": "intermediate"
+  "query": |
+      index="systems/parquet"
+      | eval needs_attention = if(cpu_usage > 80 OR memory_usage > 70, "Yes", "No")
+      | table systemID, needs_attention
+
+- "id": "244"
+  "category": "FIELDSUMMARY"
+  "title": "Inspecting Data Fields"
+  "complexity": "advanced"
+  "query": |
+      index="data/parquet"
+      | fieldsummary
+      | table field, type, count
+
+- "id": "245"
+  "category": "RENAME"
+  "title": "Adjusting Field Names for Consistency"
+  "complexity": "basic"
+  "query": |
+      index="datasets/parquet"
+      | rename oldName1 as newName1, oldName2 as newName2
+      | table newName1, newName2
+
+- "id": "246"
+  "category": "DEDUP"
+  "title": "Filtering Out Redundant Alerts"
+  "complexity": "intermediate"
+  "query": |
+      index="alerts/parquet"
+      | dedup alertID
+      | table alertID, description
+
+- "id": "247"
+  "category": "COALESCE"
+  "title": "Consolidating Alternate Fields"
+  "complexity": "intermediate"
+  "query": |
+      index="records/parquet"
+      | eval main_value = coalesce(fieldA, fieldB, fieldC)
+      | table recordID, main_value
+
+- "id": "248"
+  "category": "EVAL"
+  "title": "Performing Date Calculations"
+  "complexity": "advanced"
+  "query": |
+      index="events/parquet"
+      | eval days_since_event = (now() - _time) / 86400
+      | table eventID, days_since_event
+
+- "id": "249"
+  "category": "LOOKUP"
+  "title": "Enhancing Data with Additional Info"
+  "complexity": "intermediate"
+  "query": |
+      index="transactions/parquet"
+      | lookup currency_rates.csv currency_code OUTPUT rate
+      | eval amount_usd = amount * rate
+      | table transactionID, amount_usd
+
+- "id": "250"
+  "category": "FIELDS"
+  "title": "Specifying Fields to Display"
+  "complexity": "basic"
+  "query": |
+      index="logs/parquet"
+      | fields eventID, timestamp, message
+      | table eventID, timestamp, message
+
+- "id": "251"
+  "category": "REX"
+  "title": "Extracting Hostnames from URLs"
+  "complexity": "advanced"
+  "query": |
+      index="web_traffic/parquet"
+      | rex field=url "https?://(?<hostname>[^/]+)/"
+      | table eventID, hostname
+
+- "id": "252"
+  "category": "STATS"
+  "title": "Counting Unique Users"
+  "complexity": "intermediate"
+  "query": |
+      index="sessions/parquet"
+      | stats dc(userID) as unique_users
+      | table unique_users
+
+- "id": "253"
+  "category": "TIMECHART"
+  "title": "Comparing Metrics Over Time"
+  "complexity": "advanced"
+  "query": |
+      index="performance/parquet"
+      | timechart span=1h avg(metric1) as avg_metric1, avg(metric2) as avg_metric2
+      | table _time, avg_metric1, avg_metric2
+
+- "id": "254"
+  "category": "EVAL"
+  "title": "Assigning Risk Levels"
+  "complexity": "intermediate"
+  "query": |
+      index="accounts/parquet"
+      | eval risk_level = case(balance < 1000, "Low", balance < 5000, "Medium", 1=1, "High")
+      | table accountID, risk_level
+
+- "id": "255"
+  "category": "APPENDPIPE"
+  "title": "Adding Grand Totals"
+  "complexity": "intermediate"
+  "query": |
+      index="expenses/parquet"
+      | stats sum(cost) as total_cost by category
+      | appendpipe [ stats sum(total_cost) as grand_total ]
+      | table category, total_cost, grand_total
+
+- "id": "256"
+  "category": "SORT"
+  "title": "Ordering by Custom Criteria"
+  "complexity": "intermediate"
+  "query": |
+      index="products/parquet"
+      | sort -in_stock, +price
+      | table productID, in_stock, price
+
+- "id": "257"
+  "category": "FIELDSUMMARY"
+  "title": "Summarizing Field Statistics"
+  "complexity": "advanced"
+  "query": |
+      index="logs/parquet"
+      | fieldsummary
+      | table field, count, null_count
+
+- "id": "258"
+  "category": "DEDUP"
+  "title": "Keeping the Most Recent Entry"
+  "complexity": "intermediate"
+  "query": |
+      index="updates/parquet"
+      | dedup itemID sortby -_time
+      | table itemID, status
+
+- "id": "259"
+  "category": "MVJOIN"
+  "title": "Consolidating Multiple Entries"
+  "complexity": "advanced"
+  "query": |
+      index="orders/parquet"
+      | eval items_list = mvjoin(items, ", ")
+      | table orderID, items_list
+
+- "id": "260"
+  "category": "EVAL"
+  "title": "Calculating Time Differences"
+  "complexity": "intermediate"
+  "query": |
+      index="events/parquet"
+      | eval duration = end_time - start_time
+      | table eventID, duration
+
+- "id": "261"
+  "category": "LOOKUP"
+  "title": "Cross-Referencing Data"
+  "complexity": "intermediate"
+  "query": |
+      index="network_logs/parquet"
+      | lookup ip_reputation.csv ip_address OUTPUT risk_score
+      | table ip_address, risk_score
+
+- "id": "262"
+  "category": "RENAME"
+  "title": "Adjusting Field Labels"
+  "complexity": "basic"
+  "query": |
+      index="data/parquet"
+      | rename field_old as field_new
+      | table field_new
+
+- "id": "263"
+  "category": "TIMECHART"
+  "title": "Monitoring Throughput Over Time"
+  "complexity": "advanced"
+  "query": |
+      index="data_transfer/parquet"
+      | timechart span=15m sum(bytes_transferred) as total_bytes
+      | table _time, total_bytes
+
+- "id": "264"
+  "category": "STATS"
+  "title": "Aggregating Data by Category"
+  "complexity": "intermediate"
+  "query": |
+      index="expenses/parquet"
+      | stats sum(cost) as total_cost by department
+      | table department, total_cost
+
+- "id": "265"
+  "category": "EVAL"
+  "title": "Formatting Strings"
+  "complexity": "intermediate"
+  "query": |
+      index="users/parquet"
+      | eval display_name = upper(lastName) . ", " . capitalize(firstName)
+      | table userID, display_name
+
+- "id": "266"
+  "category": "DEDUP"
+  "title": "Avoiding Duplicate Alerts"
+  "complexity": "intermediate"
+  "query": |
+      index="alerts/parquet"
+      | dedup alertID, severity
+      | table alertID, severity
+
+- "id": "267"
+  "category": "FIELDS"
+  "title": "Focusing on Key Information"
+  "complexity": "basic"
+  "query": |
+      index="transactions/parquet"
+      | fields transactionID, amount, date
+      | table transactionID, amount, date
+
+- "id": "268"
+  "category": "SORT"
+  "title": "Prioritizing Critical Issues"
+  "complexity": "basic"
+  "query": |
+      index="issues/parquet"
+      | sort -priority
+      | table issueID, priority
+
+- "id": "269"
+  "category": "COALESCE"
+  "title": "Consolidating Multiple Data Points"
+  "complexity": "intermediate"
+  "query": |
+      index="measurements/parquet"
+      | eval value = coalesce(reading1, reading2, reading3)
+      | table measurementID, value
+
+- "id": "270"
+  "category": "EVAL"
+  "title": "Assigning Categories Based on Values"
+  "complexity": "intermediate"
+  "query": |
+      index="scores/parquet"
+      | eval grade = case(score >= 90, "A", score >= 80, "B", score >= 70, "C", score >= 60, "D", 1=1, "F")
+      | table studentID, grade
+
+- "id": "271"
+  "category": "REX"
+  "title": "Capturing Specific Patterns"
+  "complexity": "advanced"
+  "query": |
+      index="logs/parquet"
+      | rex field=message "User\s+(?<username>\w+)\s+logged\s+in"
+      | table eventID, username
+
+- "id": "272"
+  "category": "FIELDSUMMARY"
+  "title": "Getting an Overview of Fields"
+  "complexity": "advanced"
+  "query": |
+      index="data/parquet"
+      | fieldsummary
+      | table field, type, distinct_count
+
+- "id": "273"
+  "category": "TIMECHART"
+  "title": "Analyzing Data Usage Trends"
+  "complexity": "advanced"
+  "query": |
+      index="usage_logs/parquet"
+      | timechart span=1h sum(data_used) as total_data
+      | table _time, total_data
+
+- "id": "274"
+  "category": "STATS"
+  "title": "Calculating Percentiles"
+  "complexity": "intermediate"
+  "query": |
+      index="response_times/parquet"
+      | stats perc95(response_time) as perc95_response
+      | table perc95_response
+
+- "id": "275"
+  "category": "EVAL"
+  "title": "Computing Ratios"
+  "complexity": "intermediate"
+  "query": |
+      index="financials/parquet"
+      | eval debt_to_income = total_debt / total_income
+      | table accountID, debt_to_income
+
+- "id": "276"
+  "category": "APPENDPIPE"
+  "title": "Combining Different Metrics"
+  "complexity": "intermediate"
+  "query": |
+      index="operations/parquet"
+      | stats count as total_operations
+      | appendpipe [ stats avg(duration) as average_duration ]
+      | table total_operations, average_duration
+
+- "id": "277"
+  "category": "DEDUP"
+  "title": "Ensuring Unique Entries"
+  "complexity": "intermediate"
+  "query": |
+      index="inventory/parquet"
+      | dedup itemID
+      | table itemID, quantity
+
+- "id": "278"
+  "category": "SORT"
+  "title": "Ranking by Popularity"
+  "complexity": "basic"
+  "query": |
+      index="products/parquet"
+      | stats count as views by productID
+      | sort -views
+      | table productID, views
+
+- "id": "279"
+  "category": "EVAL"
+  "title": "Standardizing Units"
+  "complexity": "intermediate"
+  "query": |
+      index="measurements/parquet"
+      | eval length_cm = length_in * 2.54
+      | table measurementID, length_cm
+
+- "id": "280"
+  "category": "LOOKUP"
+  "title": "Mapping IPs to Hostnames"
+  "complexity": "intermediate"
+  "query": |
+      index="network_traffic/parquet"
+      | lookup dns_lookup.csv ip_address OUTPUT hostname
+      | table ip_address, hostname
+
+- "id": "281"
+  "category": "GROUPED_INDEX_FILTERS"
+  "title": "Complex Query with Grouped Filters and Time Constraints"
+  "complexity": "advanced"
+  "query": |
+      (
+          earliest="2024-01-01" latest="2024-12-31"
+          (
+              (status="error" AND errorCode IN (500, 503, 504))
+              OR
+              (status="warning" AND warningCode=300)
+          )
+          AND (userRole="admin" OR userRole="superuser")
+          index="system_logs/parquet"
+      )
+      OR
+      (
+          earliest="2023-01-01" latest="2023-12-31"
+          (action="login" AND success=false)
+          AND (attempts >= 3)
+          index="security_logs/parquet"
+      )
+      | eval failure_rate = (failed_logins / total_logins) * 100
+      | stats sum(failed_logins) as total_failed, sum(total_logins) as total_attempts by userID
+      | where total_attempts > 10
+      | sort -total_failed
+      | join type=inner userID [ search index="user_profiles/parquet" | fields userID, userName, department ]
+      | eval risk_level = if(total_failed / total_attempts > 0.5, "High", "Low")
+      | table userID, userName, department, total_failed, total_attempts, risk_level
+
+- "id": "282"
+  "category": "TRANSACTION"
+  "title": "Building Complex Transactions Over Multiple Fields"
+  "complexity": "advanced"
+  "query": |
+      index="ecommerce_logs/parquet"
+      | transaction customerID orderID startswith=(action="order_placed") endswith=(action="order_completed") maxspan=1h maxpause=30m
+      | eval order_duration = duration / 60
+      | where order_duration > 15
+      | stats count as long_orders by customerID
+      | join type=left customerID [ search index="customer_data/parquet" | fields customerID, customerName, loyaltyStatus ]
+      | eval priority_customer = if(loyaltyStatus="Gold" OR loyaltyStatus="Platinum", "Yes", "No")
+      | table customerID, customerName, loyaltyStatus, long_orders, priority_customer
+      | sort -long_orders
+      | where priority_customer="Yes"
+      | outputlookup order_analysis.csv
+
+- "id": "283"
+  "category": "MAP"
+  "title": "Using MAP to Iterate Over Dynamic Subsearches"
+  "complexity": "advanced"
+  "query": |
+      index="network_events/parquet"
+      | stats count by src_ip
+      | where count > 100
+      | map search="search index=\"network_traffic/parquet\" src_ip=$src_ip$ | stats sum(bytes_transferred) as total_bytes by dest_ip"
+      | where total_bytes > 1000000
+      | join type=left dest_ip [ search index="ip_location/parquet" | fields dest_ip, country, city ]
+      | stats sum(total_bytes) as total_data by country, city
+      | sort -total_data
+      | table country, city, total_data
+      | eval total_data_gb = total_data / (1024 * 1024 * 1024)
+      | fields -total_data
+      | rename total_data_gb as "Total Data (GB)"
+      | where "Total Data (GB)" > 1
+      | outputlookup high_volume_traffic.csv
+
+- "id": "284"
+  "category": "STREAMSTATS"
+  "title": "Calculating Rolling Averages and Detecting Anomalies"
+  "complexity": "advanced"
+  "query": |
+      index="stock_prices/parquet"
+      | sort 0 time
+      | streamstats window=20 avg(price) as rolling_avg stdev(price) as rolling_std by stockSymbol
+      | eval upper_band = rolling_avg + (2 * rolling_std)
+      | eval lower_band = rolling_avg - (2 * rolling_std)
+      | where price > upper_band OR price < lower_band
+      | eval anomaly_type = if(price > upper_band, "Above Upper Band", "Below Lower Band")
+      | table time, stockSymbol, price, rolling_avg, rolling_std, upper_band, lower_band, anomaly_type
+      | join type=left stockSymbol [ search index="company_info/parquet" | fields stockSymbol, companyName, sector ]
+      | fields time, companyName, sector, price, anomaly_type
+      | rename companyName as "Company", sector as "Sector", price as "Price", anomaly_type as "Anomaly Type"
+      | sort time
+
+- "id": "285"
+  "category": "MULTISEARCH"
+  "title": "Combining Multiple Complex Searches with MULTISEARCH"
+  "complexity": "advanced"
+  "query": |
+      | multisearch
+          [
+              index="user_activity/parquet"
+              earliest="2024-01-01" latest="2024-01-31"
+              | stats count as login_attempts by userID
+              | where login_attempts > 50
+              | eval activity_type="High Login Attempts"
+          ]
+          [
+              index="financial_transactions/parquet"
+              earliest="2024-01-01" latest="2024-01-31"
+              | stats sum(amount) as total_spent by userID
+              | where total_spent > 10000
+              | eval activity_type="High Spending"
+          ]
+          [
+              index="security_incidents/parquet"
+              earliest="2024-01-01" latest="2024-01-31"
+              | stats count as incidents by userID
+              | where incidents > 5
+              | eval activity_type="Security Incidents"
+          ]
+      | join type=left userID [ search index="user_profiles/parquet" | fields userID, userName, department ]
+      | table userID, userName, department, activity_type, login_attempts, total_spent, incidents
+      | fillnull value=0 login_attempts total_spent incidents
+      | sort -login_attempts, -total_spent, -incidents
+
+- "id": "286"
+  "category": "EVAL"
+  "title": "Nested EVAL Expressions with Conditional Logic"
+  "complexity": "advanced"
+  "query": |
+      index="sales_data/parquet"
+      | eval
+          discount = case(
+              customerType="Gold", amount * 0.2,
+              customerType="Silver", amount * 0.1,
+              customerType="Bronze", amount * 0.05,
+              1=1, 0
+          ),
+          net_amount = amount - discount,
+          category = if(net_amount > 1000, "High Value", "Regular")
+      | stats sum(net_amount) as total_sales by category, region
+      | where total_sales > 50000
+      | join type=left region [ search index="regional_managers/parquet" | fields region, managerName ]
+      | rename managerName as "Regional Manager"
+      | table region, "Regional Manager", category, total_sales
+      | sort -total_sales
+      | eval total_sales = "$" . tostring(total_sales, "commas")
+      | fields region, "Regional Manager", category, total_sales
+
+- "id": "287"
+  "category": "STATS"
+  "title": "Advanced Statistical Analysis with Multiple Aggregations"
+  "complexity": "advanced"
+  "query": |
+      index="employee_performance/parquet"
+      | stats
+          avg(rating) as avg_rating,
+          median(rating) as median_rating,
+          stdev(rating) as stdev_rating,
+          perc90(rating) as perc90_rating,
+          min(rating) as min_rating,
+          max(rating) as max_rating
+          by department, jobTitle
+      | where avg_rating > 4
+      | eval performance_category = case(
+          avg_rating >= 4.5, "Outstanding",
+          avg_rating >= 4.0, "Excellent",
+          avg_rating >= 3.5, "Good",
+          1=1, "Average"
+      )
+      | join type=left department [ search index="department_info/parquet" | fields department, headOfDepartment ]
+      | table department, jobTitle, headOfDepartment, avg_rating, performance_category
+      | sort -avg_rating
+      | fields department, jobTitle, headOfDepartment, avg_rating, performance_category
+
+- "id": "288"
+  "category": "TRANSACTION"
+  "title": "Complex Transaction Processing for Session Analysis"
+  "complexity": "advanced"
+  "query": |
+      index="web_logs/parquet"
+      | transaction sessionID startswith=(action="session_start") endswith=(action="session_end") maxspan=4h maxpause=30m
+      | eval session_duration = duration / 60
+      | eval page_views = mvcount(pages_visited)
+      | where session_duration > 5 AND page_views > 10
+      | stats
+          count as total_sessions,
+          avg(session_duration) as avg_duration,
+          avg(page_views) as avg_page_views
+          by userID
+      | where total_sessions > 3
+      | join type=left userID [ search index="user_profiles/parquet" | fields userID, userName, membershipLevel ]
+      | table userID, userName, membershipLevel, total_sessions, avg_duration, avg_page_views
+      | sort -total_sessions
+      | eval avg_duration = round(avg_duration, 2)
+      | eval avg_page_views = round(avg_page_views, 0)
+      | fields userID, userName, membershipLevel, total_sessions, avg_duration, avg_page_views
+
+- "id": "289"
+  "category": "JOIN"
+  "title": "Joining Multiple Datasets with Complex Conditions"
+  "complexity": "advanced"
+  "query": |
+      index="orders/parquet"
+      | join type=left orderID [ search index="payments/parquet" | fields orderID, paymentStatus, paymentDate ]
+      | join type=left customerID [ search index="customers/parquet" | fields customerID, customerName, customerSegment ]
+      | where paymentStatus="Completed" AND shipmentStatus="Shipped"
+      | eval order_age = now() - orderDate
+      | where order_age > (7 * 24 * 60 * 60)
+      | stats count as delayed_orders by customerSegment, region
+      | join type=left region [ search index="regions/parquet" | fields region, regionalManager ]
+      | table region, regionalManager, customerSegment, delayed_orders
+      | sort -delayed_orders
+      | where delayed_orders > 5
+      | eval delayed_orders = tostring(delayed_orders, "commas")
+      | fields region, regionalManager, customerSegment, delayed_orders
+
+- "id": "290"
+  "category": "MACRO"
+  "title": "Using Macros for Reusable Search Patterns"
+  "complexity": "advanced"
+  "query": |
+      index="application_logs/parquet"
+      | `error_count_by_module(startDate="2024-01-01", endDate="2024-12-31")`
+      | where error_count > 100
+      | join type=left moduleName [ search index="module_info/parquet" | fields moduleName, moduleOwner ]
+      | table moduleName, moduleOwner, error_count
+      | sort -error_count
+      | eval error_count = tostring(error_count, "commas")
+      | fields moduleName, moduleOwner, error_count
+      | outputlookup module_error_report.csv
+      | macro my_custom_macro(to="admin@example.com" subject="Module Error Report" format="csv" sendresults=true)
+
+- "id": "291"
+  "category": "FIELDS"
+  "title": "Advanced Field Selection and Exclusion"
+  "complexity": "advanced"
+  "query": |
+      index="big_data/parquet"
+      | fields - rawData, _time, _indextime, _sourcetype, _source, _host
+      | fields + transactionID, userID, productID, amount, status, timestamp
+      | rename timestamp as "Transaction Time"
+      | where status!="Completed"
+      | sort -amount
+      | eval amount = "$" . tostring(amount, "commas")
+      | fields transactionID, userID, productID, amount, "Transaction Time", status
+      | join type=left userID [ search index="user_info/parquet" | fields userID, userName, email ]
+      | table transactionID, userName, email, productID, amount, "Transaction Time", status
+
+- "id": "292"
+  "category": "EVAL"
+  "title": "Complex Calculations with Multiple EVAL Functions"
+  "complexity": "advanced"
+  "query": |
+      index="energy_consumption/parquet"
+      | eval
+          daily_consumption = total_consumption / days_active,
+          cost = daily_consumption * cost_per_unit,
+          efficiency = if(daily_consumption < average_consumption, "High", "Low")
+      | stats
+          sum(daily_consumption) as total_daily_consumption,
+          sum(cost) as total_cost
+          by applianceType
+      | where total_daily_consumption > 1000
+      | eval total_cost = "$" . tostring(total_cost, "commas")
+      | fields applianceType, total_daily_consumption, total_cost
+      | sort -total_daily_consumption
+      | table applianceType, total_daily_consumption, total_cost
+
+- "id": "295"
+  "category": "JOIN"
+  "title": "Joining Datasets with Multiple Matching Fields"
+  "complexity": "advanced"
+  "query": |
+      index="health_records/parquet"
+      | join type=left patientID, visitID [ search index="lab_results/parquet" | fields patientID, visitID, labTest, result ]
+      | join type=left patientID [ search index="patient_info/parquet" | fields patientID, patientName, age, gender ]
+      | where labTest="Blood Glucose" AND result > 140
+      | stats count as high_glucose_readings by patientID, patientName, age, gender
+      | where high_glucose_readings > 3
+      | sort -high_glucose_readings
+      | table patientID, patientName, age, gender, high_glucose_readings
+      | fields patientID, patientName, age, gender, high_glucose_readings
+
+- "id": "296"
+  "category": "MULTISEARCH"
+  "title": "Combining Diverse Searches for Comprehensive Analysis"
+  "complexity": "advanced"
+  "query": |
+      | multisearch
+          [
+              index="sales/parquet"
+              earliest="2024-01-01" latest="2024-06-30"
+              productType="Books"
+              | stats sum(amount) as total_sales by productCategory
+              | eval data_type="Sales Data"
+          ]
+          [
+              index="sales/parquet"
+              productType="Books"
+              earliest="2024-01-01" latest="2024-06-30"
+              | stats sum(payments) as total_received by productCategory
+              | eval data_type="Sales Payments"
+          ]
+          [
+              productType="Books"
+              index="inventory/parquet"
+              earliest="2024-01-01" latest="2024-06-30"
+              | stats avg(stockLevel) as avg_stock by productCategory
+              | eval data_type="Inventory Data"
+          ]
+          [
+              earliest="2024-01-01" latest="2024-06-30"
+              index="customer_feedback/bookGenres.parquet"
+              productType="Books"
+              | stats avg(rating) as avg_rating by bookGenre
+              | eval data_type="Feedback Data"
+          ]
+          [
+              earliest="2024-01-01" latest="2024-06-30"
+              productType="Books"
+              index="customer_feedback/bookGenres.parquet"
+              | stats avg(rating) as avg_rating by bookGenre
+              | eval data_type="Feedback Data"
+          ]
+          [
+              productType="Books"
+              earliest="2024-01-01" latest="2024-06-30"
+              index="customer_feedback/bookGenres.parquet"
+              | stats avg(rating) as avg_rating by bookGenre
+              | eval data_type="Feedback Data"
+          ]
+      | stats
+          values(total_sales) as total_sales,
+          values(avg_stock) as avg_stock,
+          values(avg_rating) as avg_rating
+          by productCategory
+      | where total_sales > 50000 AND avg_rating < 3
+      | sort -total_sales
+      | table productCategory, total_sales, avg_stock, avg_rating
+
+- "id": "297"
+  "category": "EVAL"
+  "title": "Advanced String Manipulation and Field Extraction"
+  "complexity": "advanced"
+  "query": |
+      index="email_logs/parquet"
+      | eval
+          domain = lower(substr(email, index(email, "@") + 1)),
+          username = substr(email, 0, index(email, "@"))
+      | stats count as email_count by domain
+      | where email_count > 1000
+      | join type=left domain [ search index="domain_info/parquet" | fields domain, organization ]
+      | table domain, organization, email_count
+      | sort -email_count
+      | fields domain, organization, email_count
+
+- "id": "298"
+  "category": "STATS"
+  "title": "Calculating Advanced Metrics with Conditional Aggregations"
+  "complexity": "advanced"
+  "query": |
+      index="financial_data/parquet"
+      | stats
+          sum(amount) as total_amount,
+          sum(eval(if(transactionType="Credit", amount, 0))) as total_credits,
+          sum(eval(if(transactionType="Debit", amount, 0))) as total_debits,
+          avg(amount) as average_amount,
+          max(amount) as max_transaction,
+          min(amount) as min_transaction
+          by accountID
+      | where total_amount > 100000
+      | join type=left accountID [ search index="account_info/parquet" | fields accountID, accountHolderName ]
+      | table accountID, accountHolderName, total_amount, total_credits, total_debits, average_amount
+      | sort -total_amount
+      | eval total_amount = "$" . tostring(total_amount, "commas")
+      | eval total_credits = "$" . tostring(total_credits, "commas")
+      | eval total_debits = "$" . tostring(total_debits, "commas")
+      | fields accountID, accountHolderName, total_amount, total_credits, total_debits, average_amount

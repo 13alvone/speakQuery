@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Saved Search{% endblock %}
+
+{% block extra_css %}
+    <!-- Include Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/save_search.css') }}">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Create Saved Search</h1>
+
+        <!-- Notification Container -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by save_search.js -->
+        </div>
+
+        <form id="saved-search-form" method="POST" action="/commit_saved_search">
+            <!-- Request ID (readonly) -->
+            <div class="field">
+                <label class="label">Request ID</label>
+                <div class="control">
+                    <input class="input" type="text" name="request_id" value="{{ request_id }}" readonly>
+                </div>
+            </div>
+
+            <!-- Search Title -->
+            <div class="field">
+                <label class="label">Search Title</label>
+                <div class="control">
+                    <input class="input" type="text" name="title" placeholder="Unique title here" required>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="field">
+                <label class="label">Description</label>
+                <div class="control">
+                    <textarea class="textarea" name="description" rows="4" placeholder="Brief description about the purpose of the saved search." required></textarea>
+                </div>
+            </div>
+
+            <!-- Search Logic -->
+            <div class="field">
+                <label class="label">Search Logic</label>
+                <div class="control">
+                    <textarea class="textarea" name="query" rows="4" required>{{ saved_query }}</textarea>
+                </div>
+            </div>
+
+            <!-- Permissions -->
+            <div class="field">
+                <label class="label">Permissions</label>
+                <div class="control">
+                    <input class="input" type="text" name="permissions" value="644" required>
+                </div>
+            </div>
+
+            <!-- Lookback -->
+            <div class="field">
+                <label class="label">Lookback</label>
+                <div class="control">
+                    <input class="input" type="text" name="lookback" placeholder="-1h" required>
+                </div>
+            </div>
+
+            <!-- Cron Schedule -->
+            <div class="field">
+                <label class="label">Cron Schedule</label>
+                <div class="control">
+                    <input class="input" type="text" name="cron_schedule" value="{{ cron_schedule }}" required>
+                </div>
+            </div>
+
+            <!-- Trigger -->
+            <div class="field">
+                <label class="label">Trigger</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="trigger" required>
+                            <option value="once">Once</option>
+                            <option value="per_result">Per Result</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Throttle -->
+            <div class="field">
+                <label class="label">Throttle</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="throttle" required>
+                            <option value="no" selected>No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Throttle Fields Container -->
+            <!-- These fields are inside this container and will be toggled based on the "Throttle" selection -->
+            <div class="throttle-fields is-hidden">
+                <!-- Throttle By -->
+                <div class="field">
+                    <label class="label">Throttle By</label>
+                    <div class="control">
+                        <input class="input" type="text" name="throttle_by" placeholder="existing_field,other_field" value="">
+                    </div>
+                    <p class="help">Enter field names to throttle by, separated by commas.</p>
+                </div>
+
+                <!-- Throttle Time Period -->
+                <div class="field">
+                    <label class="label">Throttle Time Period</label>
+                    <div class="control">
+                        <input class="input" type="text" name="throttle_time_period" placeholder="-1d">
+                    </div>
+                    <p class="help">Specify the time period for throttling (e.g., -1h, -1d).</p>
+                </div>
+            </div>
+
+            <!-- Event Message -->
+            <div class="field">
+                <label class="label">Event Message</label>
+                <div class="control">
+                    <input class="input" type="text" name="event_message" placeholder="Concise message or subject of the alert." value="" required>
+                </div>
+            </div>
+
+            <!-- Send Email -->
+            <div class="field">
+                <label class="label">Send Email</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="send_email" required>
+                            <option value="no" selected>No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Fields -->
+            <div class="email-fields is-hidden">
+                <!-- Email Address -->
+                <div class="field">
+                    <label class="label">Email Address</label>
+                    <div class="control">
+                        <input class="input" type="email" placeholder="Ex. user@example.com" name="email_address" value="">
+                    </div>
+                </div>
+
+                <!-- Email Content -->
+                <div class="field">
+                    <label class="label">Email Content</label>
+                    <div class="control">
+                        <textarea class="textarea" name="email_content" placeholder="Enter email content body here." rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" type="submit">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/save_search.js') }}"></script>
+{% endblock %}

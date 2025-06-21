@@ -1,0 +1,149 @@
+<!-- frontend/templates/settings.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_css %}
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Application Settings</h1>
+
+        <div class="columns">
+            <!-- Main Column -->
+            <div class="column">
+                <div class="box">
+                    <h2 class="subtitle">Global Configuration</h2>
+                    <form id="settings-form">
+                        <!-- Upload Folder -->
+                        <div class="field spaced-field">
+                            <label class="label">Upload Folder</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="UPLOAD_FOLDER" name="UPLOAD_FOLDER" placeholder="Enter upload folder path" required>
+                            </div>
+                        </div>
+
+                        <!-- Allowed Extensions -->
+                        <div class="field spaced-field">
+                            <label class="label">Allowed Extensions (comma-separated)</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="ALLOWED_EXTENSIONS" name="ALLOWED_EXTENSIONS" placeholder="e.g., sqlite3,parquet,csv,json" required>
+                            </div>
+                        </div>
+
+                        <!-- Max Content Length in GB -->
+                        <div class="field spaced-field">
+                            <label class="label">Max Content Length (GB)</label>
+                            <div class="control has-icons-right">
+                                <input class="input monospaced-input" type="number" id="MAX_CONTENT_LENGTH" name="MAX_CONTENT_LENGTH" placeholder="e.g., 16" min="0" step="0.1" required>
+                                <span class="icon is-small is-right">
+                                    <i class="fas fa-hdd"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Temporary Directory -->
+                        <div class="field spaced-field">
+                            <label class="label">Temporary Directory</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="TEMP_DIR" name="TEMP_DIR" placeholder="Enter temporary directory path" required>
+                            </div>
+                        </div>
+
+                        <!-- Lookup Directory -->
+                        <div class="field spaced-field">
+                            <label class="label">Lookup Directory</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="LOOKUP_DIR" name="LOOKUP_DIR" placeholder="Enter lookup directory path" required>
+                            </div>
+                        </div>
+
+                        <!-- Load Job Directory -->
+                        <div class="field spaced-field">
+                            <label class="label">Load Job Directory</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="LOADJOB_DIR" name="LOADJOB_DIR" placeholder="Enter load job directory path" required>
+                            </div>
+                        </div>
+
+                        <!-- Indexes Directory -->
+                        <div class="field spaced-field">
+                            <label class="label">Indexes Directory</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="INDEXES_DIR" name="INDEXES_DIR" placeholder="Enter indexes directory path" required>
+                            </div>
+                        </div>
+
+                        <!-- Saved Searches Database Filename -->
+                        <div class="field spaced-field">
+                            <label class="label">Saved Searches Database Filename</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="SAVED_SEARCHES_DB" name="SAVED_SEARCHES_DB" placeholder="e.g., saved_searches.db" required>
+                            </div>
+                        </div>
+
+                        <!-- Scheduled Inputs Database Filename -->
+                        <div class="field spaced-field">
+                            <label class="label">Scheduled Inputs Database Filename</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="text" id="SCHEDULED_INPUTS_DB" name="SCHEDULED_INPUTS_DB" placeholder="e.g., scheduled_inputs.db" required>
+                            </div>
+                        </div>
+
+                        <!-- Log Level -->
+                        <div class="field spaced-field">
+                            <label class="label">Log Level</label>
+                            <div class="control">
+                                <div class="select monospaced-input">
+                                    <select id="LOG_LEVEL" name="LOG_LEVEL" required>
+                                        <option value="DEBUG">DEBUG</option>
+                                        <option value="INFO">INFO</option>
+                                        <option value="WARNING">WARNING</option>
+                                        <option value="ERROR">ERROR</option>
+                                        <option value="CRITICAL">CRITICAL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keep Latest Files -->
+                        <div class="field spaced-field">
+                            <label class="label">Keep Latest Files (Number)</label>
+                            <div class="control">
+                                <input class="input monospaced-input" type="number" id="KEEP_LATEST_FILES" name="KEEP_LATEST_FILES" placeholder="e.g., 20" min="1" required>
+                            </div>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="field is-grouped spaced-field">
+                            <div class="control">
+                                <button class="button is-link" type="submit">Save Settings</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-light" type="reset">Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Optional Sidebar Column -->
+            <div class="column is-one-quarter">
+                <div class="box">
+                    <h2 class="subtitle">Help</h2>
+                    <p>Configure the global settings of the application. Ensure that directory paths are valid and accessible by the application.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

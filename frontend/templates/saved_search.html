@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Saved Search{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/saved_search.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Edit Saved Search</h1>
+        <div class="columns">
+            <div class="column is-half">
+                <div class="box">
+                    <form id="saveSearchForm" data-search-id="{{ search_id }}">
+                        <!-- Title Field -->
+                        <div class="field">
+                            <label class="label" for="title">Title</label>
+                            <div class="control">
+                                <input class="input" type="text" id="title" name="title" value="{{ search.title }}" required aria-label="Title">
+                            </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="field">
+                            <label class="label" for="description">Description</label>
+                            <div class="control">
+                                <textarea class="textarea" id="description" name="description" required aria-label="Description">{{ search.description }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Query Field -->
+                        <div class="field">
+                            <label class="label" for="query">Query</label>
+                            <div class="control">
+                                <textarea class="textarea" id="query" name="query" required aria-label="Query">{{ search.query }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Cron Schedule Field -->
+                        <div class="field">
+                            <label class="label" for="cron_schedule">Cron Schedule</label>
+                            <div class="control">
+                                <input class="input" type="text" id="cron_schedule" name="cron_schedule" value="{{ search.cron_schedule }}" required aria-label="Cron Schedule">
+                            </div>
+                        </div>
+
+                        <!-- Trigger Field -->
+                        <div class="field">
+                            <label class="label" for="trigger">Trigger</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="trigger" name="trigger" required aria-label="Trigger">
+                                        <option value="Once" {% if trigger_options.once_selected %}selected{% endif %}>Once</option>
+                                        <option value="Per Result" {% if trigger_options.per_result_selected %}selected{% endif %}>Per Result</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lookback Field -->
+                        <div class="field">
+                            <label class="label" for="lookback">Lookback</label>
+                            <div class="control">
+                                <input class="input" type="text" id="lookback" name="lookback" value="{{ search.lookback }}" required aria-label="Lookback">
+                            </div>
+                        </div>
+
+                        <!-- Throttle Field -->
+                        <div class="field">
+                            <label class="label" for="throttle">Throttle</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="throttle" name="throttle" required aria-label="Throttle">
+                                        <option value="Yes" {% if throttle_options.yes_selected %}selected{% endif %}>Yes</option>
+                                        <option value="No" {% if throttle_options.no_selected %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Throttle Time Period Field -->
+                        <div class="field">
+                            <label class="label" for="throttle_time_period">Throttle Time Period</label>
+                            <div class="control">
+                                <input class="input" type="text" id="throttle_time_period" name="throttle_time_period" value="{{ search.throttle_time_period }}" required aria-label="Throttle Time Period">
+                            </div>
+                        </div>
+
+                        <!-- Throttle By Field -->
+                        <div class="field">
+                            <label class="label" for="throttle_by">Throttle By</label>
+                            <div class="control">
+                                <input class="input" type="text" id="throttle_by" name="throttle_by" value="{{ search.throttle_by }}" required aria-label="Throttle By">
+                            </div>
+                        </div>
+
+                        <!-- Event Message Field -->
+                        <div class="field">
+                            <label class="label" for="event_message">Event Message</label>
+                            <div class="control">
+                                <textarea class="textarea" id="event_message" name="event_message" required aria-label="Event Message">{{ search.event_message }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Send Email Field -->
+                        <div class="field">
+                            <label class="label" for="send_email">Send Email</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="send_email" name="send_email" required aria-label="Send Email">
+                                        <option value="Yes" {% if send_email_options.yes_selected %}selected{% endif %}>Yes</option>
+                                        <option value="No" {% if send_email_options.no_selected %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Address Field -->
+                        <div class="field">
+                            <label class="label" for="email_address">Email Address</label>
+                            <div class="control">
+                                <input class="input" type="email" id="email_address" name="email_address" value="{{ search.email_address }}" required aria-label="Email Address">
+                            </div>
+                        </div>
+
+                        <!-- Email Content Field -->
+                        <div class="field">
+                            <label class="label" for="email_content">Email Content</label>
+                            <div class="control">
+                                <textarea class="textarea" id="email_content" name="email_content" required aria-label="Email Content">{{ search.email_content }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Disabled Field -->
+                        <div class="field">
+                            <label class="checkbox" for="disabled">
+                                <input type="checkbox" id="disabled" name="disabled" {{ disabled_checked }} aria-label="Disabled">
+                                Disabled
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button type="submit" class="button is-link">Save Changes</button>
+                            </div>
+                            <div class="control">
+                                <a href="/saved_searches.html" class="button is-light">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/saved_search.js') }}"></script>
+{% endblock %}

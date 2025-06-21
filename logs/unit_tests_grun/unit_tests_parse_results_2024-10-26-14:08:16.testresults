@@ -1,0 +1,405 @@
+2024-10-26 14:08:16,405 - INFO - Deleted existing 'lexers/antlr4_active' directory.
+2024-10-26 14:08:17,099 - INFO - Regenerated the target antlr4 files successfully.
+2024-10-26 14:08:17,196 - INFO - --------------------
+2024-10-26 14:08:17,196 - INFO - Test 0: CATEGORY: [INDEX], COMPLEXITY: [basic], TITLE: [Basic Index Call]
+2024-10-26 14:08:17,203 - INFO - --------------------
+2024-10-26 14:08:17,203 - INFO - Test 1: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Evaluate New Field]
+2024-10-26 14:08:17,209 - INFO - --------------------
+2024-10-26 14:08:17,209 - INFO - Test 2: CATEGORY: [FILTER], COMPLEXITY: [basic], TITLE: [Basic Search with Filter]
+2024-10-26 14:08:17,210 - INFO - --------------------
+2024-10-26 14:08:17,210 - INFO - Test 3: CATEGORY: [WHERE], COMPLEXITY: [intermediate], TITLE: [Using WHERE Clause]
+2024-10-26 14:08:17,213 - INFO - --------------------
+2024-10-26 14:08:17,213 - INFO - Test 4: CATEGORY: [STATS], COMPLEXITY: [intermediate], TITLE: [Statistics with STATS]
+2024-10-26 14:08:17,215 - INFO - --------------------
+2024-10-26 14:08:17,215 - INFO - Test 5: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining Two Datasets]
+2024-10-26 14:08:17,215 - INFO - --------------------
+2024-10-26 14:08:17,215 - INFO - Test 6: CATEGORY: [APPEND], COMPLEXITY: [intermediate], TITLE: [Appending Results from Another Search]
+2024-10-26 14:08:17,216 - INFO - --------------------
+2024-10-26 14:08:17,216 - INFO - Test 7: CATEGORY: [SORT], COMPLEXITY: [basic], TITLE: [Sorting Results]
+2024-10-26 14:08:17,217 - INFO - --------------------
+2024-10-26 14:08:17,217 - INFO - Test 8: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [Renaming Fields]
+2024-10-26 14:08:17,217 - INFO - --------------------
+2024-10-26 14:08:17,217 - INFO - Test 9: CATEGORY: [REX], COMPLEXITY: [advanced], TITLE: [Using Regular Expressions]
+2024-10-26 14:08:17,217 - INFO - --------------------
+2024-10-26 14:08:17,217 - INFO - Test 10: CATEGORY: [EVENTSTATS], COMPLEXITY: [intermediate], TITLE: [Event Statistics with EVENTSTATS]
+2024-10-26 14:08:17,219 - INFO - --------------------
+2024-10-26 14:08:17,219 - INFO - Test 11: CATEGORY: [STREAMSTATS], COMPLEXITY: [advanced], TITLE: [Stream Statistics with STREAMSTATS]
+2024-10-26 14:08:17,220 - INFO - --------------------
+2024-10-26 14:08:17,220 - INFO - Test 12: CATEGORY: [APPENDPIPE], COMPLEXITY: [intermediate], TITLE: [Appending with APPENDPIPE]
+2024-10-26 14:08:17,222 - INFO - --------------------
+2024-10-26 14:08:17,222 - INFO - Test 13: CATEGORY: [TIMECHART], COMPLEXITY: [advanced], TITLE: [Time-Based Chart with TIMECHART]
+2024-10-26 14:08:17,223 - INFO - --------------------
+2024-10-26 14:08:17,223 - INFO - Test 14: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [Selecting Specific Fields with FIELDS]
+2024-10-26 14:08:17,223 - INFO - --------------------
+2024-10-26 14:08:17,223 - INFO - Test 15: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [Creating a Table with MAKETABLE]
+2024-10-26 14:08:17,224 - INFO - --------------------
+2024-10-26 14:08:17,224 - INFO - Test 16: CATEGORY: [MVEXPAND], COMPLEXITY: [intermediate], TITLE: [Expanding Multivalue Fields with MVEXPAND]
+2024-10-26 14:08:17,224 - INFO - --------------------
+2024-10-26 14:08:17,224 - INFO - Test 17: CATEGORY: [LOOKUP], COMPLEXITY: [intermediate], TITLE: [Performing a Lookup with LOOKUP]
+2024-10-26 14:08:17,224 - INFO - --------------------
+2024-10-26 14:08:17,224 - INFO - Test 18: CATEGORY: [FIELDSUMMARY], COMPLEXITY: [advanced], TITLE: [Field Summary with FIELDSUMMARY]
+2024-10-26 14:08:17,224 - INFO - --------------------
+2024-10-26 14:08:17,224 - INFO - Test 19: CATEGORY: [HEAD], COMPLEXITY: [basic], TITLE: [Limiting Results with HEAD]
+2024-10-26 14:08:17,225 - INFO - --------------------
+2024-10-26 14:08:17,225 - INFO - Test 20: CATEGORY: [IF], COMPLEXITY: [advanced], TITLE: [Conditional Evaluation with IF]
+2024-10-26 14:08:17,225 - INFO - --------------------
+2024-10-26 14:08:17,225 - INFO - Test 21: CATEGORY: [CASE], COMPLEXITY: [advanced], TITLE: [Using CASE for Multiple Conditions]
+2024-10-26 14:08:17,225 - INFO - --------------------
+2024-10-26 14:08:17,225 - INFO - Test 22: CATEGORY: [BIN], COMPLEXITY: [intermediate], TITLE: [Binning Data with BIN]
+2024-10-26 14:08:17,226 - INFO - --------------------
+2024-10-26 14:08:17,226 - INFO - Test 23: CATEGORY: [MVJOIN], COMPLEXITY: [advanced], TITLE: [Joining Multivalue Fields with MVJOIN]
+2024-10-26 14:08:17,226 - INFO - --------------------
+2024-10-26 14:08:17,226 - INFO - Test 24: CATEGORY: [SPATH], COMPLEXITY: [intermediate], TITLE: [Extracting JSON Fields with SPATH]
+2024-10-26 14:08:17,226 - INFO - --------------------
+2024-10-26 14:08:17,226 - INFO - Test 25: CATEGORY: [STREAMSTATS], COMPLEXITY: [advanced], TITLE: [Calculating Running Totals with STREAMSTATS]
+2024-10-26 14:08:17,226 - INFO - --------------------
+2024-10-26 14:08:17,226 - INFO - Test 26: CATEGORY: [COALESCE], COMPLEXITY: [intermediate], TITLE: [Handling Null Values with COALESCE]
+2024-10-26 14:08:17,227 - INFO - --------------------
+2024-10-26 14:08:17,227 - INFO - Test 27: CATEGORY: [MVFILTER], COMPLEXITY: [advanced], TITLE: [Filtering Multivalue Fields with MVFILTER]
+2024-10-26 14:08:17,227 - INFO - --------------------
+2024-10-26 14:08:17,227 - INFO - Test 28: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [Filling Null Values in Multiple Fields]
+2024-10-26 14:08:17,227 - INFO - --------------------
+2024-10-26 14:08:17,227 - INFO - Test 29: CATEGORY: [URLENCODE], COMPLEXITY: [intermediate], TITLE: [Encoding URLs with URLENCODE]
+2024-10-26 14:08:17,228 - INFO - --------------------
+2024-10-26 14:08:17,228 - INFO - Test 30: CATEGORY: [REVERSE], COMPLEXITY: [basic], TITLE: [Reversing Event Order]
+2024-10-26 14:08:17,228 - INFO - --------------------
+2024-10-26 14:08:17,228 - INFO - Test 31: CATEGORY: [DEDUPE], COMPLEXITY: [intermediate], TITLE: [Removing Duplicate Events]
+2024-10-26 14:08:17,229 - INFO - --------------------
+2024-10-26 14:08:17,229 - INFO - Test 32: CATEGORY: [SORT], COMPLEXITY: [intermediate], TITLE: [Sorting with Multiple Fields]
+2024-10-26 14:08:17,229 - INFO - --------------------
+2024-10-26 14:08:17,229 - INFO - Test 33: CATEGORY: [REX], COMPLEXITY: [advanced], TITLE: [Extracting Fields with REX]
+2024-10-26 14:08:17,229 - INFO - --------------------
+2024-10-26 14:08:17,229 - INFO - Test 34: CATEGORY: [REGEX], COMPLEXITY: [advanced], TITLE: [Filtering with REGEX]
+2024-10-26 14:08:17,229 - INFO - --------------------
+2024-10-26 14:08:17,229 - INFO - Test 35: CATEGORY: [BASE64], COMPLEXITY: [intermediate], TITLE: [Encoding and Decoding with BASE64]
+2024-10-26 14:08:17,230 - INFO - --------------------
+2024-10-26 14:08:17,230 - INFO - Test 36: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [Filling Null Values]
+2024-10-26 14:08:17,230 - INFO - --------------------
+2024-10-26 14:08:17,230 - INFO - Test 37: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [intermediate], TITLE: [Outputting to a Lookup Table]
+2024-10-26 14:08:17,230 - INFO - --------------------
+2024-10-26 14:08:17,230 - INFO - Test 38: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining with Type Specification]
+2024-10-26 14:08:17,231 - INFO - --------------------
+2024-10-26 14:08:17,231 - INFO - Test 39: CATEGORY: [CASE], COMPLEXITY: [advanced], TITLE: [Using CASE for Conditional Evaluation]
+2024-10-26 14:08:17,231 - INFO - --------------------
+2024-10-26 14:08:17,231 - INFO - Test 40: CATEGORY: [MVREVERSE], COMPLEXITY: [advanced], TITLE: [Reversing Multivalue Fields with MVREVERSE]
+2024-10-26 14:08:17,231 - INFO - --------------------
+2024-10-26 14:08:17,231 - INFO - Test 41: CATEGORY: [MVCOMBINE], COMPLEXITY: [advanced], TITLE: [Combining Multivalue Fields with MVCOMBINE]
+2024-10-26 14:08:17,231 - INFO - --------------------
+2024-10-26 14:08:17,231 - INFO - Test 42: CATEGORY: [SUBSTR], COMPLEXITY: [intermediate], TITLE: [Extracting Substrings with SUBSTR]
+2024-10-26 14:08:17,232 - INFO - --------------------
+2024-10-26 14:08:17,232 - INFO - Test 43: CATEGORY: [MVINDEX], COMPLEXITY: [advanced], TITLE: [Indexing Multivalue Fields with MVINDEX]
+2024-10-26 14:08:17,232 - INFO - --------------------
+2024-10-26 14:08:17,232 - INFO - Test 44: CATEGORY: [DECODE], COMPLEXITY: [intermediate], TITLE: [Decoding Encoded Fields with DECODE]
+2024-10-26 14:08:17,232 - INFO - --------------------
+2024-10-26 14:08:17,232 - INFO - Test 45: CATEGORY: [ENCODE], COMPLEXITY: [intermediate], TITLE: [Encoding Fields with ENCODE]
+2024-10-26 14:08:17,233 - INFO - --------------------
+2024-10-26 14:08:17,233 - INFO - Test 46: CATEGORY: [COUNT], COMPLEXITY: [basic], TITLE: [Counting Events with COUNT]
+2024-10-26 14:08:17,233 - INFO - --------------------
+2024-10-26 14:08:17,233 - INFO - Test 47: CATEGORY: [SUM], COMPLEXITY: [basic], TITLE: [Summing Values with SUM]
+2024-10-26 14:08:17,233 - INFO - --------------------
+2024-10-26 14:08:17,233 - INFO - Test 48: CATEGORY: [AVG], COMPLEXITY: [basic], TITLE: [Averaging Values with AVG]
+2024-10-26 14:08:17,233 - INFO - --------------------
+2024-10-26 14:08:17,233 - INFO - Test 49: CATEGORY: [MAX], COMPLEXITY: [basic], TITLE: [Finding Maximum Values with MAX]
+2024-10-26 14:08:17,234 - INFO - --------------------
+2024-10-26 14:08:17,234 - INFO - Test 50: CATEGORY: [MIN], COMPLEXITY: [basic], TITLE: [Finding Minimum Values with MIN]
+2024-10-26 14:08:17,234 - INFO - --------------------
+2024-10-26 14:08:17,234 - INFO - Test 51: CATEGORY: [MEDIAN], COMPLEXITY: [intermediate], TITLE: [Calculating Median with MEDIAN]
+2024-10-26 14:08:17,234 - INFO - --------------------
+2024-10-26 14:08:17,234 - INFO - Test 52: CATEGORY: [MODE], COMPLEXITY: [advanced], TITLE: [Finding Mode with MODE]
+2024-10-26 14:08:17,235 - INFO - --------------------
+2024-10-26 14:08:17,235 - INFO - Test 53: CATEGORY: [SQRT], COMPLEXITY: [intermediate], TITLE: [Calculating Square Root with SQRT]
+2024-10-26 14:08:17,235 - INFO - --------------------
+2024-10-26 14:08:17,235 - INFO - Test 54: CATEGORY: [ABS], COMPLEXITY: [basic], TITLE: [Calculating Absolute Values with ABS]
+2024-10-26 14:08:17,235 - INFO - --------------------
+2024-10-26 14:08:17,235 - INFO - Test 55: CATEGORY: [REPEAT], COMPLEXITY: [intermediate], TITLE: [Repeating Strings with REPEAT]
+2024-10-26 14:08:17,235 - INFO - --------------------
+2024-10-26 14:08:17,235 - INFO - Test 56: CATEGORY: [REPLACE], COMPLEXITY: [intermediate], TITLE: [Replacing Substrings with REPLACE]
+2024-10-26 14:08:17,236 - INFO - --------------------
+2024-10-26 14:08:17,236 - INFO - Test 57: CATEGORY: [CONCAT], COMPLEXITY: [basic], TITLE: [Concatenating Fields with CONCAT]
+2024-10-26 14:08:17,236 - INFO - --------------------
+2024-10-26 14:08:17,236 - INFO - Test 58: CATEGORY: [LOWER], COMPLEXITY: [basic], TITLE: [Converting to Lowercase with LOWER]
+2024-10-26 14:08:17,236 - INFO - --------------------
+2024-10-26 14:08:17,236 - INFO - Test 59: CATEGORY: [UPPER], COMPLEXITY: [basic], TITLE: [Converting to Uppercase with UPPER]
+2024-10-26 14:08:17,237 - INFO - --------------------
+2024-10-26 14:08:17,237 - INFO - Test 60: CATEGORY: [CAPITALIZE], COMPLEXITY: [basic], TITLE: [Capitalizing Text with CAPITALIZE]
+2024-10-26 14:08:17,237 - INFO - --------------------
+2024-10-26 14:08:17,237 - INFO - Test 61: CATEGORY: [LTRIM], COMPLEXITY: [basic], TITLE: [Trimming Left Spaces with LTRIM]
+2024-10-26 14:08:17,237 - INFO - --------------------
+2024-10-26 14:08:17,237 - INFO - Test 62: CATEGORY: [RTRIM], COMPLEXITY: [basic], TITLE: [Trimming Right Spaces with RTRIM]
+2024-10-26 14:08:17,237 - INFO - --------------------
+2024-10-26 14:08:17,237 - INFO - Test 63: CATEGORY: [TRIM], COMPLEXITY: [basic], TITLE: [Trimming Spaces with TRIM]
+2024-10-26 14:08:17,238 - INFO - --------------------
+2024-10-26 14:08:17,238 - INFO - Test 64: CATEGORY: [SUBSTR], COMPLEXITY: [intermediate], TITLE: [Extracting Substrings with SUBSTR]
+2024-10-26 14:08:17,238 - INFO - --------------------
+2024-10-26 14:08:17,238 - INFO - Test 65: CATEGORY: [LEN], COMPLEXITY: [basic], TITLE: [Calculating Length with LEN]
+2024-10-26 14:08:17,238 - INFO - --------------------
+2024-10-26 14:08:17,238 - INFO - Test 66: CATEGORY: [CONSECUTIVE], COMPLEXITY: [advanced], TITLE: [Consecutive Duplicate Removal with CONSECUTIVE]
+2024-10-26 14:08:17,238 - INFO - --------------------
+2024-10-26 14:08:17,238 - INFO - Test 67: CATEGORY: [ISNULL], COMPLEXITY: [intermediate], TITLE: [Checking for Null Values with ISNULL]
+2024-10-26 14:08:17,239 - INFO - --------------------
+2024-10-26 14:08:17,239 - INFO - Test 68: CATEGORY: [ISNOTNULL], COMPLEXITY: [intermediate], TITLE: [Checking for Non-Null Values with ISNOTNULL]
+2024-10-26 14:08:17,239 - INFO - --------------------
+2024-10-26 14:08:17,239 - INFO - Test 69: CATEGORY: [RANGE], COMPLEXITY: [advanced], TITLE: [Filtering Within a Range with RANGE]
+2024-10-26 14:08:17,241 - INFO - --------------------
+2024-10-26 14:08:17,241 - INFO - Test 70: CATEGORY: [MVDCOUNT], COMPLEXITY: [advanced], TITLE: [Counting Multivalue Fields with MVDCOUNT]
+2024-10-26 14:08:17,241 - INFO - --------------------
+2024-10-26 14:08:17,241 - INFO - Test 71: CATEGORY: [MVZIP], COMPLEXITY: [advanced], TITLE: [Zipping Multivalue Fields with MVZIP]
+2024-10-26 14:08:17,241 - INFO - --------------------
+2024-10-26 14:08:17,241 - INFO - Test 72: CATEGORY: [MVAPPEND], COMPLEXITY: [advanced], TITLE: [Appending Multivalue Fields with MVAPPEND]
+2024-10-26 14:08:17,241 - INFO - --------------------
+2024-10-26 14:08:17,241 - INFO - Test 73: CATEGORY: [MVFIND], COMPLEXITY: [advanced], TITLE: [Finding Values in Multivalue Fields with MVFIND]
+2024-10-26 14:08:17,242 - INFO - --------------------
+2024-10-26 14:08:17,242 - INFO - Test 74: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic Search Command]
+2024-10-26 14:08:17,242 - INFO - --------------------
+2024-10-26 14:08:17,242 - INFO - Test 75: CATEGORY: [DEFANG], COMPLEXITY: [intermediate], TITLE: [Defanging URLs with DEFANG]
+2024-10-26 14:08:17,242 - INFO - --------------------
+2024-10-26 14:08:17,242 - INFO - Test 76: CATEGORY: [FANG], COMPLEXITY: [intermediate], TITLE: [Fanging URLs with FANG]
+2024-10-26 14:08:17,242 - INFO - --------------------
+2024-10-26 14:08:17,242 - INFO - Test 77: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [Rounding Numbers with ROUND]
+2024-10-26 14:08:17,243 - INFO - --------------------
+2024-10-26 14:08:17,243 - INFO - Test 78: CATEGORY: [MAX_MATCH], COMPLEXITY: [advanced], TITLE: [Limiting Matches with MAX_MATCH]
+2024-10-26 14:08:17,243 - INFO - --------------------
+2024-10-26 14:08:17,243 - INFO - Test 79: CATEGORY: [FANG], COMPLEXITY: [advanced], TITLE: [Fanging with Custom Replacement]
+2024-10-26 14:08:17,243 - INFO - --------------------
+2024-10-26 14:08:17,243 - INFO - Test 80: CATEGORY: [OUTPUTNEW], COMPLEXITY: [intermediate], TITLE: [Outputting New Fields with OUTPUTNEW]
+2024-10-26 14:08:17,244 - INFO - --------------------
+2024-10-26 14:08:17,244 - INFO - Test 81: CATEGORY: [MVREVERSE], COMPLEXITY: [advanced], TITLE: [Reversing Multivalue Fields with MVREVERSE]
+2024-10-26 14:08:17,244 - INFO - --------------------
+2024-10-26 14:08:17,244 - INFO - Test 82: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining with Multiple Fields]
+2024-10-26 14:08:17,244 - INFO - --------------------
+2024-10-26 14:08:17,244 - INFO - Test 83: CATEGORY: [SPECIAL_FUNC], COMPLEXITY: [advanced], TITLE: [Using Special Functions]
+2024-10-26 14:08:17,244 - INFO - --------------------
+2024-10-26 14:08:17,244 - INFO - Test 84: CATEGORY: [EVAL], COMPLEXITY: [intermediate], TITLE: [Evaluating Multiple Fields with EVAL]
+2024-10-26 14:08:17,245 - INFO - --------------------
+2024-10-26 14:08:17,245 - INFO - Test 85: CATEGORY: [RESET_AFTER], COMPLEXITY: [advanced], TITLE: [Resetting Stats with RESET_AFTER]
+2024-10-26 14:08:17,245 - INFO - --------------------
+2024-10-26 14:08:17,245 - INFO - Test 86: CATEGORY: [EVENTSTATS], COMPLEXITY: [intermediate], TITLE: [Enhancing Events with EVENTSTATS]
+2024-10-26 14:08:17,245 - INFO - --------------------
+2024-10-26 14:08:17,245 - INFO - Test 87: CATEGORY: [MVCOUNT], COMPLEXITY: [advanced], TITLE: [Counting Multivalue Entries with MVCOUNT]
+2024-10-26 14:08:17,246 - INFO - --------------------
+2024-10-26 14:08:17,246 - INFO - Test 88: CATEGORY: [FIELDSUMMARY], COMPLEXITY: [advanced], TITLE: [Generating Field Summaries]
+2024-10-26 14:08:17,246 - INFO - --------------------
+2024-10-26 14:08:17,246 - INFO - Test 89: CATEGORY: [DCOUNT], COMPLEXITY: [intermediate], TITLE: [Distinct Counting with DCOUNT]
+2024-10-26 14:08:17,246 - INFO - --------------------
+2024-10-26 14:08:17,246 - INFO - Test 90: CATEGORY: [LOOKUP], COMPLEXITY: [advanced], TITLE: [Performing Multiple Lookups]
+2024-10-26 14:08:17,246 - INFO - --------------------
+2024-10-26 14:08:17,246 - INFO - Test 91: CATEGORY: [MVAPPEND], COMPLEXITY: [advanced], TITLE: [Appending Multiple Multivalue Fields]
+2024-10-26 14:08:17,247 - INFO - --------------------
+2024-10-26 14:08:17,247 - INFO - Test 92: CATEGORY: [REVERSE], COMPLEXITY: [basic], TITLE: [Reversing Results Order]
+2024-10-26 14:08:17,247 - INFO - --------------------
+2024-10-26 14:08:17,247 - INFO - Test 93: CATEGORY: [REPLACE], COMPLEXITY: [intermediate], TITLE: [Replacing Patterns with REPLACE]
+2024-10-26 14:08:17,247 - INFO - --------------------
+2024-10-26 14:08:17,247 - INFO - Test 94: CATEGORY: [BIN], COMPLEXITY: [intermediate], TITLE: [Binning Numerical Data with BIN]
+2024-10-26 14:08:17,248 - INFO - --------------------
+2024-10-26 14:08:17,248 - INFO - Test 95: CATEGORY: [MATCH], COMPLEXITY: [advanced], TITLE: [Matching Patterns with MATCH]
+2024-10-26 14:08:17,248 - INFO - --------------------
+2024-10-26 14:08:17,248 - INFO - Test 96: CATEGORY: [MVFIND], COMPLEXITY: [advanced], TITLE: [Finding Specific Values in Multivalue Fields with MVFIND]
+2024-10-26 14:08:17,248 - INFO - --------------------
+2024-10-26 14:08:17,248 - INFO - Test 97: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [Rounding to Nearest Integer with ROUND]
+2024-10-26 14:08:17,248 - INFO - --------------------
+2024-10-26 14:08:17,248 - INFO - Test 98: CATEGORY: [SEARCH], COMPLEXITY: [advanced], TITLE: [Advanced Search with Multiple Conditions]
+2024-10-26 14:08:17,249 - INFO - --------------------
+2024-10-26 14:08:17,249 - INFO - Test 99: CATEGORY: [COUNT], COMPLEXITY: [intermediate], TITLE: [Counting Unique Users with COUNT]
+2024-10-26 14:08:17,249 - INFO - --------------------
+2024-10-26 14:08:17,249 - INFO - Test 100: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Index Filters with AND and OR]
+2024-10-26 14:08:17,290 - INFO - --------------------
+2024-10-26 14:08:17,290 - INFO - Test 101: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Index Filters with Multiple Conditions]
+2024-10-26 14:08:17,294 - INFO - --------------------
+2024-10-26 14:08:17,294 - INFO - Test 102: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Filters with NOT and OR]
+2024-10-26 14:08:17,307 - INFO - --------------------
+2024-10-26 14:08:17,307 - INFO - Test 103: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Mixed Logical Operators]
+2024-10-26 14:08:17,310 - INFO - --------------------
+2024-10-26 14:08:17,310 - INFO - Test 104: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Multiple AND Conditions]
+2024-10-26 14:08:17,317 - INFO - --------------------
+2024-10-26 14:08:17,317 - INFO - Test 105: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Ungrouped Filters with NOT Conditions]
+2024-10-26 14:08:17,319 - INFO - --------------------
+2024-10-26 14:08:17,319 - INFO - Test 106: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Filters with Nested Parentheses]
+2024-10-26 14:08:17,334 - INFO - --------------------
+2024-10-26 14:08:17,334 - INFO - Test 107: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Sequential Index Calls]
+2024-10-26 14:08:17,336 - ERROR - Syntax Error - line 2:18 no viable alternative at input '(metric="cpu"ANDvalue'
+2024-10-26 14:08:17,336 - ERROR - Syntax Error - line 2:18 mismatched input 'value' expecting {NEWLINE, NOT, '+', '-', '++', '--', '~', '(', 'repeat', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'substr', 'tostring', 'type', 'abs', 'urlencode', 'urldecode', BOOLEAN, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 14:08:17,336 - ERROR - Syntax Error - line 2:54 no viable alternative at input '(metric="memory"ANDvalue'
+2024-10-26 14:08:17,337 - ERROR - Syntax Error - line 2:54 mismatched input 'value' expecting {NEWLINE, NOT, '+', '-', '++', '--', '~', '(', 'repeat', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'substr', 'tostring', 'type', 'abs', 'urlencode', 'urldecode', BOOLEAN, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 14:08:17,337 - ERROR - FAILED QUERY:
+earliest="2024-08-01" latest="2024-08-31"
+(metric="cpu" AND value > 75) OR (metric="memory" AND value > 80)
+index="resource_metrics/parquet,system_metrics/parquet"
+alertTriggered=true
+index="alerts/parquet
+
+2024-10-26 14:08:17,337 - INFO - --------------------
+2024-10-26 14:08:17,337 - INFO - Test 108: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Combined Logical Operators]
+2024-10-26 14:08:17,346 - INFO - --------------------
+2024-10-26 14:08:17,346 - INFO - Test 109: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Multiple OR Conditions]
+2024-10-26 14:08:17,349 - INFO - --------------------
+2024-10-26 14:08:17,349 - INFO - Test 110: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Combined Logical Operators]
+Total Tests: 111
+Passed: 110
+Failed: 1
+Pass %: 99.0 %
+
+Details by Category:
+                         passed  failed
+INDEX                         1       0
+EVAL                          2       0
+FILTER                        1       0
+WHERE                         1       0
+STATS                         1       0
+JOIN                          3       0
+APPEND                        1       0
+SORT                          2       0
+RENAME                        1       0
+REX                           2       0
+EVENTSTATS                    2       0
+STREAMSTATS                   2       0
+APPENDPIPE                    1       0
+TIMECHART                     1       0
+FIELDS                        1       0
+MAKETABLE                     1       0
+MVEXPAND                      1       0
+LOOKUP                        2       0
+FIELDSUMMARY                  2       0
+HEAD                          1       0
+IF                            1       0
+CASE                          2       0
+BIN                           2       0
+MVJOIN                        1       0
+SPATH                         1       0
+COALESCE                      1       0
+MVFILTER                      1       0
+FILLNULL                      2       0
+URLENCODE                     1       0
+REVERSE                       2       0
+DEDUPE                        1       0
+REGEX                         1       0
+BASE64                        1       0
+OUTPUTLOOKUP                  1       0
+MVREVERSE                     2       0
+MVCOMBINE                     1       0
+SUBSTR                        2       0
+MVINDEX                       1       0
+DECODE                        1       0
+ENCODE                        1       0
+COUNT                         2       0
+SUM                           1       0
+AVG                           1       0
+MAX                           1       0
+MIN                           1       0
+MEDIAN                        1       0
+MODE                          1       0
+SQRT                          1       0
+ABS                           1       0
+REPEAT                        1       0
+REPLACE                       2       0
+CONCAT                        1       0
+LOWER                         1       0
+UPPER                         1       0
+CAPITALIZE                    1       0
+LTRIM                         1       0
+RTRIM                         1       0
+TRIM                          1       0
+LEN                           1       0
+CONSECUTIVE                   1       0
+ISNULL                        1       0
+ISNOTNULL                     1       0
+RANGE                         1       0
+MVDCOUNT                      1       0
+MVZIP                         1       0
+MVAPPEND                      2       0
+MVFIND                        2       0
+SEARCH                        2       0
+DEFANG                        1       0
+FANG                          2       0
+ROUND                         2       0
+MAX_MATCH                     1       0
+OUTPUTNEW                     1       0
+SPECIAL_FUNC                  1       0
+RESET_AFTER                   1       0
+MVCOUNT                       1       0
+DCOUNT                        1       0
+MATCH                         1       0
+GROUPED_INDEX_FILTERS         6       0
+UNGROUPED_INDEX_FILTERS       4       1
+
+Details of Complexity:
+                         passed  failed
+INDEX                         1       0
+EVAL                          2       0
+FILTER                        1       0
+WHERE                         1       0
+STATS                         1       0
+JOIN                          3       0
+APPEND                        1       0
+SORT                          2       0
+RENAME                        1       0
+REX                           2       0
+EVENTSTATS                    2       0
+STREAMSTATS                   2       0
+APPENDPIPE                    1       0
+TIMECHART                     1       0
+FIELDS                        1       0
+MAKETABLE                     1       0
+MVEXPAND                      1       0
+LOOKUP                        2       0
+FIELDSUMMARY                  2       0
+HEAD                          1       0
+IF                            1       0
+CASE                          2       0
+BIN                           2       0
+MVJOIN                        1       0
+SPATH                         1       0
+COALESCE                      1       0
+MVFILTER                      1       0
+FILLNULL                      2       0
+URLENCODE                     1       0
+REVERSE                       2       0
+DEDUPE                        1       0
+REGEX                         1       0
+BASE64                        1       0
+OUTPUTLOOKUP                  1       0
+MVREVERSE                     2       0
+MVCOMBINE                     1       0
+SUBSTR                        2       0
+MVINDEX                       1       0
+DECODE                        1       0
+ENCODE                        1       0
+COUNT                         2       0
+SUM                           1       0
+AVG                           1       0
+MAX                           1       0
+MIN                           1       0
+MEDIAN                        1       0
+MODE                          1       0
+SQRT                          1       0
+ABS                           1       0
+REPEAT                        1       0
+REPLACE                       2       0
+CONCAT                        1       0
+LOWER                         1       0
+UPPER                         1       0
+CAPITALIZE                    1       0
+LTRIM                         1       0
+RTRIM                         1       0
+TRIM                          1       0
+LEN                           1       0
+CONSECUTIVE                   1       0
+ISNULL                        1       0
+ISNOTNULL                     1       0
+RANGE                         1       0
+MVDCOUNT                      1       0
+MVZIP                         1       0
+MVAPPEND                      2       0
+MVFIND                        2       0
+SEARCH                        2       0
+DEFANG                        1       0
+FANG                          2       0
+ROUND                         2       0
+MAX_MATCH                     1       0
+OUTPUTNEW                     1       0
+SPECIAL_FUNC                  1       0
+RESET_AFTER                   1       0
+MVCOUNT                       1       0
+DCOUNT                        1       0
+MATCH                         1       0
+GROUPED_INDEX_FILTERS         6       0
+UNGROUPED_INDEX_FILTERS       4       1

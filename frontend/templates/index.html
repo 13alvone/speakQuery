@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}SpeakQuery Console{% endblock %}
+
+{% block extra_css %}
+    <!-- Include Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">SpeakQuery Console</h1>
+
+        <!-- Notification Container -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by index.js -->
+        </div>
+
+        <div class="columns">
+            <!-- Main Column -->
+            <div class="column">
+                <div class="box">
+                    <h2 class="subtitle">Query Section</h2>
+                    <div class="field">
+                        <div class="control">
+                            <textarea id="query" class="textarea" placeholder="Write your query here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <!-- Added type="button" to avoid form submission behavior -->
+                        <button id="run-query-btn" type="button" class="button is-primary">Run Query</button>
+                        <button id="save-search-btn" type="button" class="button is-link">Save Search</button>
+                    </div>
+
+                    <!-- Hidden form for Save Search -->
+                    <form id="save-search-form" action="/save_search.html" method="post" style="display:none;">
+                        <input type="hidden" name="request_id" id="form-request-id" value="">
+                        <input type="hidden" name="saved_query" id="form-saved-query" value="">
+                    </form>
+                </div>
+                <div class="box">
+                    <div id="row-count" class="mb-3"></div>
+                    <button id="tree-toggle" type="button" class="button is-light mb-3">Hide Files</button>
+                    <div id="directory-tree"></div> <!-- Directory structure tree -->
+                    <nav class="pagination is-centered" role="navigation" aria-label="pagination" id="pagination-top" style="display: none;">
+                        <button id="prev-page-btn-top" type="button" class="pagination-previous">Previous</button>
+                        <button id="next-page-btn-top" type="button" class="pagination-next">Next</button>
+                    </nav>
+                    <h2 class="subtitle">Results</h2>
+                    <!-- Container for the results with overflow-x auto -->
+                    <div id="results-container">
+                        <div id="results">
+                            <!-- Placeholder for dynamic content -->
+                        </div>
+                    </div>
+                    <nav class="pagination is-centered" role="navigation" aria-label="pagination" id="pagination-bottom" style="display: none;">
+                        <button id="prev-page-btn-bottom" type="button" class="pagination-previous">Previous</button>
+                        <button id="next-page-btn-bottom" type="button" class="pagination-next">Next</button>
+                    </nav>
+                    <div class="buttons mt-2">
+                        <button id="save-csv-btn" type="button" class="button is-link">Save as CSV</button>
+                        <button id="save-json-btn" type="button" class="button is-link">Save as JSON</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Sidebar Column -->
+            <div class="column is-one-quarter">
+                <div class="box">
+                    <h2 class="subtitle">Query Syntax Helper</h2>
+                    <p>Use the following syntax to build your query:</p>
+                    <pre id="syntax-example"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include Bulma's JavaScript (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bulma@0.9.4/js/bulma.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

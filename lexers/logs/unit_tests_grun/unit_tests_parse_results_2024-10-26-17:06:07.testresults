@@ -1,0 +1,1003 @@
+2024-10-26 17:06:07,331 - ERROR - Failed to regenerate target files: Command 'java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor -o lexers/antlr4_active lexers/speakQuery.g4' returned non-zero exit status 1.
+2024-10-26 17:06:07,364 - INFO - --------------------
+2024-10-26 17:06:07,364 - INFO - Test 0: CATEGORY: [INDEX], COMPLEXITY: [basic], TITLE: [Basic Index Call]
+2024-10-26 17:06:07,376 - INFO - --------------------
+2024-10-26 17:06:07,376 - INFO - Test 1: CATEGORY: [EVAL], COMPLEXITY: [basic], TITLE: [Evaluate New Field]
+2024-10-26 17:06:07,384 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,405 - ERROR - FAILED QUERY:
+earliest="2024-01-01" latest="2024-12-31"
+index="logs/main.log"
+| table "datafile1.parquet" some_other_field
+| eval total=price * quantity
+
+2024-10-26 17:06:07,405 - INFO - --------------------
+2024-10-26 17:06:07,405 - INFO - Test 2: CATEGORY: [FILTER], COMPLEXITY: [basic], TITLE: [Basic Search with Filter]
+2024-10-26 17:06:07,411 - INFO - --------------------
+2024-10-26 17:06:07,411 - INFO - Test 3: CATEGORY: [WHERE], COMPLEXITY: [intermediate], TITLE: [Using WHERE Clause]
+2024-10-26 17:06:07,422 - INFO - --------------------
+2024-10-26 17:06:07,422 - INFO - Test 4: CATEGORY: [STATS], COMPLEXITY: [intermediate], TITLE: [Statistics with STATS]
+2024-10-26 17:06:07,437 - INFO - --------------------
+2024-10-26 17:06:07,437 - INFO - Test 5: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining Two Datasets]
+2024-10-26 17:06:07,439 - ERROR - Syntax Error - line 2:7 mismatched input 'userID' expecting 'type'
+2024-10-26 17:06:07,440 - ERROR - Syntax Error - line 2:55 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,440 - ERROR - FAILED QUERY:
+earliest="2024-01-01" index="users/data.parquet"
+| join userID [ search index="profiles/data.parquet" | table userID, userName ]
+
+2024-10-26 17:06:07,440 - INFO - --------------------
+2024-10-26 17:06:07,440 - INFO - Test 6: CATEGORY: [APPEND], COMPLEXITY: [intermediate], TITLE: [Appending Results from Another Search]
+2024-10-26 17:06:07,445 - ERROR - Syntax Error - line 3:2 mismatched input 'append' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,445 - ERROR - FAILED QUERY:
+earliest="2024-01-01" latest="2024-10-11"
+index="output_parquets/test0.parquet"
+| append [ search index="output_parquets/test1.parquet" ]
+
+2024-10-26 17:06:07,445 - INFO - --------------------
+2024-10-26 17:06:07,445 - INFO - Test 7: CATEGORY: [SORT], COMPLEXITY: [basic], TITLE: [Sorting Results]
+2024-10-26 17:06:07,448 - INFO - --------------------
+2024-10-26 17:06:07,448 - INFO - Test 8: CATEGORY: [RENAME], COMPLEXITY: [basic], TITLE: [Renaming Fields]
+2024-10-26 17:06:07,451 - INFO - --------------------
+2024-10-26 17:06:07,451 - INFO - Test 9: CATEGORY: [REX], COMPLEXITY: [advanced], TITLE: [Using Regular Expressions]
+2024-10-26 17:06:07,453 - ERROR - Syntax Error - line 2:6 mismatched input '"user=(?<userID>\d+)"' expecting FIELD
+2024-10-26 17:06:07,453 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,453 - ERROR - FAILED QUERY:
+index="web_logs/parquet"
+| rex "user=(?<userID>\d+)"
+| table userID, action
+
+2024-10-26 17:06:07,453 - INFO - --------------------
+2024-10-26 17:06:07,453 - INFO - Test 10: CATEGORY: [EVENTSTATS], COMPLEXITY: [intermediate], TITLE: [Event Statistics with EVENTSTATS]
+2024-10-26 17:06:07,459 - ERROR - Syntax Error - line 3:13 mismatched input 'count' expecting {'dcount', 'latest', 'earliest', 'first', 'last', 'values', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'abs', NEWLINE}
+2024-10-26 17:06:07,459 - ERROR - FAILED QUERY:
+earliest="2024-02-01" latest="2024-08-31"
+index="events/parquet"
+| eventstats count as event_count by userID
+
+2024-10-26 17:06:07,459 - INFO - --------------------
+2024-10-26 17:06:07,459 - INFO - Test 11: CATEGORY: [STREAMSTATS], COMPLEXITY: [advanced], TITLE: [Stream Statistics with STREAMSTATS]
+2024-10-26 17:06:07,466 - ERROR - Syntax Error - line 3:68 missing {SINGLE_QUOTED_STRING, VARIABLE} at '='
+2024-10-26 17:06:07,466 - ERROR - Syntax Error - line 3:69 mismatched input '10' expecting {'++', '--', '~', SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:07,466 - ERROR - FAILED QUERY:
+earliest="2024-03-01"
+index="stream_data/parquet"
+| streamstats avg(responseTime) as avg_resp by sessionID reset_after=10
+
+2024-10-26 17:06:07,466 - INFO - --------------------
+2024-10-26 17:06:07,466 - INFO - Test 12: CATEGORY: [APPENDPIPE], COMPLEXITY: [intermediate], TITLE: [Appending with APPENDPIPE]
+2024-10-26 17:06:07,472 - ERROR - Syntax Error - line 3:15 mismatched input 'stats' expecting {'|', NEWLINE}
+2024-10-26 17:06:07,472 - ERROR - FAILED QUERY:
+earliest="2024-01-01" latest="2024-12-31"
+index="primary/parquet"
+| appendpipe [ stats sum(sales) as total_sales by region ]
+
+2024-10-26 17:06:07,472 - INFO - --------------------
+2024-10-26 17:06:07,472 - INFO - Test 13: CATEGORY: [TIMECHART], COMPLEXITY: [advanced], TITLE: [Time-Based Chart with TIMECHART]
+2024-10-26 17:06:07,477 - ERROR - Syntax Error - line 3:12 mismatched input 'span' expecting {'dcount', 'latest', 'earliest', 'first', 'last', 'values', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'abs', NEWLINE}
+2024-10-26 17:06:07,477 - ERROR - FAILED QUERY:
+earliest="2024-01-01" latest="2024-12-31"
+index="traffic/parquet"
+| timechart span=1d count by pageURL
+
+2024-10-26 17:06:07,477 - INFO - --------------------
+2024-10-26 17:06:07,477 - INFO - Test 14: CATEGORY: [FIELDS], COMPLEXITY: [basic], TITLE: [Selecting Specific Fields with FIELDS]
+2024-10-26 17:06:07,480 - INFO - --------------------
+2024-10-26 17:06:07,480 - INFO - Test 15: CATEGORY: [MAKETABLE], COMPLEXITY: [basic], TITLE: [Creating a Table with MAKETABLE]
+2024-10-26 17:06:07,483 - INFO - --------------------
+2024-10-26 17:06:07,483 - INFO - Test 16: CATEGORY: [MVEXPAND], COMPLEXITY: [intermediate], TITLE: [Expanding Multivalue Fields with MVEXPAND]
+2024-10-26 17:06:07,485 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,486 - ERROR - FAILED QUERY:
+index="session_logs/parquet"
+| mvexpand actions
+| table sessionID, actions
+
+2024-10-26 17:06:07,486 - INFO - --------------------
+2024-10-26 17:06:07,486 - INFO - Test 17: CATEGORY: [LOOKUP], COMPLEXITY: [intermediate], TITLE: [Performing a Lookup with LOOKUP]
+2024-10-26 17:06:07,488 - INFO - --------------------
+2024-10-26 17:06:07,488 - INFO - Test 18: CATEGORY: [FIELDSUMMARY], COMPLEXITY: [advanced], TITLE: [Field Summary with FIELDSUMMARY]
+2024-10-26 17:06:07,491 - INFO - --------------------
+2024-10-26 17:06:07,491 - INFO - Test 19: CATEGORY: [HEAD], COMPLEXITY: [basic], TITLE: [Limiting Results with HEAD]
+2024-10-26 17:06:07,494 - INFO - --------------------
+2024-10-26 17:06:07,494 - INFO - Test 20: CATEGORY: [IF], COMPLEXITY: [advanced], TITLE: [Conditional Evaluation with IF]
+2024-10-26 17:06:07,516 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,516 - ERROR - FAILED QUERY:
+index="user_data/parquet"
+| eval status=if(age > 30, "Senior", "Junior")
+| table userID, age, status
+
+2024-10-26 17:06:07,516 - INFO - --------------------
+2024-10-26 17:06:07,516 - INFO - Test 21: CATEGORY: [CASE], COMPLEXITY: [advanced], TITLE: [Using CASE for Multiple Conditions]
+2024-10-26 17:06:07,529 - ERROR - Syntax Error - line 2:107 mismatched input ')' expecting ','
+2024-10-26 17:06:07,529 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,530 - ERROR - FAILED QUERY:
+index="performance_logs/parquet"
+| eval performance=case(score >= 90, "Excellent", score >= 75, "Good", score >= 60, "Average", 1==1, "Poor")
+| table userID, score, performance
+
+2024-10-26 17:06:07,530 - INFO - --------------------
+2024-10-26 17:06:07,530 - INFO - Test 22: CATEGORY: [BIN], COMPLEXITY: [intermediate], TITLE: [Binning Data with BIN]
+2024-10-26 17:06:07,532 - ERROR - Syntax Error - line 2:17 mismatched input '1h' expecting NUMBER
+2024-10-26 17:06:07,533 - ERROR - FAILED QUERY:
+index="metrics/parquet"
+| bin _time span=1h
+| stats avg(responseTime) as avg_resp by _time
+
+2024-10-26 17:06:07,533 - INFO - --------------------
+2024-10-26 17:06:07,533 - INFO - Test 23: CATEGORY: [MVJOIN], COMPLEXITY: [advanced], TITLE: [Joining Multivalue Fields with MVJOIN]
+2024-10-26 17:06:07,535 - ERROR - Syntax Error - line 2:2 mismatched input 'mvjoin' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,536 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,536 - ERROR - FAILED QUERY:
+index="session_logs/parquet"
+| mvjoin actions delim=", "
+| table sessionID, actions
+
+2024-10-26 17:06:07,536 - INFO - --------------------
+2024-10-26 17:06:07,536 - INFO - Test 24: CATEGORY: [SPATH], COMPLEXITY: [intermediate], TITLE: [Extracting JSON Fields with SPATH]
+2024-10-26 17:06:07,539 - INFO - --------------------
+2024-10-26 17:06:07,539 - INFO - Test 25: CATEGORY: [STREAMSTATS], COMPLEXITY: [advanced], TITLE: [Calculating Running Totals with STREAMSTATS]
+2024-10-26 17:06:07,542 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,542 - ERROR - FAILED QUERY:
+index="sales/parquet"
+| streamstats sum(amount) as running_total by region
+| table region, amount, running_total
+
+2024-10-26 17:06:07,542 - INFO - --------------------
+2024-10-26 17:06:07,542 - INFO - Test 26: CATEGORY: [COALESCE], COMPLEXITY: [intermediate], TITLE: [Handling Null Values with COALESCE]
+2024-10-26 17:06:07,545 - ERROR - Syntax Error - line 2:38 no viable alternative at input 'coalesce(email,phone,"No Contact"'
+2024-10-26 17:06:07,546 - ERROR - Syntax Error - line 2:36 mismatched input ',' expecting '='
+2024-10-26 17:06:07,546 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,546 - ERROR - FAILED QUERY:
+index="user_profiles/parquet"
+| eval contact=coalesce(email, phone, "No Contact")
+| table userID, contact
+
+2024-10-26 17:06:07,546 - INFO - --------------------
+2024-10-26 17:06:07,546 - INFO - Test 27: CATEGORY: [MVFILTER], COMPLEXITY: [advanced], TITLE: [Filtering Multivalue Fields with MVFILTER]
+2024-10-26 17:06:07,549 - ERROR - Syntax Error - line 2:2 mismatched input 'mvfilter' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,549 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,549 - ERROR - FAILED QUERY:
+index="logs/parquet"
+| mvfilter(status=="error")
+| table eventID, status
+
+2024-10-26 17:06:07,549 - INFO - --------------------
+2024-10-26 17:06:07,549 - INFO - Test 28: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [Filling Null Values in Multiple Fields]
+2024-10-26 17:06:07,552 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,552 - ERROR - FAILED QUERY:
+index="inventory/parquet"
+| fillnull value="Unknown" supplier, category
+| table productID, supplier, category
+
+2024-10-26 17:06:07,552 - INFO - --------------------
+2024-10-26 17:06:07,552 - INFO - Test 29: CATEGORY: [URLENCODE], COMPLEXITY: [intermediate], TITLE: [Encoding URLs with URLENCODE]
+2024-10-26 17:06:07,559 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,560 - ERROR - FAILED QUERY:
+index="web_logs/parquet"
+| eval encodedURL=urlencode(pageURL)
+| table userID, pageURL, encodedURL
+
+2024-10-26 17:06:07,560 - INFO - --------------------
+2024-10-26 17:06:07,560 - INFO - Test 30: CATEGORY: [REVERSE], COMPLEXITY: [basic], TITLE: [Reversing Event Order]
+2024-10-26 17:06:07,562 - INFO - --------------------
+2024-10-26 17:06:07,562 - INFO - Test 31: CATEGORY: [DEDUPE], COMPLEXITY: [intermediate], TITLE: [Removing Duplicate Events]
+2024-10-26 17:06:07,565 - INFO - --------------------
+2024-10-26 17:06:07,565 - INFO - Test 32: CATEGORY: [SORT], COMPLEXITY: [intermediate], TITLE: [Sorting with Multiple Fields]
+2024-10-26 17:06:07,567 - INFO - --------------------
+2024-10-26 17:06:07,567 - INFO - Test 33: CATEGORY: [REX], COMPLEXITY: [advanced], TITLE: [Extracting Fields with REX]
+2024-10-26 17:06:07,570 - ERROR - Syntax Error - line 2:6 mismatched input '"user=(?<username>\w+)"' expecting FIELD
+2024-10-26 17:06:07,570 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,570 - ERROR - FAILED QUERY:
+index="access_logs/parquet"
+| rex "user=(?<username>\w+)"
+| table username, action
+
+2024-10-26 17:06:07,570 - INFO - --------------------
+2024-10-26 17:06:07,570 - INFO - Test 34: CATEGORY: [REGEX], COMPLEXITY: [advanced], TITLE: [Filtering with REGEX]
+2024-10-26 17:06:07,573 - INFO - --------------------
+2024-10-26 17:06:07,573 - INFO - Test 35: CATEGORY: [BASE64], COMPLEXITY: [intermediate], TITLE: [Encoding and Decoding with BASE64]
+2024-10-26 17:06:07,576 - INFO - --------------------
+2024-10-26 17:06:07,576 - INFO - Test 36: CATEGORY: [FILLNULL], COMPLEXITY: [basic], TITLE: [Filling Null Values]
+2024-10-26 17:06:07,578 - INFO - --------------------
+2024-10-26 17:06:07,578 - INFO - Test 37: CATEGORY: [OUTPUTLOOKUP], COMPLEXITY: [intermediate], TITLE: [Outputting to a Lookup Table]
+2024-10-26 17:06:07,581 - INFO - --------------------
+2024-10-26 17:06:07,581 - INFO - Test 38: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining with Type Specification]
+2024-10-26 17:06:07,584 - ERROR - Syntax Error - line 2:27 extraneous input 'search' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'latest', 'earliest', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:07,584 - ERROR - Syntax Error - line 2:62 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,584 - ERROR - FAILED QUERY:
+index="orders/parquet"
+| join type=left orderID [ search index="shipments/parquet" | table orderID, shipmentDate ]
+
+2024-10-26 17:06:07,584 - INFO - --------------------
+2024-10-26 17:06:07,584 - INFO - Test 39: CATEGORY: [CASE], COMPLEXITY: [advanced], TITLE: [Using CASE for Conditional Evaluation]
+2024-10-26 17:06:07,589 - ERROR - Syntax Error - line 2:104 mismatched input ')' expecting ','
+2024-10-26 17:06:07,589 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,590 - ERROR - FAILED QUERY:
+index="performance_logs/parquet"
+| eval performance=case(score > 90, "Excellent", score > 75, "Good", score > 60, "Average", 1==1, "Poor")
+| table userID, score, performance
+
+2024-10-26 17:06:07,590 - INFO - --------------------
+2024-10-26 17:06:07,590 - INFO - Test 40: CATEGORY: [MVREVERSE], COMPLEXITY: [advanced], TITLE: [Reversing Multivalue Fields with MVREVERSE]
+2024-10-26 17:06:07,592 - ERROR - Syntax Error - line 2:2 mismatched input 'mvreverse' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,592 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,592 - ERROR - FAILED QUERY:
+index="multivalue_logs/parquet"
+| mvreverse tags
+| table eventID, tags
+
+2024-10-26 17:06:07,592 - INFO - --------------------
+2024-10-26 17:06:07,592 - INFO - Test 41: CATEGORY: [MVCOMBINE], COMPLEXITY: [advanced], TITLE: [Combining Multivalue Fields with MVCOMBINE]
+2024-10-26 17:06:07,595 - ERROR - Syntax Error - line 2:2 mismatched input 'mvcombine' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,595 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,595 - ERROR - FAILED QUERY:
+index="sensor_data/parquet"
+| mvcombine delim=";" readings
+| table sensorID, readings
+
+2024-10-26 17:06:07,595 - INFO - --------------------
+2024-10-26 17:06:07,595 - INFO - Test 42: CATEGORY: [SUBSTR], COMPLEXITY: [intermediate], TITLE: [Extracting Substrings with SUBSTR]
+2024-10-26 17:06:07,644 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,645 - ERROR - FAILED QUERY:
+index="user_logs/parquet"
+| eval shortURL=substr(pageURL, 0, 20)
+| table userID, shortURL
+
+2024-10-26 17:06:07,645 - INFO - --------------------
+2024-10-26 17:06:07,645 - INFO - Test 43: CATEGORY: [MVINDEX], COMPLEXITY: [advanced], TITLE: [Indexing Multivalue Fields with MVINDEX]
+2024-10-26 17:06:07,647 - ERROR - Syntax Error - line 2:2 mismatched input 'mvindex' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,647 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,647 - ERROR - FAILED QUERY:
+index="event_logs/parquet"
+| mvindex actions 0,2
+| table eventID, actions
+
+2024-10-26 17:06:07,648 - INFO - --------------------
+2024-10-26 17:06:07,648 - INFO - Test 44: CATEGORY: [DECODE], COMPLEXITY: [intermediate], TITLE: [Decoding Encoded Fields with DECODE]
+2024-10-26 17:06:07,650 - ERROR - Syntax Error - line 2:20 extraneous input 'decode' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '[', '(', '++', '--', '~', NOT, 'if', 'case', NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:07,660 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,661 - ERROR - FAILED QUERY:
+index="encoded_logs/parquet"
+| eval decodedField=decode(encodedField)
+| table eventID, decodedField
+
+2024-10-26 17:06:07,661 - INFO - --------------------
+2024-10-26 17:06:07,661 - INFO - Test 45: CATEGORY: [ENCODE], COMPLEXITY: [intermediate], TITLE: [Encoding Fields with ENCODE]
+2024-10-26 17:06:07,663 - ERROR - Syntax Error - line 2:20 extraneous input 'encode' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '[', '(', '++', '--', '~', NOT, 'if', 'case', NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:07,666 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,666 - ERROR - FAILED QUERY:
+index="plaintext_logs/parquet"
+| eval encodedField=encode(message)
+| table eventID, encodedField
+
+2024-10-26 17:06:07,666 - INFO - --------------------
+2024-10-26 17:06:07,666 - INFO - Test 46: CATEGORY: [COUNT], COMPLEXITY: [basic], TITLE: [Counting Events with COUNT]
+2024-10-26 17:06:07,669 - ERROR - Syntax Error - line 2:8 mismatched input 'count' expecting {'dcount', 'latest', 'earliest', 'first', 'last', 'values', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'abs', NEWLINE}
+2024-10-26 17:06:07,669 - ERROR - FAILED QUERY:
+index="login_logs/parquet"
+| stats count as total_logins
+
+2024-10-26 17:06:07,669 - INFO - --------------------
+2024-10-26 17:06:07,669 - INFO - Test 47: CATEGORY: [SUM], COMPLEXITY: [basic], TITLE: [Summing Values with SUM]
+2024-10-26 17:06:07,671 - INFO - --------------------
+2024-10-26 17:06:07,671 - INFO - Test 48: CATEGORY: [AVG], COMPLEXITY: [basic], TITLE: [Averaging Values with AVG]
+2024-10-26 17:06:07,674 - INFO - --------------------
+2024-10-26 17:06:07,674 - INFO - Test 49: CATEGORY: [MAX], COMPLEXITY: [basic], TITLE: [Finding Maximum Values with MAX]
+2024-10-26 17:06:07,677 - INFO - --------------------
+2024-10-26 17:06:07,677 - INFO - Test 50: CATEGORY: [MIN], COMPLEXITY: [basic], TITLE: [Finding Minimum Values with MIN]
+2024-10-26 17:06:07,680 - INFO - --------------------
+2024-10-26 17:06:07,680 - INFO - Test 51: CATEGORY: [MEDIAN], COMPLEXITY: [intermediate], TITLE: [Calculating Median with MEDIAN]
+2024-10-26 17:06:07,683 - INFO - --------------------
+2024-10-26 17:06:07,683 - INFO - Test 52: CATEGORY: [MODE], COMPLEXITY: [advanced], TITLE: [Finding Mode with MODE]
+2024-10-26 17:06:07,687 - INFO - --------------------
+2024-10-26 17:06:07,687 - INFO - Test 53: CATEGORY: [SQRT], COMPLEXITY: [intermediate], TITLE: [Calculating Square Root with SQRT]
+2024-10-26 17:06:07,693 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,693 - ERROR - FAILED QUERY:
+index="math_logs/parquet"
+| eval sqrt_value=sqrt(number)
+| table eventID, number, sqrt_value
+
+2024-10-26 17:06:07,693 - INFO - --------------------
+2024-10-26 17:06:07,693 - INFO - Test 54: CATEGORY: [ABS], COMPLEXITY: [basic], TITLE: [Calculating Absolute Values with ABS]
+2024-10-26 17:06:07,699 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,699 - ERROR - FAILED QUERY:
+index="finance_logs/parquet"
+| eval abs_change=abs(change)
+| table transactionID, change, abs_change
+
+2024-10-26 17:06:07,699 - INFO - --------------------
+2024-10-26 17:06:07,699 - INFO - Test 55: CATEGORY: [REPEAT], COMPLEXITY: [intermediate], TITLE: [Repeating Strings with REPEAT]
+2024-10-26 17:06:07,705 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,706 - ERROR - FAILED QUERY:
+index="string_logs/parquet"
+| eval repeated=repeat(word, 3)
+| table eventID, word, repeated
+
+2024-10-26 17:06:07,706 - INFO - --------------------
+2024-10-26 17:06:07,706 - INFO - Test 56: CATEGORY: [REPLACE], COMPLEXITY: [intermediate], TITLE: [Replacing Substrings with REPLACE]
+2024-10-26 17:06:07,716 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,716 - ERROR - FAILED QUERY:
+index="text_logs/parquet"
+| eval cleaned_text=replace(rawText, "error", "warning")
+| table eventID, rawText, cleaned_text
+
+2024-10-26 17:06:07,717 - INFO - --------------------
+2024-10-26 17:06:07,717 - INFO - Test 57: CATEGORY: [CONCAT], COMPLEXITY: [basic], TITLE: [Concatenating Fields with CONCAT]
+2024-10-26 17:06:07,728 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,728 - ERROR - FAILED QUERY:
+index="user_logs/parquet"
+| eval fullName=concat(firstName, " ", lastName)
+| table userID, fullName
+
+2024-10-26 17:06:07,728 - INFO - --------------------
+2024-10-26 17:06:07,728 - INFO - Test 58: CATEGORY: [LOWER], COMPLEXITY: [basic], TITLE: [Converting to Lowercase with LOWER]
+2024-10-26 17:06:07,734 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,734 - ERROR - FAILED QUERY:
+index="text_logs/parquet"
+| eval lowerCaseField=lower(caseField)
+| table eventID, caseField, lowerCaseField
+
+2024-10-26 17:06:07,734 - INFO - --------------------
+2024-10-26 17:06:07,734 - INFO - Test 59: CATEGORY: [UPPER], COMPLEXITY: [basic], TITLE: [Converting to Uppercase with UPPER]
+2024-10-26 17:06:07,740 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,740 - ERROR - FAILED QUERY:
+index="text_logs/parquet"
+| eval upperCaseField=upper(caseField)
+| table eventID, caseField, upperCaseField
+
+2024-10-26 17:06:07,740 - INFO - --------------------
+2024-10-26 17:06:07,740 - INFO - Test 60: CATEGORY: [CAPITALIZE], COMPLEXITY: [basic], TITLE: [Capitalizing Text with CAPITALIZE]
+2024-10-26 17:06:07,747 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,747 - ERROR - FAILED QUERY:
+index="text_logs/parquet"
+| eval capitalized=capitalize(word)
+| table eventID, word, capitalized
+
+2024-10-26 17:06:07,747 - INFO - --------------------
+2024-10-26 17:06:07,747 - INFO - Test 61: CATEGORY: [LTRIM], COMPLEXITY: [basic], TITLE: [Trimming Left Spaces with LTRIM]
+2024-10-26 17:06:07,754 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,754 - ERROR - FAILED QUERY:
+index="string_logs/parquet"
+| eval trimmed= ltrim(rawText)
+| table eventID, rawText, trimmed
+
+2024-10-26 17:06:07,754 - INFO - --------------------
+2024-10-26 17:06:07,754 - INFO - Test 62: CATEGORY: [RTRIM], COMPLEXITY: [basic], TITLE: [Trimming Right Spaces with RTRIM]
+2024-10-26 17:06:07,760 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,761 - ERROR - FAILED QUERY:
+index="string_logs/parquet"
+| eval trimmed= rtrim(rawText)
+| table eventID, rawText, trimmed
+
+2024-10-26 17:06:07,761 - INFO - --------------------
+2024-10-26 17:06:07,761 - INFO - Test 63: CATEGORY: [TRIM], COMPLEXITY: [basic], TITLE: [Trimming Spaces with TRIM]
+2024-10-26 17:06:07,767 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,767 - ERROR - FAILED QUERY:
+index="string_logs/parquet"
+| eval trimmed= trim(rawText)
+| table eventID, rawText, trimmed
+
+2024-10-26 17:06:07,767 - INFO - --------------------
+2024-10-26 17:06:07,767 - INFO - Test 64: CATEGORY: [SUBSTR], COMPLEXITY: [intermediate], TITLE: [Extracting Substrings with SUBSTR]
+2024-10-26 17:06:07,774 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,774 - ERROR - FAILED QUERY:
+index="user_logs/parquet"
+| eval first_three=substr(username, 0, 3)
+| table userID, username, first_three
+
+2024-10-26 17:06:07,774 - INFO - --------------------
+2024-10-26 17:06:07,774 - INFO - Test 65: CATEGORY: [LEN], COMPLEXITY: [basic], TITLE: [Calculating Length with LEN]
+2024-10-26 17:06:07,781 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,781 - ERROR - FAILED QUERY:
+index="message_logs/parquet"
+| eval message_length=len(message)
+| table eventID, message, message_length
+
+2024-10-26 17:06:07,781 - INFO - --------------------
+2024-10-26 17:06:07,781 - INFO - Test 66: CATEGORY: [CONSECUTIVE], COMPLEXITY: [advanced], TITLE: [Consecutive Duplicate Removal with CONSECUTIVE]
+2024-10-26 17:06:07,784 - INFO - --------------------
+2024-10-26 17:06:07,784 - INFO - Test 67: CATEGORY: [ISNULL], COMPLEXITY: [intermediate], TITLE: [Checking for Null Values with ISNULL]
+2024-10-26 17:06:07,806 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,806 - ERROR - FAILED QUERY:
+index="user_data/parquet"
+| eval email_status=if(isnull(email), "No Email", "Has Email")
+| table userID, email, email_status
+
+2024-10-26 17:06:07,806 - INFO - --------------------
+2024-10-26 17:06:07,806 - INFO - Test 68: CATEGORY: [ISNOTNULL], COMPLEXITY: [intermediate], TITLE: [Checking for Non-Null Values with ISNOTNULL]
+2024-10-26 17:06:07,809 - ERROR - Syntax Error - line 2:23 extraneous input 'isnotnull' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '[', '(', '++', '--', '~', NOT, 'if', 'case', NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:07,849 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,849 - ERROR - FAILED QUERY:
+index="user_data/parquet"
+| eval phone_status=if(isnotnull(phone), "Has Phone", "No Phone")
+| table userID, phone, phone_status
+
+2024-10-26 17:06:07,849 - INFO - --------------------
+2024-10-26 17:06:07,849 - INFO - Test 69: CATEGORY: [RANGE], COMPLEXITY: [advanced], TITLE: [Filtering Within a Range with RANGE]
+2024-10-26 17:06:07,854 - ERROR - Syntax Error - line 3:24 extraneous input 'range' expecting '('
+2024-10-26 17:06:07,854 - ERROR - Syntax Error - line 4:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,855 - ERROR - FAILED QUERY:
+earliest="2024-01-01" latest="2024-12-31"
+index="metrics/parquet"
+| where responseTime in range(100, 500)
+| table eventID, responseTime
+
+2024-10-26 17:06:07,855 - INFO - --------------------
+2024-10-26 17:06:07,855 - INFO - Test 70: CATEGORY: [MVDCOUNT], COMPLEXITY: [advanced], TITLE: [Counting Multivalue Fields with MVDCOUNT]
+2024-10-26 17:06:07,861 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,861 - ERROR - FAILED QUERY:
+index="multivalue_logs/parquet"
+| eval action_count=mvdcount(actions)
+| table eventID, actions, action_count
+
+2024-10-26 17:06:07,861 - INFO - --------------------
+2024-10-26 17:06:07,861 - INFO - Test 71: CATEGORY: [MVZIP], COMPLEXITY: [advanced], TITLE: [Zipping Multivalue Fields with MVZIP]
+2024-10-26 17:06:07,864 - ERROR - Syntax Error - line 2:2 mismatched input 'mvzip' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,864 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,864 - ERROR - FAILED QUERY:
+index="sensor_logs/parquet"
+| mvzip(sensorIDs, sensorNames, ",") as zipped
+| table eventID, zipped
+
+2024-10-26 17:06:07,864 - INFO - --------------------
+2024-10-26 17:06:07,864 - INFO - Test 72: CATEGORY: [MVAPPEND], COMPLEXITY: [advanced], TITLE: [Appending Multivalue Fields with MVAPPEND]
+2024-10-26 17:06:07,866 - ERROR - Syntax Error - line 2:2 mismatched input 'mvappend' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,867 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,867 - ERROR - FAILED QUERY:
+index="session_logs/parquet"
+| mvappend actions1, actions2, actions3
+| table sessionID, actions1, actions2, actions3
+
+2024-10-26 17:06:07,867 - INFO - --------------------
+2024-10-26 17:06:07,867 - INFO - Test 73: CATEGORY: [MVFIND], COMPLEXITY: [advanced], TITLE: [Finding Values in Multivalue Fields with MVFIND]
+2024-10-26 17:06:07,873 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,874 - ERROR - FAILED QUERY:
+index="inventory_logs/parquet"
+| eval found=mvfind(tags, "urgent")
+| table eventID, tags, found
+
+2024-10-26 17:06:07,874 - INFO - --------------------
+2024-10-26 17:06:07,874 - INFO - Test 74: CATEGORY: [SEARCH], COMPLEXITY: [basic], TITLE: [Basic Search Command]
+2024-10-26 17:06:07,876 - INFO - --------------------
+2024-10-26 17:06:07,876 - INFO - Test 75: CATEGORY: [DEFANG], COMPLEXITY: [intermediate], TITLE: [Defanging URLs with DEFANG]
+2024-10-26 17:06:07,883 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,883 - ERROR - FAILED QUERY:
+index="url_logs/parquet"
+| eval safeURL=defang(url)
+| table eventID, url, safeURL
+
+2024-10-26 17:06:07,883 - INFO - --------------------
+2024-10-26 17:06:07,883 - INFO - Test 76: CATEGORY: [FANG], COMPLEXITY: [intermediate], TITLE: [Fanging URLs with FANG]
+2024-10-26 17:06:07,889 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,889 - ERROR - FAILED QUERY:
+index="safe_logs/parquet"
+| eval originalURL=fang(safeURL)
+| table eventID, safeURL, originalURL
+
+2024-10-26 17:06:07,889 - INFO - --------------------
+2024-10-26 17:06:07,889 - INFO - Test 77: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [Rounding Numbers with ROUND]
+2024-10-26 17:06:07,898 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,898 - ERROR - FAILED QUERY:
+index="finance_logs/parquet"
+| eval roundedAmount=round(amount, 2)
+| table transactionID, amount, roundedAmount
+
+2024-10-26 17:06:07,898 - INFO - --------------------
+2024-10-26 17:06:07,898 - INFO - Test 78: CATEGORY: [MAX_MATCH], COMPLEXITY: [advanced], TITLE: [Limiting Matches with MAX_MATCH]
+2024-10-26 17:06:07,901 - ERROR - Syntax Error - line 2:6 mismatched input 'max_match' expecting FIELD
+2024-10-26 17:06:07,901 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,901 - ERROR - FAILED QUERY:
+index="regex_logs/parquet"
+| rex max_match=5 "pattern=(?<matched>\w+)"
+| table eventID, matched
+
+2024-10-26 17:06:07,901 - INFO - --------------------
+2024-10-26 17:06:07,901 - INFO - Test 79: CATEGORY: [FANG], COMPLEXITY: [advanced], TITLE: [Fanging with Custom Replacement]
+2024-10-26 17:06:07,908 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,908 - ERROR - FAILED QUERY:
+index="url_logs/parquet"
+| eval safeURL=replace(url, "http", "hxxp")
+| table eventID, url, safeURL
+
+2024-10-26 17:06:07,908 - INFO - --------------------
+2024-10-26 17:06:07,908 - INFO - Test 80: CATEGORY: [OUTPUTNEW], COMPLEXITY: [intermediate], TITLE: [Outputting New Fields with OUTPUTNEW]
+2024-10-26 17:06:07,916 - ERROR - Syntax Error - line 3:2 mismatched input 'outputnew' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,916 - ERROR - FAILED QUERY:
+index="new_fields_logs/parquet"
+| eval newField=concat(firstName, " ", lastName)
+| outputnew new_fields_backup.csv
+
+2024-10-26 17:06:07,916 - INFO - --------------------
+2024-10-26 17:06:07,916 - INFO - Test 81: CATEGORY: [MVREVERSE], COMPLEXITY: [advanced], TITLE: [Reversing Multivalue Fields with MVREVERSE]
+2024-10-26 17:06:07,918 - ERROR - Syntax Error - line 2:2 mismatched input 'mvreverse' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,918 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,918 - ERROR - FAILED QUERY:
+index="multivalue_logs/parquet"
+| mvreverse tags
+| table eventID, tags
+
+2024-10-26 17:06:07,918 - INFO - --------------------
+2024-10-26 17:06:07,918 - INFO - Test 82: CATEGORY: [JOIN], COMPLEXITY: [advanced], TITLE: [Joining with Multiple Fields]
+2024-10-26 17:06:07,921 - ERROR - Syntax Error - line 2:12 missing {'left', 'right', 'center'} at 'inner'
+2024-10-26 17:06:07,921 - ERROR - Syntax Error - line 2:18 missing '[' at 'orderID'
+2024-10-26 17:06:07,924 - ERROR - Syntax Error - line 2:25 extraneous input ',' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:07,925 - ERROR - Syntax Error - line 2:38 extraneous input '[' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:07,925 - ERROR - Syntax Error - line 2:75 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,925 - ERROR - FAILED QUERY:
+index="orders/parquet"
+| join type=inner orderID, customerID [ search index="customers/parquet" | table orderID, customerID, customerName ]
+
+2024-10-26 17:06:07,925 - INFO - --------------------
+2024-10-26 17:06:07,925 - INFO - Test 83: CATEGORY: [SPECIAL_FUNC], COMPLEXITY: [advanced], TITLE: [Using Special Functions]
+2024-10-26 17:06:07,928 - ERROR - Syntax Error - line 2:2 mismatched input '`' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,928 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,928 - ERROR - FAILED QUERY:
+index="special_logs/parquet"
+| `custom_special_func`
+| table eventID, specialField
+
+2024-10-26 17:06:07,928 - INFO - --------------------
+2024-10-26 17:06:07,928 - INFO - Test 84: CATEGORY: [EVAL], COMPLEXITY: [intermediate], TITLE: [Evaluating Multiple Fields with EVAL]
+2024-10-26 17:06:07,931 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,931 - ERROR - FAILED QUERY:
+index="metrics/parquet"
+| eval total=price * quantity, profit=total - cost
+| table productID, price, quantity, total, profit
+
+2024-10-26 17:06:07,931 - INFO - --------------------
+2024-10-26 17:06:07,931 - INFO - Test 85: CATEGORY: [RESET_AFTER], COMPLEXITY: [advanced], TITLE: [Resetting Stats with RESET_AFTER]
+2024-10-26 17:06:07,934 - ERROR - Syntax Error - line 2:67 missing {SINGLE_QUOTED_STRING, VARIABLE} at '='
+2024-10-26 17:06:07,934 - ERROR - Syntax Error - line 2:68 mismatched input '5' expecting {'++', '--', '~', SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:07,934 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,935 - ERROR - FAILED QUERY:
+index="stream_data/parquet"
+| streamstats sum(amount) as running_total by sessionID reset_after=5
+| table sessionID, amount, running_total
+
+2024-10-26 17:06:07,935 - INFO - --------------------
+2024-10-26 17:06:07,935 - INFO - Test 86: CATEGORY: [EVENTSTATS], COMPLEXITY: [intermediate], TITLE: [Enhancing Events with EVENTSTATS]
+2024-10-26 17:06:07,938 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,938 - ERROR - FAILED QUERY:
+index="user_events/parquet"
+| eventstats avg(duration) as avg_duration by userID
+| table userID, eventID, duration, avg_duration
+
+2024-10-26 17:06:07,938 - INFO - --------------------
+2024-10-26 17:06:07,938 - INFO - Test 87: CATEGORY: [MVCOUNT], COMPLEXITY: [advanced], TITLE: [Counting Multivalue Entries with MVCOUNT]
+2024-10-26 17:06:07,945 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,945 - ERROR - FAILED QUERY:
+index="data_logs/parquet"
+| eval count_tags=mvcount(tags)
+| table eventID, tags, count_tags
+
+2024-10-26 17:06:07,945 - INFO - --------------------
+2024-10-26 17:06:07,945 - INFO - Test 88: CATEGORY: [FIELDSUMMARY], COMPLEXITY: [advanced], TITLE: [Generating Field Summaries]
+2024-10-26 17:06:07,947 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,947 - ERROR - FAILED QUERY:
+index="survey_data/parquet"
+| fieldsummary()
+| table field, type, distinct_count
+
+2024-10-26 17:06:07,947 - INFO - --------------------
+2024-10-26 17:06:07,947 - INFO - Test 89: CATEGORY: [DCOUNT], COMPLEXITY: [intermediate], TITLE: [Distinct Counting with DCOUNT]
+2024-10-26 17:06:07,952 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,952 - ERROR - FAILED QUERY:
+index="unique_logs/parquet"
+| stats dcount(userID) as unique_users by region
+| table region, unique_users
+
+2024-10-26 17:06:07,953 - INFO - --------------------
+2024-10-26 17:06:07,953 - INFO - Test 90: CATEGORY: [LOOKUP], COMPLEXITY: [advanced], TITLE: [Performing Multiple Lookups]
+2024-10-26 17:06:07,955 - INFO - --------------------
+2024-10-26 17:06:07,955 - INFO - Test 91: CATEGORY: [MVAPPEND], COMPLEXITY: [advanced], TITLE: [Appending Multiple Multivalue Fields]
+2024-10-26 17:06:07,957 - ERROR - Syntax Error - line 2:2 mismatched input 'mvappend' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,957 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,958 - ERROR - FAILED QUERY:
+index="log_data/parquet"
+| mvappend errors, warnings, infos
+| table eventID, errors, warnings, infos
+
+2024-10-26 17:06:07,958 - INFO - --------------------
+2024-10-26 17:06:07,958 - INFO - Test 92: CATEGORY: [REVERSE], COMPLEXITY: [basic], TITLE: [Reversing Results Order]
+2024-10-26 17:06:07,960 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,960 - ERROR - FAILED QUERY:
+index="order_logs/parquet"
+| reverse
+| table orderID, timestamp
+
+2024-10-26 17:06:07,960 - INFO - --------------------
+2024-10-26 17:06:07,960 - INFO - Test 93: CATEGORY: [REPLACE], COMPLEXITY: [intermediate], TITLE: [Replacing Patterns with REPLACE]
+2024-10-26 17:06:07,967 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,967 - ERROR - FAILED QUERY:
+index="message_logs/parquet"
+| eval cleanMessage=replace(rawMessage, "ERROR", "ERR")
+| table eventID, rawMessage, cleanMessage
+
+2024-10-26 17:06:07,967 - INFO - --------------------
+2024-10-26 17:06:07,968 - INFO - Test 94: CATEGORY: [BIN], COMPLEXITY: [intermediate], TITLE: [Binning Numerical Data with BIN]
+2024-10-26 17:06:07,970 - ERROR - Syntax Error - line 2:26 missing {SECONDS, MINUTES, HOURS, DAYS, WEEKS, YEARS} at '\n'
+2024-10-26 17:06:07,970 - ERROR - Syntax Error - line 3:8 mismatched input 'count' expecting {'dcount', 'latest', 'earliest', 'first', 'last', 'values', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'abs', NEWLINE}
+2024-10-26 17:06:07,970 - ERROR - Syntax Error - line 4:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,970 - ERROR - FAILED QUERY:
+index="metrics/parquet"
+| bin responseTime span=50
+| stats count by responseTime
+| table responseTime, count
+
+2024-10-26 17:06:07,970 - INFO - --------------------
+2024-10-26 17:06:07,970 - INFO - Test 95: CATEGORY: [MATCH], COMPLEXITY: [advanced], TITLE: [Matching Patterns with MATCH]
+2024-10-26 17:06:07,974 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,975 - ERROR - FAILED QUERY:
+index="regex_logs/parquet"
+| eval isMatch=match(message, "failure")
+| table eventID, message, isMatch
+
+2024-10-26 17:06:07,975 - INFO - --------------------
+2024-10-26 17:06:07,975 - INFO - Test 96: CATEGORY: [MVFIND], COMPLEXITY: [advanced], TITLE: [Finding Specific Values in Multivalue Fields with MVFIND]
+2024-10-26 17:06:07,979 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,980 - ERROR - FAILED QUERY:
+index="session_logs/parquet"
+| eval found=mvfind(actions, "login")
+| table sessionID, actions, found
+
+2024-10-26 17:06:07,980 - INFO - --------------------
+2024-10-26 17:06:07,980 - INFO - Test 97: CATEGORY: [ROUND], COMPLEXITY: [basic], TITLE: [Rounding to Nearest Integer with ROUND]
+2024-10-26 17:06:07,982 - ERROR - Syntax Error - line 2:33 no viable alternative at input 'round(profit)'
+2024-10-26 17:06:07,982 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,982 - ERROR - FAILED QUERY:
+index="financial_logs/parquet"
+| eval roundedProfit=round(profit)
+| table transactionID, profit, roundedProfit
+
+2024-10-26 17:06:07,982 - INFO - --------------------
+2024-10-26 17:06:07,982 - INFO - Test 98: CATEGORY: [SEARCH], COMPLEXITY: [advanced], TITLE: [Advanced Search with Multiple Conditions]
+2024-10-26 17:06:07,985 - ERROR - Syntax Error - line 2:19 no viable alternative at input '(eventType='
+2024-10-26 17:06:07,986 - ERROR - FAILED QUERY:
+index="security_logs/parquet"
+| search (eventType="login" AND status="success") OR (eventType="logout" AND status="failure")
+| table eventID, eventType, status
+
+2024-10-26 17:06:07,986 - INFO - --------------------
+2024-10-26 17:06:07,986 - INFO - Test 99: CATEGORY: [COUNT], COMPLEXITY: [intermediate], TITLE: [Counting Unique Users with COUNT]
+2024-10-26 17:06:07,988 - ERROR - Syntax Error - line 2:8 mismatched input 'count' expecting {'dcount', 'latest', 'earliest', 'first', 'last', 'values', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'abs', NEWLINE}
+2024-10-26 17:06:07,988 - ERROR - Syntax Error - line 3:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}
+2024-10-26 17:06:07,988 - ERROR - FAILED QUERY:
+index="user_logs/parquet"
+| stats count by userID
+| table userID, count
+
+2024-10-26 17:06:07,988 - INFO - --------------------
+2024-10-26 17:06:07,988 - INFO - Test 100: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Index Filters with AND and OR]
+2024-10-26 17:06:07,990 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:07,991 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'index', NEWLINE}
+2024-10-26 17:06:07,991 - ERROR - Syntax Error - line 3:4 extraneous input '(' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:07,991 - ERROR - FAILED QUERY:
+(
+    earliest="2024-05-01" latest="2024-05-31"
+    (status=200 AND responseTime < 300) OR errorCode=500
+    index="web_logs/parquet,api_logs/parquet"
+) OR 
+(
+    earliest="2023-06-01" latest="2023-06-30"
+    userRole="admin"
+    index="admin_logs/parquet"
+)
+
+2024-10-26 17:06:07,991 - INFO - --------------------
+2024-10-26 17:06:07,991 - INFO - Test 101: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Index Filters with Multiple Conditions]
+2024-10-26 17:06:07,994 - ERROR - Syntax Error - line 2:7 no viable alternative at input '(action='
+2024-10-26 17:06:07,995 - ERROR - Syntax Error - line 2:7 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:07,998 - ERROR - Syntax Error - line 2:27 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,000 - ERROR - Syntax Error - line 2:32 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,000 - ERROR - Syntax Error - line 2:44 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,001 - ERROR - Syntax Error - line 2:65 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,001 - ERROR - Syntax Error - line 2:71 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,001 - ERROR - FAILED QUERY:
+earliest="2024-07-01" latest="2024-07-31"
+(action="login" AND success=true) OR (action="logout" AND success=false)
+index="user_activity/parquet,session_logs/parquet"
+earliest="2023-08-01" latest="2023-08-31"
+loginAttempts >= 5
+index="security_logs/parquet
+
+2024-10-26 17:06:08,001 - INFO - --------------------
+2024-10-26 17:06:08,001 - INFO - Test 102: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Filters with NOT and OR]
+2024-10-26 17:06:08,002 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:08,002 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,002 - ERROR - Syntax Error - line 3:4 extraneous input 'NOT' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,002 - ERROR - FAILED QUERY:
+(
+    earliest="2024-09-01" latest="2024-09-30"
+    NOT (status=404 OR status=503)
+    index="error_logs/parquet,system_logs/parquet"
+) OR 
+(
+    earliest="2023-10-01" latest="2023-10-31"
+    diskUsage > 80
+    index="performance_logs/parquet"
+)
+
+2024-10-26 17:06:08,002 - INFO - --------------------
+2024-10-26 17:06:08,002 - INFO - Test 103: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Mixed Logical Operators]
+2024-10-26 17:06:08,021 - INFO - --------------------
+2024-10-26 17:06:08,021 - INFO - Test 104: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Multiple AND Conditions]
+2024-10-26 17:06:08,022 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:08,022 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,022 - ERROR - Syntax Error - line 3:4 extraneous input '(' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,022 - ERROR - FAILED QUERY:
+(
+    earliest="2024-02-01" latest="2024-02-28"
+    (region="US" AND sales > 10000) AND (productCategory="Electronics")
+    index="sales_data/parquet,inventory_data/parquet"
+) OR 
+(
+    earliest="2023-03-01" latest="2023-03-31"
+    region="EU" AND sales > 15000
+    index="sales_data_eu/parquet"
+)
+
+2024-10-26 17:06:08,022 - INFO - --------------------
+2024-10-26 17:06:08,022 - INFO - Test 105: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Ungrouped Filters with NOT Conditions]
+2024-10-26 17:06:08,025 - ERROR - Syntax Error - line 2:4 no viable alternative at input 'NOT('
+2024-10-26 17:06:08,025 - ERROR - Syntax Error - line 2:11 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,026 - ERROR - Syntax Error - line 2:32 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,026 - ERROR - Syntax Error - line 2:42 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,026 - ERROR - FAILED QUERY:
+earliest="2024-04-01" latest="2024-04-30"
+NOT (status="inactive" OR status="pending")
+index="user_status/parquet,activity_logs/parquet"
+earliest="2023-05-01" latest="2023-05-31"
+active=true
+index="active_users/parquet
+
+2024-10-26 17:06:08,026 - INFO - --------------------
+2024-10-26 17:06:08,026 - INFO - Test 106: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Grouped Filters with Nested Parentheses]
+2024-10-26 17:06:08,027 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:08,027 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,027 - ERROR - Syntax Error - line 3:4 extraneous input '(' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,027 - ERROR - FAILED QUERY:
+(
+    earliest="2024-06-01" latest="2024-06-30"
+    ((type="error" AND severity>=3) OR (type="warning" AND severity=2))
+    index="system_errors/parquet,application_errors/parquet"
+) OR 
+(
+    earliest="2023-07-01" latest="2023-07-31"
+    type="info" AND source="monitoring"
+    index="info_logs/parquet"
+)
+
+2024-10-26 17:06:08,027 - INFO - --------------------
+2024-10-26 17:06:08,027 - INFO - Test 107: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Sequential Index Calls]
+2024-10-26 17:06:08,030 - ERROR - Syntax Error - line 2:7 no viable alternative at input '(metric='
+2024-10-26 17:06:08,030 - ERROR - Syntax Error - line 2:7 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,030 - ERROR - Syntax Error - line 2:18 mismatched input 'value' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:08,033 - ERROR - Syntax Error - line 2:28 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,033 - ERROR - Syntax Error - line 2:40 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,033 - ERROR - Syntax Error - line 2:54 mismatched input 'value' expecting {'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE}
+2024-10-26 17:06:08,034 - ERROR - Syntax Error - line 2:64 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,034 - ERROR - FAILED QUERY:
+earliest="2024-08-01" latest="2024-08-31"
+(metric="cpu" AND value > 75) OR (metric="memory" AND value > 80)
+index="resource_metrics/parquet,system_metrics/parquet"
+earliest="2023-09-01" latest="2023-09-30"
+alertTriggered=true
+index="alerts/parquet
+
+2024-10-26 17:06:08,034 - INFO - --------------------
+2024-10-26 17:06:08,034 - INFO - Test 108: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Combined Logical Operators]
+2024-10-26 17:06:08,034 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:08,034 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,034 - ERROR - Syntax Error - line 3:4 extraneous input '(' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,035 - ERROR - FAILED QUERY:
+(
+    earliest="2024-10-01" latest="2024-10-31"
+    (region="APAC" AND (sales > 5000 OR salesGrowth > 10)) AND active=true
+    index="sales_apac/parquet,performance_apac/parquet"
+) OR 
+(
+    earliest="2023-11-01" latest="2023-11-30"
+    region="LATAM" AND sales > 7000
+    index="sales_latam/parquet"
+)
+
+2024-10-26 17:06:08,035 - INFO - --------------------
+2024-10-26 17:06:08,035 - INFO - Test 109: CATEGORY: [UNGROUPED_INDEX_FILTERS], COMPLEXITY: [advanced], TITLE: [Ungrouped Filters with Multiple OR Conditions]
+2024-10-26 17:06:08,037 - ERROR - Syntax Error - line 2:10 no viable alternative at input '(eventType='
+2024-10-26 17:06:08,038 - ERROR - Syntax Error - line 2:10 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,038 - ERROR - Syntax Error - line 2:31 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,039 - ERROR - Syntax Error - line 2:53 extraneous input '=' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,039 - ERROR - Syntax Error - line 2:70 extraneous input ')' expecting {'|', 'repeat', 'mvreverse', 'mvcombine', 'mvfind', 'mvdedup', 'mvappend', 'mvfilter', 'mvcount', 'mvdcount', 'mvzip', 'macro', 'null', 'defang', 'fang', 'to_cron', 'from_cron', 'round', 'min', 'max', 'median', 'mode', 'avg', 'sum', 'random', 'sqrt', 'range', 'coalesce', 'isnull', 'len', 'concat', 'replace', 'lower', 'upper', 'capitalize', 'ltrim', 'rtrim', 'trim', 'match', 'index', 'mvindex', 'mvjoin', 'substr', 'tostring', 'abs', 'urlencode', 'urldecode', BOOLEAN, ']', '(', '++', '--', '~', NOT, NUMBER, SINGLE_QUOTED_STRING, DOUBLE_QUOTED_STRING, VARIABLE, NEWLINE}
+2024-10-26 17:06:08,039 - ERROR - FAILED QUERY:
+earliest="2024-12-01" latest="2024-12-31"
+(eventType="login" OR eventType="signup" OR eventType="password_reset")
+index="user_events/parquet,auth_logs/parquet"
+earliest="2023-01-01" latest="2023-01-31"
+attempts >= 3
+index="security_logs/parquet
+
+2024-10-26 17:06:08,039 - INFO - --------------------
+2024-10-26 17:06:08,039 - INFO - Test 110: CATEGORY: [GROUPED_INDEX_FILTERS], COMPLEXITY: [intermediate], TITLE: [Grouped Filters with Combined Logical Operators]
+2024-10-26 17:06:08,039 - ERROR - Syntax Error - line 1:1 no viable alternative at input '(\n'
+2024-10-26 17:06:08,039 - ERROR - Syntax Error - line 2:4 extraneous input 'earliest' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,039 - ERROR - Syntax Error - line 3:4 extraneous input 's' expecting {'|', 'index', NEWLINE}
+2024-10-26 17:06:08,040 - ERROR - FAILED QUERY:
+(
+    earliest="2024-10-01" latest="2024-10-31"
+    s=4
+    index="sales_apac/parquet,performance_apac/parquet"
+) OR 
+(
+    earliest="2023-11-01" latest="2023-11-30"
+    region="LATAM" AND sales > 7000
+    index="sales_latam/parquet"
+)
+
+Total Tests: 111
+Passed: 29
+Failed: 82
+Pass %: 26.0 %
+
+Details by Category:
+                         passed  failed
+INDEX                         1       0
+EVAL                          0       3
+FILTER                        1       0
+WHERE                         1       0
+STATS                         1       0
+JOIN                          0       4
+APPEND                        0       2
+SORT                          2       0
+RENAME                        1       0
+REX                           0       3
+EVENTSTATS                    0       3
+STREAMSTATS                   0       3
+APPENDPIPE                    0       2
+TIMECHART                     0       2
+FIELDS                        1       0
+MAKETABLE                     1       0
+MVEXPAND                      0       2
+LOOKUP                        2       0
+FIELDSUMMARY                  1       1
+HEAD                          1       0
+IF                            0       2
+CASE                          0       3
+BIN                           0       3
+MVJOIN                        0       2
+SPATH                         1       0
+COALESCE                      0       2
+MVFILTER                      0       2
+FILLNULL                      1       2
+URLENCODE                     0       2
+REVERSE                       1       1
+DEDUPE                        1       0
+REGEX                         1       0
+BASE64                        1       0
+OUTPUTLOOKUP                  1       0
+MVREVERSE                     0       3
+MVCOMBINE                     0       2
+SUBSTR                        0       3
+MVINDEX                       0       2
+DECODE                        0       2
+ENCODE                        0       2
+COUNT                         0       3
+SUM                           1       0
+AVG                           1       0
+MAX                           1       0
+MIN                           1       0
+MEDIAN                        1       0
+MODE                          1       0
+SQRT                          0       2
+ABS                           0       2
+REPEAT                        0       2
+REPLACE                       0       3
+CONCAT                        0       2
+LOWER                         0       2
+UPPER                         0       2
+CAPITALIZE                    0       2
+LTRIM                         0       2
+RTRIM                         0       2
+TRIM                          0       2
+LEN                           0       2
+CONSECUTIVE                   1       0
+ISNULL                        0       2
+ISNOTNULL                     0       2
+RANGE                         0       2
+MVDCOUNT                      0       2
+MVZIP                         0       2
+MVAPPEND                      0       3
+MVFIND                        0       3
+SEARCH                        1       1
+DEFANG                        0       2
+FANG                          0       3
+ROUND                         0       3
+MAX_MATCH                     0       2
+OUTPUTNEW                     0       2
+SPECIAL_FUNC                  0       2
+RESET_AFTER                   0       2
+MVCOUNT                       0       2
+DCOUNT                        0       2
+MATCH                         0       2
+GROUPED_INDEX_FILTERS         0       7
+UNGROUPED_INDEX_FILTERS       1       5
+
+Details of Complexity:
+                         passed  failed
+INDEX                         1       0
+EVAL                          0       3
+FILTER                        1       0
+WHERE                         1       0
+STATS                         1       0
+JOIN                          0       4
+APPEND                        0       2
+SORT                          2       0
+RENAME                        1       0
+REX                           0       3
+EVENTSTATS                    0       3
+STREAMSTATS                   0       3
+APPENDPIPE                    0       2
+TIMECHART                     0       2
+FIELDS                        1       0
+MAKETABLE                     1       0
+MVEXPAND                      0       2
+LOOKUP                        2       0
+FIELDSUMMARY                  1       1
+HEAD                          1       0
+IF                            0       2
+CASE                          0       3
+BIN                           0       3
+MVJOIN                        0       2
+SPATH                         1       0
+COALESCE                      0       2
+MVFILTER                      0       2
+FILLNULL                      1       2
+URLENCODE                     0       2
+REVERSE                       1       1
+DEDUPE                        1       0
+REGEX                         1       0
+BASE64                        1       0
+OUTPUTLOOKUP                  1       0
+MVREVERSE                     0       3
+MVCOMBINE                     0       2
+SUBSTR                        0       3
+MVINDEX                       0       2
+DECODE                        0       2
+ENCODE                        0       2
+COUNT                         0       3
+SUM                           1       0
+AVG                           1       0
+MAX                           1       0
+MIN                           1       0
+MEDIAN                        1       0
+MODE                          1       0
+SQRT                          0       2
+ABS                           0       2
+REPEAT                        0       2
+REPLACE                       0       3
+CONCAT                        0       2
+LOWER                         0       2
+UPPER                         0       2
+CAPITALIZE                    0       2
+LTRIM                         0       2
+RTRIM                         0       2
+TRIM                          0       2
+LEN                           0       2
+CONSECUTIVE                   1       0
+ISNULL                        0       2
+ISNOTNULL                     0       2
+RANGE                         0       2
+MVDCOUNT                      0       2
+MVZIP                         0       2
+MVAPPEND                      0       3
+MVFIND                        0       3
+SEARCH                        1       1
+DEFANG                        0       2
+FANG                          0       3
+ROUND                         0       3
+MAX_MATCH                     0       2
+OUTPUTNEW                     0       2
+SPECIAL_FUNC                  0       2
+RESET_AFTER                   0       2
+MVCOUNT                       0       2
+DCOUNT                        0       2
+MATCH                         0       2
+GROUPED_INDEX_FILTERS         0       7
+UNGROUPED_INDEX_FILTERS       1       5

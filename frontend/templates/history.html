@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Load Jobs{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+    <!-- Include Bulma CSS if not included globally -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Load Jobs</h1>
+
+        <!-- Notification Container for Bulma Notifications -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by history.js -->
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="box">
+                    <div id="loadjob-table">
+                        <!-- Placeholder for dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include Bulma's JavaScript (optional, for interactive components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bulma@0.9.4/js/bulma.min.js"></script>
+    <script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

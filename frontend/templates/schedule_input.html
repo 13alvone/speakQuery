@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Scheduled Input{% endblock %}
+
+{% block extra_css %}
+    <!-- Include Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/schedule_input.css') }}">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Create Scheduled Input</h1>
+
+        <!-- Notification Container -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by schedule_input.js -->
+        </div>
+
+        <div class="columns">
+            <!-- Left Column -->
+            <div class="column is-two-thirds">
+                <!-- Static Note -->
+                <div class="notification is-info">
+                    <strong>Note:</strong> To fetch data from an API within your script, use:
+                    <pre><code>data = FETCH_API_DATA('https://api.example.com/endpoint')</code></pre>
+                    You can make multiple API calls as needed.
+                    <br><br>
+                    To save your results, call <code>GENERATE_RESULTS(df)</code> at the <strong>end</strong> of your script. It must accept a pandas DataFrame as the only argument.
+                </div>
+
+                <!-- Static Code Example -->
+                <div class="field">
+                    <label class="label">Example Script</label>
+                    <div class="control">
+                        <pre class="static-code-block">
+# Example script using FETCH_API_DATA and GENERATE_RESULTS
+import pandas as pd
+
+data1 = FETCH_API_DATA('https://financialmodelingprep.com/api/v3/profile/AAPL')
+data2 = FETCH_API_DATA('https://financialmodelingprep.com/api/v3/grade/AAPL')
+
+df1 = pd.DataFrame(data1)
+df2 = pd.DataFrame(data2)
+
+# Merge DataFrames on a common column
+df = pd.merge(df1, df2, on='symbol')
+
+# Generate results
+GENERATE_RESULTS(df)
+                        </pre>
+                    </div>
+                </div>
+
+                <form id="scheduled-input-form" method="POST" action="/commit_scheduled_input">
+                    <!-- Title Field -->
+                    <div class="field">
+                        <label class="label" for="title">Title</label>
+                        <div class="control">
+                            <input class="input" type="text" id="title" name="title" placeholder="Enter a title for this scheduled input" required>
+                        </div>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="field">
+                        <label class="label" for="description">Description</label>
+                        <div class="control">
+                            <textarea class="textarea" id="description" name="description" rows="3" placeholder="Enter a description (optional)"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- API URL Field -->
+                    <div class="field">
+                        <label class="label" for="api_url">API URL</label>
+                        <div class="control">
+                            <input class="input" type="url" id="api_url" name="api_url" placeholder="Enter the JSON REST API URL">
+                        </div>
+                    </div>
+
+                    <!-- Populate Sample Data Button -->
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-info" type="button" id="populate-data-btn">Populate Sample Data</button>
+                        </div>
+                    </div>
+
+                    <!-- Python Code Field -->
+                    <div class="field">
+                        <label class="label" for="code">Python Code</label>
+                        <div class="control">
+                            <textarea class="textarea" id="code" name="code" rows="15" placeholder="Enter your Python code here" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Cron Schedule Field -->
+                    <div class="field">
+                        <label class="label" for="cron_schedule">Cron Schedule</label>
+                        <div class="control">
+                            <input class="input" type="text" id="cron_schedule" name="cron_schedule" placeholder="Cron expression" required>
+                        </div>
+                    </div>
+
+                    <!-- Overwrite Field -->
+                    <div class="field">
+                        <label class="label" for="overwrite">Overwrite</label>
+                        <div class="control">
+                            <div class="select">
+                                <select id="overwrite" name="overwrite" required>
+                                    <option value="true">Overwrite</option>
+                                    <option value="false">Create new file on conflict</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subdirectory Field -->
+                    <div class="field">
+                        <label class="label" for="subdirectory">Optional Subdirectory</label>
+                        <div class="control">
+                            <input class="input" type="text" id="subdirectory" name="subdirectory" placeholder="Enter subdirectory (optional)">
+                        </div>
+                    </div>
+
+                    <!-- Disabled Field -->
+                    <div class="field">
+                        <div class="control">
+                            <label class="checkbox">
+                                <input type="checkbox" id="disabled" name="disabled">
+                                Disable this scheduled input
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-primary" type="submit">Save</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-info" type="button" id="test-script-btn">Test Script</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- DataFrame Summary Display -->
+                <div id="df-summary-container" class="box" style="display: none;">
+                    <!-- DataFrame summary will be displayed here -->
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="column" id="json-display-container">
+                <!-- Sample JSON data will be displayed here -->
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include Bulma's JavaScript (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bulma@0.9.4/js/bulma.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/schedule_input.js') }}"></script>
+{% endblock %}

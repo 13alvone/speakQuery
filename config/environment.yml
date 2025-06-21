@@ -1,0 +1,21 @@
+# conda env create -f /home/cspeakes/PycharmProjects/speak-query/environment.yml
+name: speakQueryEnv
+channels:
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - python=3.11
+  - aiosqlite
+  - antlr4-python3-runtime
+  - apscheduler
+  - croniter
+  - flask
+  - pandas
+  - pyarrow
+  - pyparsing
+  - pyyaml
+  - requests
+  - aiosmtplib
+  - restrictedpython
+  - jpype1
+prefix: /home/cspeakes/anaconda3/envs/speakQueryEnv

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Lookup Files{% endblock %}
+
+{% block extra_css %}
+    <!-- Include Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Include your CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lookups.css') }}">
+    <!-- Font Awesome CSS CDN -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Lookup Files</h1>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay is-hidden">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading data, please wait...</p>
+            </div>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+            <!-- Notifications will be injected here by lookups.js -->
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="menu">
+                    <!-- Upload Button -->
+                    <button class="button is-primary" id="uploadBtn">Upload File</button>
+                </div>
+
+                <!-- Upload Modal -->
+                <div id="uploadModal" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <button class="modal-close is-large" aria-label="close"></button>
+                            <h2 class="title is-4">Upload File</h2>
+                            <form id="uploadForm">
+                                <div class="field">
+                                    <div class="file has-name is-fullwidth">
+                                        <label class="file-label">
+                                            <input class="file-input" type="file" id="fileInput" name="file">
+                                            <span class="file-cta">
+                                                <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                </span>
+                                                <span class="file-label">
+                                                    Choose a file…
+                                                </span>
+                                            </span>
+                                            <span class="file-name" id="fileName">
+                                                No file chosen
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="button is-primary">Upload</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box mt-2">
+                    <div id="lookup-table">
+                        <!-- Placeholder for dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Include Axios if not already included globally -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Include Bulma's JavaScript (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bulma@0.9.4/js/bulma.min.js"></script>
+    <!-- Include your JavaScript file -->
+    <script src="{{ url_for('static', filename='js/lookups.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,3 @@
+| table file="477457c9-17d3-4e0b-ab5d-b3d55d906480"
+| eval x = TOSTRING(2)
+| eval expected_x_result = -11

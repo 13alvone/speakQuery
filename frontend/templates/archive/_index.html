@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom SPL Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bulma.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        /* General Section Tabs */
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .menu-list {
+            display: flex;
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .menu-list li {
+            margin: 0 10px;
+        }
+        .menu-list li a {
+            text-decoration: none;
+            padding: 10px 15px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .menu-list li a:hover {
+            background-color: #ddd;
+        }
+        /* Query Box */
+        #query {
+            width: 85%;
+            font-family: Consolas, monospace;
+            font-size: 10pt;
+            min-height: 150px; /* Approx. 10 lines of text */
+            overflow-y: auto;
+            resize: none; /* Disable manual resizing */
+        }
+        /* Results Table */
+        #results {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <!-- General Section Tabs -->
+            <div class="menu">
+                <ul class="menu-list">
+                    <li><a href="#">Search</a></li>
+                    <li><a href="#">File Upload</a></li>
+                    <li><a href="#">Lookups</a></li>
+                    <li><a href="#">Search History</a></li>
+                    <li><a href="#">Scheduled Searches</a></li>
+                    <li><a href="#">Scheduled Inputs</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        <h1 class="title">Query Section</h1>
+                        <textarea id="query" class="textarea" placeholder="Write your query here..."></textarea>
+                        <button id="run-query-btn" class="button is-primary mt-2">Run Query</button>
+                    </div>
+                    <div class="box mt-2">
+                        <h2 class="title">Results</h2>
+                        <div id="results">
+                            {% if column_names %}
+                                <table class="table is-striped is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            {% for col in column_names %}
+                                                <th>{{ col }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in row_data %}
+                                            <tr>
+                                                {% for col, row_ in zip(column_names, row) %}
+                                                    <td>{{ row_ }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No results to display.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <h2 class="title">Time Setter</h2>
+                        <input type="datetime-local" id="query-time" class="input">
+                        <button id="set-time-btn" class="button is-info mt-2">Set Time</button>
+                    </div>
+                    <div class="box">
+                        <h2 class="title">Query Syntax Helper</h2>
+                        <p>Use the following syntax to build your query:</p>
+                        <pre id="syntax-example"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+    document.getElementById('run-query-btn').addEventListener('click', function() {
+        const query = document.getElementById('query').value;
+        axios.post('/run_query', { query: query })
+            .then(response => {
+                console.log('[DEBUG] Raw query result:', response);
+                if (response.data.status === 'success') {
+                    // Replace the entire document content with the returned HTML
+                    const newDoc = document.open("text/html", "replace");
+                    newDoc.write(response.data.message); // Assuming the HTML content is in `response.data.message`
+                    newDoc.close();
+
+                    // Reinsert the original query into the query box
+                    const queryBox = document.getElementById('query');
+                    if (queryBox) {
+                        queryBox.value = query;
+                        autoExpandQueryBox();
+                    }
+                } else {
+                    console.error('[x] Query error:', response.data.message);
+                    document.getElementById('results').innerHTML = '<p>Error: ' + response.data.message + '</p>';
+                }
+            })
+            .catch(error => {
+                console.error('[x] Error running query:', error);
+                if (error.response && error.response.data && error.response.data.message) {
+                    document.getElementById('results').innerHTML = '<p>Error: ' + error.response.data.message + '</p>';
+                } else {
+                    document.getElementById('results').innerHTML = '<p>Error: An unknown error occurred.</p>';
+                }
+            });
+    });
+
+    document.getElementById('set-time-btn').addEventListener('click', function() {
+        const queryTime = document.getElementById('query-time').value;
+        const query = document.getElementById('query').value;
+        document.getElementById('query').value = query + `| timerange("${queryTime}", "${queryTime}", TIMESTAMP)\n`;
+    });
+
+    document.getElementById('syntax-example').textContent = `
+        | table file===
+        | select * from TARGET_FILE$
+        | timerange("07/03/2018 03:00:00", "07/05/2019 04:00:00", TIMESTAMP)
+        | eval test="test"
+        | eval t2="header_3"
+        | search header_1>= 400 AND header_2>= 500 AND (header_3 == "e" OR t2 == "that")
+    `;
+
+    // Adjust query box height dynamically
+    function autoExpandQueryBox() {
+        const queryBox = document.getElementById('query');
+        queryBox.style.height = 'auto';  // Reset the height
+        queryBox.style.height = (queryBox.scrollHeight) + 'px';  // Set new height
+    }
+
+    document.getElementById('query').addEventListener('input', autoExpandQueryBox);
+    </script>
+</body>
+</html>

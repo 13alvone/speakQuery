@@ -1,0 +1,13 @@
+[package]
+name = "r_datetime_parser"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "r_datetime_parser"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.20.0", features = ["extension-module"] }
+chrono = "0.4.37"
+
