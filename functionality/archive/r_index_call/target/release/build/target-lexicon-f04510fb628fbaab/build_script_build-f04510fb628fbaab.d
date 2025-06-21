@@ -1,8 +1,0 @@
-/Users/cspeakes/PycharmProjects/speak-query/functionality/r_index_call/target/release/build/target-lexicon-f04510fb628fbaab/build_script_build-f04510fb628fbaab: /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/build.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/data_model.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/triple.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/targets.rs
-
-/Users/cspeakes/PycharmProjects/speak-query/functionality/r_index_call/target/release/build/target-lexicon-f04510fb628fbaab/build_script_build-f04510fb628fbaab.d: /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/build.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/data_model.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/triple.rs /Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/targets.rs
-
-/Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/build.rs:
-/Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/data_model.rs:
-/Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/triple.rs:
-/Users/cspeakes/.cargo/registry/src/index.crates.io-6f17d22bba15001f/target-lexicon-0.12.16/src/targets.rs:

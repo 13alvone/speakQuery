@@ -1,3 +1,0 @@
-/Users/cspeakes/PycharmProjects/speak-query/functionality/cpp_index_call/build/CMakeFiles/cpp_index_call.dir
-/Users/cspeakes/PycharmProjects/speak-query/functionality/cpp_index_call/build/CMakeFiles/edit_cache.dir
-/Users/cspeakes/PycharmProjects/speak-query/functionality/cpp_index_call/build/CMakeFiles/rebuild_cache.dir
