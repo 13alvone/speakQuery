@@ -1,8 +1,7 @@
-lexers/__pycache__/*
-frontend/static/temp/*
-functionality/cpp_index_call/build/*
-functionality/cpp_datetime_parser/build/*
-functionality/__pycache__/*
-functionality/archive/*
 env/*
+executed_scheduled_searches/*
 __pycache__/*
+jobs/*
+functionality/cpp_datetime_parser/build/*
+functionality/cpp_index_call/build/*
+query_engine/frontend/static/temp/*
