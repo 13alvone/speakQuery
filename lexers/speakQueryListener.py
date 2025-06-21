@@ -25,6 +25,7 @@ from handlers.GeneralHandler import GeneralHandler
 from handlers.LookupHandler import LookupHandler
 from handlers.SearchCmdHandler import SearchDirective
 from handlers.StatsHandler import StatsHandler
+from handlers.MacroHandler import MacroHandler
 
 # Import speakQueryParser (support for relative or absolute import)
 if "." in __name__:
@@ -117,6 +118,7 @@ class speakQueryListener(ParseTreeListener):
         self.lookup_handler = LookupHandler()
         self.search_cmd_handler = SearchDirective()
         self.stats_handler = StatsHandler()
+        self.macro_handler = MacroHandler()
 
     # Enter a parse tree produced by speakQueryParser#speakQuery.
     def enterSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
@@ -435,6 +437,19 @@ class speakQueryListener(ParseTreeListener):
                 field = seg_tokens[1]
                 idxs = [int(i.strip(',')) for i in seg_tokens[2:]]
                 self.main_df = self.general_handler.execute_mvindex(self.main_df, field, idxs, 'mvindex')
+
+            elif seg_str.startswith('`') and seg_str.endswith('`'):
+                macro_body = seg_str[1:-1]
+                if '(' in macro_body and macro_body.endswith(')'):
+                    name, arg_str = macro_body.split('(', 1)
+                    arg_str = arg_str[:-1]
+                else:
+                    name, arg_str = macro_body, ''
+                args = self.macro_handler.parse_arguments(arg_str)
+                try:
+                    self.main_df = self.macro_handler.execute_macro(name, args, self.main_df)
+                except Exception as e:
+                    logging.error(f"[x] Macro '{name}' failure: {e}")
 
             else:
                 logging.warning(f"[!] Unhandled transformation '{cmd}', defaulting to eval")
