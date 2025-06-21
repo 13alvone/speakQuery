@@ -1207,9 +1207,9 @@ def upload_file():
 @app.route('/view_lookup', methods=['GET'])
 def view_lookup():
     filepath = request.args.get('file')
-    filename = filepath.split('/')[-1]
     if not filepath:
         return "<p>Error: No file specified.</p>", 400
+    filename = filepath.split('/')[-1]
 
     # Ensure the file is within the allowed directory
     if not filepath.startswith(app.config['LOOKUP_DIR']):
@@ -1237,10 +1237,9 @@ def view_lookup():
 def delete_lookup_file():
     data = request.json
     filepath = data.get('filepath')
-    filename = filepath.split('/')[-1]
-
     if not filepath:
         return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
+    filename = filepath.split('/')[-1]
 
     # Ensure the file is within the allowed directory
     if not filepath.startswith(app.config['LOOKUP_DIR']):
@@ -1269,10 +1268,9 @@ def clone_lookup_file():
     data = request.json
     filepath = data.get('filepath')
     new_name = data.get('new_name')
-    filename = filepath.split('/')[-1]
-
     if not filepath:
         return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
+    filename = filepath.split('/')[-1]
 
     # Ensure the file is within the allowed directory
     if not filepath.startswith(app.config['LOOKUP_DIR']):
