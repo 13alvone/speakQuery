@@ -84,3 +84,6 @@ fi
 
 python3 tests/describe_indexes.py
 
+# Run Bandit security scan using the project's .bandit config
+bandit -r .
+
