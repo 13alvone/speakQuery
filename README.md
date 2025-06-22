@@ -24,15 +24,19 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
      conda env create -f config/environment.yml
      conda activate speakQueryEnv
      ```
-3. **Build the C++ extensions** – From the project root run `build_custom_components.py`.
-   This script compiles the performance‑critical modules in a repeatable,
-   durable way:
+3. **Required build tools**
+   - CMake ≥3.5
+   - A C++17 compiler
+   - `pybind11` (the build script will attempt to install it automatically)
+4. **Build the C++ extensions** – After activating the environment, run
+   `build_custom_components.py` from the project root. The script compiles the
+   performance‑critical modules and installs `pybind11` automatically if it is
+   missing. To force a clean rebuild:
    ```bash
-   python build_custom_components.py
+   python build_custom_components.py --rebuild
    ```
-   You can build a single component with `--component` or force a clean
-   rebuild with `--rebuild`.
-4. **Run the application**
+   You can also build a single component with `--component`.
+5. **Run the application**
    - Start the Flask server:
      ```bash
      python app.py
@@ -51,9 +55,10 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
 
 After building the C++ extensions, run the unit tests located in `tests/`:
 ```bash
+python build_custom_components.py --rebuild
 pytest -vv
 ```
-The script `tests/automated_build_test.sh` demonstrates compiling the extensions and running the tests in one step.
+The script `tests/automated_build_test.sh` demonstrates compiling the extensions and running a small sample test in one step.
 
 ## Regenerating the parser
 
