@@ -1,6 +1,6 @@
-# Generated from speakQuery.g4 by ANTLR 4.13.1
+# Generated from speakQuery.g4 by ANTLR 4.9.2
 from antlr4 import *
-if "." in __name__:
+if __name__ is not None and "." in __name__:
     from .speakQueryParser import speakQueryParser
 else:
     from speakQueryParser import speakQueryParser

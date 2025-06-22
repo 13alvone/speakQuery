@@ -72,6 +72,17 @@ Two small utilities help inspect your data and server setup:
 - **`describe_frontend.sh`** – outputs basic environment information helpful when
   debugging the web frontend.
 
+## Timechart command
+
+The query language includes a `timechart` directive for quick time-series
+aggregation. Use `span=<interval>` to control bin size and optional `BY` fields
+to group results. Example:
+
+```spl
+| timechart span=1h count by host
+```
+
+
 ## Regenerating the parser
 
 `lexers/speakQuery.g4` is the authoritative grammar for the query language. Parser files under `lexers/antlr4_active/` are generated from this grammar.
