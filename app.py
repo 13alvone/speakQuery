@@ -20,8 +20,8 @@ from werkzeug.utils import secure_filename
 from croniter import croniter
 
 # Local application imports
-from lexers.speakQueryLexer import speakQueryLexer
-from lexers.speakQueryParser import speakQueryParser
+from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
+from lexers.antlr4_active.speakQueryParser import speakQueryParser
 from lexers.speakQueryListener import speakQueryListener
 from handlers.JavaHandler import JavaHandler
 from validation.SavedSearchValidation import SavedSearchValidation

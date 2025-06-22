@@ -14,8 +14,8 @@ fake_loader.resolve_and_import_so = lambda path, name: types.SimpleNamespace(
 )
 sys.modules["functionality.so_loader"] = fake_loader
 
-from lexers.speakQueryLexer import speakQueryLexer
-from lexers.speakQueryParser import speakQueryParser
+from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
+from lexers.antlr4_active.speakQueryParser import speakQueryParser
 from lexers.speakQueryListener import speakQueryListener
 
 
