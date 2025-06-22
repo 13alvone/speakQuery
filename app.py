@@ -333,34 +333,7 @@ def settings():
     return render_template('settings.html')
 
 
-@app.route('/check_title_unique', methods=['POST'])
-def check_title_unique():
-    title = request.json.get('title')
-    if title:
-        is_unique = is_title_unique(title)
-        return jsonify({'is_unique': is_unique})
-    else:
-        return jsonify({'error': 'No title provided'}), 400
-
-
-@app.route('/fetch_api_data', methods=['POST'])
-def fetch_api_data():
-    data = request.get_json()
-    api_url = data.get('api_url')
-
-    if not api_url:
-        return jsonify({'status': 'error', 'message': 'API URL is required.'}), 400
-
-    try:
-        if not is_allowed_api_url(api_url):
-            return jsonify({'status': 'error', 'message': 'Domain not allowed.'}), 400
-
-        response = requests.get(api_url, timeout=10)
-        response.raise_for_status()
-        api_data = response.json()
-        return jsonify({'status': 'success', 'api_data': api_data}), 200
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 400
+# Blueprint routes moved to routes/query.py
 
 
 @app.route('/toggle_disable_scheduled_input/<int:input_id>', methods=['POST'])
@@ -676,91 +649,7 @@ def scheduled_inputs():
     return render_template('scheduled_inputs.html')
 
 
-@app.route('/run_query', methods=['POST'])
-def run_query():
-
-    # data = request.json
-
-    data = request.get_json(force=True, silent=True)
-    if data is None:
-        logging.error("[x] No JSON payload detected in /run_query request.")
-        return jsonify({'status': 'error', 'message': 'Expected JSON payload.'}), 400
-    query_str = data.get('query', '')
-    logging.info(f"[i] Query received: {query_str}")
-
-    try:
-        result_df = execute_speakQuery(data.get('query'))  # Process the query using your custom SPL language
-        logging.info(f"Query result before processing: {result_df}")
-
-        if result_df is None or result_df.empty:
-            logging.warning("No data returned from query.")
-            return jsonify({'status': 'error', 'message': 'No data returned from query.'})
-
-        result_df = result_df.fillna('')
-
-        logging.info(f"Query result after processing NaN values: {result_df}")
-
-        column_names = result_df.columns.values.tolist()
-        row_data = result_df.to_dict(orient='records')
-        logging.debug(f"Column names: {column_names}.")
-        logging.debug(f"Data: {row_data}.")
-
-        # Store the result_df in a temporary location
-        request_id = f'{time.time()}_{str(uuid.uuid4())}'
-        # save_dataframe(request_id, sanitize_dataframe(result_df), data.get('query'))
-        save_dataframe(request_id, result_df, data.get('query'))
-
-        response = {
-            'status': 'success',
-            'results': row_data,
-            'column_names': column_names,
-            'request_id': request_id
-        }
-        logging.debug(f"Response: {response}")
-
-        return jsonify(response)
-
-    except Exception as e:
-        logging.error(f"Error processing query: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)})
-
-
-@app.route('/get_query_for_loadjob/<filename>', methods=['GET'])
-def get_query_for_loadjob(filename):
-    """
-    Retrieve the original query associated with a given load job filename.
-
-    Args:
-        filename (str): The load job filename (e.g., '1727138492.564529_167a8a78-1b24-42a3-9634-82707d112423.pkl')
-
-    Returns:
-        JSON response containing the original query or an error message.
-    """
-    try:
-        # Ensure the filename ends with '.pkl'
-        if not filename.endswith('.pkl'):
-            return jsonify({'error': 'Invalid filename format. Expected a .pkl file.'}), 400
-
-        # Extract the request_id by removing the '.pkl' extension
-        request_id = filename[:-4]
-
-        # Connect to history.db
-        conn = sqlite3.connect(app.config['HISTORY_DB'])
-        cursor = conn.cursor()
-
-        # Retrieve the query based on request_id
-        cursor.execute('SELECT query FROM history WHERE query_id = ?', (request_id,))
-        row = cursor.fetchone()
-        conn.close()
-
-        if row:
-            original_query = row[0]
-            return jsonify({'query': original_query}), 200
-        else:
-            return jsonify({'error': 'No query found for the given load job filename.'}), 404
-    except Exception as e:
-        logging.error(f"Error retrieving query for load job '{filename}': {str(e)}")
-        return jsonify({'error': 'Internal server error.'}), 500
+# Query routes moved to routes/query.py
 
 
 @app.route('/commit_saved_search', methods=['POST'])
@@ -1181,269 +1070,13 @@ def get_directory_tree():
     return jsonify(directory_tree)
 
 
-@app.route('/save_results', methods=['POST'])
-def save_results():
-    data = request.json
-    request_id = data.get('request_id')
-    save_type = data.get('save_type')
-    format_type = data.get('format')
-    start = data.get('start', 0)
-    end = data.get('end', None)
-
-    logging.info(f"Saving results: {format_type} - {save_type}")
-
-    try:
-        result_df = load_dataframe(request_id)
-        if save_type == 'current_page':
-            result_df = result_df.iloc[start:end]
-
-        file_name = f"{round(time.time(), 6)}_{uuid.uuid4()}.{format_type}"
-        file_path = os.path.join(app.config['TEMP_DIR'], file_name)
-
-        if format_type == 'csv':
-            result_df.to_csv(file_path, index=False)
-        elif format_type == 'json':
-            result_df.to_json(file_path, orient='records')
-
-        return jsonify({'status': 'success', 'file_url': f'/static/temp/{file_name}', 'file_name': file_name})
-
-    except Exception as e:
-        logging.error(f"Error saving results: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)})
+# Query route moved to routes/query.py
 
 
-@app.route('/get_lookup_files', methods=['GET'])
-def get_lookup_files():
-    lookup_dir = app.config['LOOKUP_DIR']
-    files = []
-
-    for root, _, filenames in os.walk(lookup_dir):
-        for filename in filenames:
-            filepath = os.path.join(root, filename)
-            stats = os.stat(filepath)
-            row_count = get_row_count(filepath)
-
-            files.append({
-                'filename': filename,
-                'filepath': filepath,
-                'created_at': datetime.fromtimestamp(stats.st_ctime).strftime('%Y-%m-%d %H:%M:%S'),
-                'updated_at': datetime.fromtimestamp(stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
-                'filesize': stats.st_size,
-                'permissions': oct(stats.st_mode)[-3:],
-                'row_count': row_count
-            })
-
-    return jsonify({'status': 'success', 'files': files})
+# Lookup routes moved to routes/lookups.py
 
 
-@app.route('/get_loadjob_files', methods=['GET'])
-def get_loadjob_files():
-    loadjob_dir = app.config['LOADJOB_DIR']
-    files = []
-
-    for root, _, filenames in os.walk(loadjob_dir):
-        for filename in filenames:
-            filepath = os.path.join(root, filename)
-            stats = os.stat(filepath)
-
-            files.append({
-                'filename': filename,
-                'created_at': datetime.fromtimestamp(stats.st_ctime).strftime('%Y-%m-%d %H:%M:%S'),
-                'updated_at': datetime.fromtimestamp(stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
-                'filesize': stats.st_size
-            })
-
-    return jsonify({'status': 'success', 'files': files})
-
-
-@app.route('/upload_file', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'status': 'error', 'message': 'No file part in the request.'})
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'status': 'error', 'message': 'No file selected for uploading.'})
-
-    if not allowed_file(file.filename):
-        return jsonify({'status': 'error', 'message': 'File type not allowed.'})
-
-    filename = secure_filename(file.filename)
-    upload_dir = app.config['LOOKUP_DIR']
-    os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join(upload_dir, filename)
-
-    try:
-        file.save(file_path)
-        return jsonify({'status': 'success', 'message': 'File uploaded successfully.'})
-    except Exception as e:
-        logging.error(f"Error saving file: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)})
-
-
-@app.route('/view_lookup', methods=['GET'])
-def view_lookup():
-    filepath = request.args.get('file')
-    if not filepath:
-        return "<p>Error: No file specified.</p>", 400
-    filename = filepath.split('/')[-1]
-
-    # Ensure the file is within the allowed directory
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
-        return "<p>Error: Invalid file path.</p>", 400
-
-    # Prevent directory traversal attacks
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = \
-        f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-    if not safe_filepath.startswith(target_filepath):
-        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
-        return "<p>Error: File not found.</p>", 404
-
-    try:
-        df = pd.read_csv(safe_filepath)
-        return df.to_html()
-    except Exception as e:
-        logging.error(f"Error reading file: {str(e)}")
-        return "<p>Error reading file.</p>", 500
-
-
-@app.route('/delete_lookup_file', methods=['POST'])
-def delete_lookup_file():
-    data = request.json
-    filepath = data.get('filepath')
-    if not filepath:
-        return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
-    filename = filepath.split('/')[-1]
-
-    # Ensure the file is within the allowed directory
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
-        return jsonify({'status': 'error', 'message': 'Invalid file path.'}), 400
-
-    # Prevent directory traversal attacks
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = \
-        f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-    if not safe_filepath.startswith(target_filepath):
-        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
-        return jsonify({'status': 'error', 'message': 'File not found.'}), 404
-
-    try:
-        os.remove(safe_filepath)
-        return jsonify({'status': 'success'})
-    except Exception as e:
-        logging.error(f"Error deleting file: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-@app.route('/clone_lookup_file', methods=['POST'])
-def clone_lookup_file():
-    data = request.json
-    filepath = data.get('filepath')
-    new_name = data.get('new_name')
-    if not filepath:
-        return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
-    filename = filepath.split('/')[-1]
-
-    # Ensure the file is within the allowed directory
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
-        return jsonify({'status': 'error', 'message': 'Invalid file path.'}), 400
-
-    # Prevent directory traversal attacks
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = \
-        f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-
-    if not safe_filepath.startswith(target_filepath):
-        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
-        return jsonify({'status': 'error', 'message': 'File not found.'}), 404
-
-    if not new_name:
-        base_name = os.path.basename(filepath)
-        new_name = f"{os.path.splitext(base_name)[0]}_copy{os.path.splitext(base_name)[1]}"
-
-    new_filename = secure_filename(new_name)
-    new_filepath = os.path.join(os.path.dirname(safe_filepath), new_filename)
-
-    try:
-        shutil.copy(safe_filepath, new_filepath)
-        return jsonify({'status': 'success'})
-    except Exception as e:
-        logging.error(f"Error cloning file: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-@app.route('/get_settings', methods=['GET'])
-def get_settings():
-    try:
-        conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])  # Adjust if different
-        cursor = conn.cursor()
-        cursor.execute('SELECT key, value FROM app_settings')
-        _settings = cursor.fetchall()
-        conn.close()
-
-        settings_dict = {}
-        for key, value in _settings:
-            # Convert types based on key
-            if key == 'ALLOWED_EXTENSIONS':
-                settings_dict[key] = ','.join(app.config.get(key, []))
-            elif key == 'ALLOWED_API_DOMAINS':
-                settings_dict[key] = ','.join(app.config.get(key, []))
-            elif key in ['MAX_CONTENT_LENGTH', 'KEEP_LATEST_FILES']:
-                settings_dict[key] = int(app.config.get(key, 0))
-            else:
-                settings_dict[key] = app.config.get(key, '')
-
-        return jsonify({'status': 'success', 'settings': settings_dict}), 200
-    except Exception as e:
-        logging.error(f"Error fetching settings: {str(e)}")
-        return jsonify({'status': 'error', 'message': 'Failed to fetch settings.'}), 500
-
-
-@app.route('/update_settings', methods=['POST'])
-def update_settings():
-    try:
-        data = request.json
-        if not data or 'settings' not in data:
-            return jsonify({'status': 'error', 'message': 'No settings provided.'}), 400
-
-        _settings = data['settings']
-        conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])  # Adjust if different
-        cursor = conn.cursor()
-
-        for key, value in _settings.items():
-            # Type conversion based on key
-            if key == 'ALLOWED_EXTENSIONS':
-                # Expecting a comma-separated string
-                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
-                app.config[key] = set(ext.strip().lower() for ext in value.split(','))
-            elif key == 'ALLOWED_API_DOMAINS':
-                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
-                app.config[key] = set(d.strip() for d in value.split(',') if d.strip())
-            elif key == 'MAX_CONTENT_LENGTH':
-                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(int(value)), key))
-                app.config[key] = int(value)
-            elif key == 'KEEP_LATEST_FILES':
-                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(int(value)), key))
-                app.config[key] = int(value)
-            else:
-                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
-                app.config[key] = value
-
-        conn.commit()
-        conn.close()
-
-        return jsonify({'status': 'success', 'message': 'Settings updated successfully.'}), 200
-
-    except Exception as e:
-        logging.error(f"Error updating settings: {str(e)}")
-        return jsonify({'status': 'error', 'message': 'Failed to update settings.'}), 500
+# Settings routes moved to routes/settings.py
 
 
 def get_row_count(filepath):
@@ -1544,6 +1177,15 @@ def execute_speakQuery(speak_query: str):
     walker.walk(listener, tree)
 
     return listener.main_df
+
+# Register blueprints
+from routes.query import query_bp
+from routes.lookups import lookups_bp
+from routes.settings import settings_bp
+
+app.register_blueprint(query_bp)
+app.register_blueprint(lookups_bp)
+app.register_blueprint(settings_bp)
 
 
 if __name__ == '__main__':
