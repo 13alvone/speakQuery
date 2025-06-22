@@ -40,7 +40,13 @@ app = Flask(
     static_folder='frontend/static'
 )
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key:
+    raise RuntimeError(
+        "SECRET_KEY environment variable not set. "
+        "Set SECRET_KEY before running the application."
+    )
+app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
 
 # Configuration
