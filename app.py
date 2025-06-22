@@ -954,7 +954,7 @@ def update_saved_search(search_id):
         return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
 
     except Exception as e:
-        print(f"Error updating saved search: {e}")  # For debugging; consider using logging
+        logging.error(f"Error updating saved search: {e}")
         return jsonify({'status': 'error', 'message': 'Internal server error.'}), 500
 
 
@@ -1074,7 +1074,7 @@ def update_scheduled_input(input_id):
         conn.close()
         return jsonify({'status': 'success'})
     except Exception as e:
-        print(e)
+        logging.error(e)
         return jsonify({'status': 'error', 'message': 'Failed to update scheduled input.'}), 500
 
 

@@ -3,6 +3,9 @@ import os
 import pyarrow.parquet as pq
 from subprocess import check_output
 from typing import Generator
+import logging
+
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
 def explore_directory() -> str:
@@ -48,7 +51,7 @@ def main():
 
     # Step 2: Print parquet file contents
     for parquet_file in find_parquet_files():
-        print(read_parquet_preview(parquet_file))
+        logging.info(read_parquet_preview(parquet_file))
 
 
 if __name__ == "__main__":

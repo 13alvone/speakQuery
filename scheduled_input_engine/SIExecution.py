@@ -416,8 +416,8 @@ GENERATE_RESULTS(df)
     try:
         processor = SIExecution(user_code, test_mode=True)
         df_summary = processor.execute_code_test()  # Execute the code in test mode
-        print("Processed code executed successfully.")
-        print("DataFrame Summary:")
-        print(df_summary)
+        logger.info("Processed code executed successfully.")
+        logger.info("DataFrame Summary:")
+        logger.info(df_summary)
     except Exception as e:
-        print(f"Error: {str(e)}")
+        logger.error(f"Error: {str(e)}")
