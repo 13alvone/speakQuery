@@ -10,6 +10,8 @@ import logging
 import numpy as np
 import pandas as pd
 import base64
+import ast
+import operator
 
 from handlers.MathematicOperations import MathHandler
 from handlers.StringHandler import StringHandler
@@ -165,7 +167,107 @@ class EvalHandler:
             if isinstance(x, pd.Series) else base64.b64decode(str(x)).decode()
         })
         try:
-            result = eval(expr, {"__builtins__": {}}, local_env)
+            # Parse the expression into an AST
+            tree = ast.parse(expr, mode="eval")
+
+            allowed_funcs = set(local_env.keys())
+
+            class SafeEvaluator(ast.NodeVisitor):
+                allowed_operators = {
+                    ast.Add: operator.add,
+                    ast.Sub: operator.sub,
+                    ast.Mult: operator.mul,
+                    ast.Div: operator.truediv,
+                    ast.Mod: operator.mod,
+                    ast.Pow: operator.pow,
+                    ast.FloorDiv: operator.floordiv,
+                }
+
+                allowed_unary = {ast.UAdd: operator.pos, ast.USub: operator.neg, ast.Not: operator.not_}
+
+                allowed_bool = {ast.And: lambda a, b: a & b, ast.Or: lambda a, b: a | b}
+
+                allowed_compare = {
+                    ast.Eq: operator.eq,
+                    ast.NotEq: operator.ne,
+                    ast.Lt: operator.lt,
+                    ast.LtE: operator.le,
+                    ast.Gt: operator.gt,
+                    ast.GtE: operator.ge,
+                }
+
+                def __init__(self, env):
+                    self.env = env
+
+                def visit(self, node):
+                    return super().visit(node)
+
+                def generic_visit(self, node):
+                    raise ValueError(f"Unsupported expression: {ast.dump(node)}")
+
+                def visit_Expression(self, node):
+                    return self.visit(node.body)
+
+                def visit_Name(self, node):
+                    if node.id in self.env:
+                        return self.env[node.id]
+                    raise ValueError(f"Use of name '{node.id}' is not allowed")
+
+                def visit_Constant(self, node):
+                    return node.value
+
+                # Python <3.8 compatibility
+                def visit_Num(self, node):
+                    return node.n
+
+                def visit_BinOp(self, node):
+                    if type(node.op) not in self.allowed_operators:
+                        raise ValueError("Operator not allowed")
+                    left = self.visit(node.left)
+                    right = self.visit(node.right)
+                    return self.allowed_operators[type(node.op)](left, right)
+
+                def visit_UnaryOp(self, node):
+                    if type(node.op) not in self.allowed_unary:
+                        raise ValueError("Unary operator not allowed")
+                    operand = self.visit(node.operand)
+                    return self.allowed_unary[type(node.op)](operand)
+
+                def visit_BoolOp(self, node):
+                    if type(node.op) not in self.allowed_bool:
+                        raise ValueError("Boolean operator not allowed")
+                    values = [self.visit(v) for v in node.values]
+                    result = values[0]
+                    for v in values[1:]:
+                        result = self.allowed_bool[type(node.op)](result, v)
+                    return result
+
+                def visit_Compare(self, node):
+                    left = self.visit(node.left)
+                    results = []
+                    for op, comp in zip(node.ops, node.comparators):
+                        if type(op) not in self.allowed_compare:
+                            raise ValueError("Comparison operator not allowed")
+                        right = self.visit(comp)
+                        results.append(self.allowed_compare[type(op)](left, right))
+                        left = right
+                    result = results[0]
+                    for r in results[1:]:
+                        result = result & r
+                    return result
+
+                def visit_Call(self, node):
+                    if not isinstance(node.func, ast.Name):
+                        raise ValueError("Only direct function calls allowed")
+                    func_name = node.func.id
+                    if func_name not in allowed_funcs or not callable(self.env.get(func_name)):
+                        raise ValueError(f"Function '{func_name}' is not allowed")
+                    args = [self.visit(a) for a in node.args]
+                    kwargs = {kw.arg: self.visit(kw.value) for kw in node.keywords}
+                    return self.env[func_name](*args, **kwargs)
+
+            evaluator = SafeEvaluator(local_env)
+            result = evaluator.visit(tree)
             return result
         except Exception as e:
             logging.error(f"[x] Error in custom_eval for expression '{expr}': {e}")
