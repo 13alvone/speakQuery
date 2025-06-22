@@ -24,19 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Add event listeners to select elements to handle dynamic form changes
     overwriteSelect.addEventListener('change', toggleFields);
 
-    // Function to display error notifications
-    function showError(message) {
-        // Implement your notification logic here
-        // Example using a simple alert (replace with your modal logic)
-        alert(`Error: ${message}`);
-    }
-
-    // Function to display success notifications
-    function showNotification(message) {
-        // Implement your notification logic here
-        // Example using a simple alert (replace with your modal logic)
-        alert(`Success: ${message}`);
-    }
+    // Notifications are provided by common.js
 
     // Function to handle form submission
     async function handleFormSubmission(event) {
