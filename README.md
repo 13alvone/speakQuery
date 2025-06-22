@@ -57,6 +57,7 @@ Install the Python requirements first, then run the unit tests located in `tests
 ```bash
 pip install -r requirements.txt
 python build_custom_components.py --rebuild
+flake8 --exclude=env
 pytest -vv
 ```
 The script `tests/automated_build_test.sh` demonstrates compiling the extensions and running a small sample test in one step.
