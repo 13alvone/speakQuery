@@ -1,6 +1,9 @@
 from antlr4 import *
 from speakQueryLexer import speakQueryLexer
 from speakQueryParser import speakQueryParser
+import logging
+
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 # Read your test query into a string
 with open('current_query.test', 'r') as file:
@@ -21,4 +24,4 @@ parser = speakQueryParser(stream)
 tree = parser.speakQuery()
 
 # To print the parse tree
-print(tree.toStringTree(recog=parser))
+logging.info(tree.toStringTree(recog=parser))

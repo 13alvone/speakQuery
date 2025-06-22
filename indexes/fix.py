@@ -3,6 +3,9 @@ import pyarrow.parquet as pq
 import random
 from datetime import datetime, timedelta
 import pandas as pd
+import logging
+
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
 def generate_parquet_files():
@@ -50,7 +53,7 @@ def generate_parquet_files():
     # Write the table to Parquet files
     for file_path in output_files:
         pq.write_table(table, file_path)
-        print(f"Parquet file generated: {file_path}")
+        logging.info(f"Parquet file generated: {file_path}")
 
     # Adding another example for validation
     data2 = [
@@ -88,7 +91,7 @@ def generate_parquet_files():
 
     # Write the table to Parquet file
     pq.write_table(table2, 'test2.parquet')
-    print(f"Parquet file generated: {'output_parquets/test2.parquet'}")
+    logging.info(f"Parquet file generated: {'output_parquets/test2.parquet'}")
 
 
 # Generate the required Parquet files

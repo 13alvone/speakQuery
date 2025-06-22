@@ -87,6 +87,6 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
 if __name__ == '__main__':
     suggested_cron_time = suggest_next_cron_runtime()
     if suggested_cron_time:
-        print(f"Suggested Cron Time: {suggested_cron_time}")
+        logging.info(f"Suggested Cron Time: {suggested_cron_time}")
     else:
-        print("Could not determine a suggested cron time.")
+        logging.info("Could not determine a suggested cron time.")
