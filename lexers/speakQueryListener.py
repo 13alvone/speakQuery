@@ -134,14 +134,19 @@ class speakQueryListener(ParseTreeListener):
         self.macro_handler = MacroHandler()
         self.multisearch_handler = MultiSearchHandler()
 
-
     # Exit a parse tree produced by speakQueryParser#speakQuery.
     def exitSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
-        """
-        Exit hook for the top-level query context. Handles index calls,
-        inputlookup, loadjob, and a full transformation pipeline (stats/eventstats/streamstats and eval)
-        by re-parsing the raw query string to ensure all fields (e.g. multiple BY fields) are captured.
-        Returns the resulting pandas DataFrame or None.
+        """Top level exit hook used by the parser.
+
+        The initial index expression is parsed via ANTLR.  All subsequent
+        pipeline commands (``| stats ...``, ``| eval ...`` etc.) are currently
+        tokenised manually.  The grammar does define rules for these
+        directives but the listener does not yet utilise those contexts for
+        execution.  ``exitSpeakQuery`` therefore re-tokenises the raw query and
+        dispatches the recognised commands itself.  The list of commands handled
+        this way is documented in ``_apply_command``.
+
+        Returns the resulting ``pandas.DataFrame`` or ``None``.
         """
 
         # Save the root context on first invocation
@@ -239,388 +244,242 @@ class speakQueryListener(ParseTreeListener):
             cmd = seg_tokens[0].split("(")[0].lower()
             logging.info(f"[i] Processing pipeline segment: {cmd}")
 
-            if cmd in ("stats", "eventstats", "streamstats"):
-                try:
-                    self.main_df = self.stats_handler.run_stats(
-                        seg_tokens, self.main_df
-                    )
-                except Exception as e:
-                    logging.error(f"[x] StatsHandler failure on '{seg_str}': {e}")
-                    raise
-
-            elif cmd == "timechart":
-                from handlers.ChartHandler import ChartHandler
-
-                chart_handler = ChartHandler()
-                try:
-                    self.main_df = chart_handler.run_timechart(seg_tokens, self.main_df)
-                except Exception as e:
-                    logging.error(f"[x] ChartHandler failure on '{seg_str}': {e}")
-                    raise
-
-            elif cmd == "eval":
-                from handlers.EvalHandler import EvalHandler
-
-                eval_handler = EvalHandler()
-                try:
-                    self.main_df = eval_handler.run_eval(seg_tokens, self.main_df)
-                except Exception as e:
-                    logging.error(f"[x] EvalHandler failure on '{seg_str}': {e}")
-                    raise
-
-            elif cmd in ("head", "limit"):
-                try:
-                    count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
-                    self.main_df = self.general_handler.head_call(
-                        self.main_df, count, "head"
-                    )
-                except Exception as e:
-                    logging.error(f"[x] HEAD/LIMIT failure: {e}")
-
-            elif cmd == "sort":
-                try:
-                    cols = [c.lstrip("+-").strip(",") for c in seg_tokens[1:]]
-                    direction = "+" if seg_tokens[1].startswith("+") else "-"
-                    self.main_df = self.general_handler.sort_df_by_columns(
-                        self.main_df, cols, direction
-                    )
-                except Exception as e:
-                    logging.error(f"[x] SORT failure: {e}")
-
-            elif cmd == "reverse":
-                self.main_df = self.general_handler.reverse_df_rows(self.main_df)
-
-            elif cmd == "regex":
-                try:
-                    arg = seg_tokens[1]
-                    field, regex = arg.split("=", 1)
-                    self.main_df = self.general_handler.filter_df_by_regex(
-                        self.main_df, field, regex
-                    )
-                except Exception as e:
-                    logging.error(f"[x] REGEX failure: {e}")
-
-            elif cmd == "fields":
-                mode = "+"
-                cols = []
-                for tok in seg_tokens[1:]:
-                    if tok.startswith("-"):
-                        mode = "-"
-                        cols.append(tok[1:].strip(","))
-                    else:
-                        cols.append(tok.strip(","))
-                try:
-                    self.main_df = self.general_handler.filter_df_columns(
-                        self.main_df, cols, mode
-                    )
-                except Exception as e:
-                    logging.error(f"[x] FIELDS failure: {e}")
-
-            elif cmd == "rename":
-                try:
-                    pairs = [p.strip() for p in " ".join(seg_tokens[1:]).split(",")]
-                    for pair in pairs:
-                        if "as" in pair:
-                            old, new = [s.strip() for s in pair.split("as")]
-                            self.main_df = self.general_handler.rename_column(
-                                self.main_df, old, new
-                            )
-                except Exception as e:
-                    logging.error(f"[x] RENAME failure: {e}")
-
-            elif cmd == "fieldsummary":
-                try:
-                    self.main_df = self.general_handler.execute_fieldsummary(
-                        self.main_df
-                    )
-                except Exception as e:
-                    logging.error(f"[x] FIELDSUMMARY failure: {e}")
-
-            elif cmd == "fillnull":
-                try:
-                    self.main_df = self.general_handler.execute_fillnull(
-                        self.main_df, seg_tokens[1:]
-                    )
-                except Exception as e:
-                    logging.error(f"[x] FILLNULL failure: {e}")
-
-            elif cmd == "table":
-                cols = [c.strip(",") for c in seg_tokens[1:]]
-                try:
-                    self.main_df = self.general_handler.filter_df_columns(
-                        self.main_df, cols, "+"
-                    )
-                except Exception as e:
-                    logging.error(f"[x] TABLE failure: {e}")
-
-            elif cmd == "maketable":
-                cols = [c.strip(",") for c in seg_tokens[1:]]
-                self.main_df = self.general_handler.create_empty_dataframe(cols)
-
-            elif cmd == "base64":
-                try:
-                    self.main_df = self.general_handler.handle_base64(
-                        self.main_df, seg_tokens
-                    )
-                except Exception as e:
-                    logging.error(f"[x] BASE64 failure: {e}")
-
-            elif cmd == "bin":
-                try:
-                    field = seg_tokens[1]
-                    span = (
-                        seg_tokens[seg_tokens.index("span") + 2]
-                        if "span" in seg_tokens
-                        else "1h"
-                    )
-                    self.main_df = self.general_handler.execute_bin(
-                        self.main_df, field, span
-                    )
-                except Exception as e:
-                    logging.error(f"[x] BIN failure: {e}")
-
-            elif cmd == "join":
-                try:
-                    join_type = "inner"
-                    fields = []
-                    idx = 1
-                    while idx < len(seg_tokens) and seg_tokens[idx] != "[":
-                        tok = seg_tokens[idx]
-                        if tok.startswith("type="):
-                            join_type = tok.split("=", 1)[1]
-                        else:
-                            fields.extend([x.strip(",") for x in tok.split(",") if x])
-                        idx += 1
-                    sub_df = None
-                    if "[" in seg_tokens:
-                        start = seg_tokens.index("[") + 1
-                        end = seg_tokens.index("]")
-                        sub_df = process_index_calls(seg_tokens[start:end])
-                    if sub_df is not None:
-                        self.main_df = self.general_handler.execute_join(
-                            self.main_df, sub_df, fields, join_type
-                        )
-                except Exception as e:
-                    logging.error(f"[x] JOIN failure: {e}")
-
-            elif cmd == "append":
-                try:
-                    if "[" in seg_tokens:
-                        start = seg_tokens.index("[") + 1
-                        end = seg_tokens.index("]")
-                        add_df = process_index_calls(seg_tokens[start:end])
-                        self.main_df = self.general_handler.execute_append(
-                            self.main_df, add_df
-                        )
-                except Exception as e:
-                    logging.error(f"[x] APPEND failure: {e}")
-
-            elif cmd == "appendpipe":
-                try:
-                    if "[" in seg_tokens:
-                        start = seg_tokens.index("[") + 1
-                        end = seg_tokens.index("]")
-                        sub_tokens = seg_tokens[start:end]
-                        sub_df = self.run_subsearch(sub_tokens, self.main_df)
-                        self.main_df = self.general_handler.execute_append(
-                            self.main_df, sub_df
-                        )
-                except Exception as e:
-                    logging.error(f"[x] APPENDPIPE failure: {e}")
-
-            elif cmd == "multisearch":
-                try:
-                    subs = []
-                    idx = 1
-                    while idx < len(seg_tokens):
-                        if seg_tokens[idx] == "[":
-                            end = seg_tokens.index("]", idx)
-                            subs.append(seg_tokens[idx + 1 : end])
-                            idx = end + 1
-                        else:
-                            idx += 1
-                    self.main_df = self.multisearch_handler.run_multisearch(
-                        subs, process_index_calls
-                    )
-                except Exception as e:
-                    logging.error(f"[x] MULTISEARCH failure: {e}")
-
-            elif cmd == "lookup":
-                try:
-                    filename = seg_tokens[1]
-                    key = seg_tokens[2]
-                    output_fields = (
-                        [t.strip(",") for t in seg_tokens[4:]]
-                        if "OUTPUT" in seg_tokens
-                        else []
-                    )
-                    lookup_df = self.lookup_handler.load_data(
-                        os.path.join(self.lookup_root, filename)
-                    )
-                    if lookup_df is not None:
-                        self.main_df = self.general_handler.execute_join(
-                            self.main_df, lookup_df, [key], "left"
-                        )
-                        if output_fields:
-                            self.main_df = self.general_handler.filter_df_columns(
-                                self.main_df, self.main_df.columns.tolist(), "+"
-                            )
-                except Exception as e:
-                    logging.error(f"[x] LOOKUP failure: {e}")
-
-            elif cmd == "outputlookup":
-                try:
-                    args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
-                    if isinstance(args, str):
-                        kwargs = {"filename": os.path.join(self.lookup_root, args)}
-                    else:
-                        args["filename"] = os.path.join(
-                            self.lookup_root, args.get("filename", "output.csv")
-                        )
-                        kwargs = args
-                    self.general_handler.execute_outputlookup(self.main_df, **kwargs)
-                except Exception as e:
-                    logging.error(f"[x] OUTPUTLOOKUP failure: {e}")
-
-            elif cmd == "coalesce":
-                try:
-                    if "(" in seg_str and ")" in seg_str:
-                        inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
-                        fields = [f.strip().strip(",") for f in inside.split(",")]
-                    else:
-                        fields = [t.strip(",") for t in seg_tokens[1:]]
-                    self.main_df = self.general_handler.execute_coalesce(
-                        self.main_df, fields
-                    )
-                except Exception as e:
-                    logging.error(f"[x] COALESCE failure: {e}")
-
-            elif cmd == "mvexpand":
-                field = seg_tokens[1]
-                self.main_df = self.general_handler.execute_mvexpand(
-                    self.main_df, field
-                )
-
-            elif cmd == "mvreverse":
-                field = seg_tokens[1]
-                self.main_df = self.general_handler.execute_mvreverse(
-                    self.main_df, field
-                )
-
-            elif cmd == "mvcombine":
-                field = None
-                delim = " "
-                for t in seg_tokens[1:]:
-                    if t.startswith("delim="):
-                        delim = t.split("=", 1)[1].strip('"')
-                    else:
-                        field = t.strip(",")
-                if field:
-                    self.main_df = self.general_handler.execute_mvcombine(
-                        self.main_df, field, delim
-                    )
-
-            elif cmd == "mvdedup":
-                field = seg_tokens[1]
-                self.main_df = self.general_handler.execute_mvdedup(self.main_df, field)
-
-            elif cmd == "mvappend":
-                fields = [t.strip(",") for t in seg_tokens[1:]]
-                self.main_df = self.general_handler.execute_mvappend(
-                    self.main_df, fields, fields[0]
-                )
-
-            elif cmd == "mvfilter":
-                field = seg_tokens[1]
-                value = (
-                    seg_tokens[2].split("=")[1]
-                    if "=" in seg_tokens[2]
-                    else seg_tokens[2]
-                )
-                self.main_df = self.general_handler.execute_mvfilter(
-                    self.main_df, field, value
-                )
-
-            elif cmd == "mvcount":
-                field = seg_tokens[1]
-                self.main_df = self.general_handler.execute_mvcount(
-                    self.main_df, field, f"{field}_count"
-                )
-
-            elif cmd == "mvdc":
-                field = seg_tokens[1]
-                self.main_df = self.general_handler.execute_mvdc(
-                    self.main_df, field, f"{field}_dc"
-                )
-
-            elif cmd == "mvfind":
-                field = seg_tokens[1]
-                pattern = seg_tokens[2] if len(seg_tokens) > 2 else ""
-                self.main_df = self.general_handler.execute_mvfind(
-                    self.main_df, field, pattern
-                )
-
-            elif cmd == "mvzip":
-                field1 = seg_tokens[1].rstrip(",")
-                field2 = seg_tokens[2].rstrip(",")
-                delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else "_"
-                self.main_df = self.general_handler.execute_mvzip(
-                    self.main_df, field1, field2, delim, "mvzip"
-                )
-
-            elif cmd == "mvjoin":
-                field = seg_tokens[1]
-                delim = seg_tokens[2].split("=")[1] if len(seg_tokens) > 2 else " "
-                self.main_df = self.general_handler.execute_mvjoin(
-                    self.main_df, field, delim
-                )
-
-            elif cmd == "mvindex":
-                field = seg_tokens[1]
-                idxs = [int(i.strip(",")) for i in seg_tokens[2:]]
-                self.main_df = self.general_handler.execute_mvindex(
-                    self.main_df, field, idxs, "mvindex"
-                )
-
-            elif cmd in ("if_", "case", "tonumber"):
-                from handlers.EvalHandler import EvalHandler
-
-                eval_handler = EvalHandler()
-                try:
-                    self.main_df = eval_handler.run_eval(seg_tokens, self.main_df)
-                except Exception as e:
-                    logging.error(f"[x] EvalHandler failure on '{seg_str}': {e}")
-                    raise
-
-            elif seg_str.startswith("`") and seg_str.endswith("`"):
-                macro_body = seg_str[1:-1]
-                if "(" in macro_body and macro_body.endswith(")"):
-                    name, arg_str = macro_body.split("(", 1)
-                    arg_str = arg_str[:-1]
-                else:
-                    name, arg_str = macro_body, ""
-                args = self.macro_handler.parse_arguments(arg_str)
-                try:
-                    self.main_df = self.macro_handler.execute_macro(
-                        name, args, self.main_df
-                    )
-                except Exception as e:
-                    logging.error(f"[x] Macro '{name}' failure: {e}")
-
-            else:
-                logging.warning(
-                    f"[!] Unhandled transformation '{cmd}', defaulting to eval"
-                )
-                from handlers.EvalHandler import EvalHandler
-
-                eval_handler = EvalHandler()
-                try:
-                    self.main_df = eval_handler.run_eval(seg_tokens, self.main_df)
-                except Exception as e:
-                    logging.error(f"[x] EvalHandler failure on '{seg_str}': {e}")
-                    raise
+            try:
+                self.main_df = self._apply_command(cmd, seg_tokens, seg_str)
+            except Exception as e:
+                logging.error(f"[x] Failure processing '{seg_str}': {e}")
+                raise
 
         return self.main_df
+
+    def _apply_command(self, cmd, seg_tokens, seg_str):
+        """Dispatch transformation commands parsed manually."""
+        if cmd in ("stats", "eventstats", "streamstats"):
+            return self.stats_handler.run_stats(seg_tokens, self.main_df)
+        if cmd == "timechart":
+            from handlers.ChartHandler import ChartHandler
+
+            return ChartHandler().run_timechart(seg_tokens, self.main_df)
+        if cmd == "eval":
+            from handlers.EvalHandler import EvalHandler
+
+            return EvalHandler().run_eval(seg_tokens, self.main_df)
+        if cmd in ("head", "limit"):
+            count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
+            return self.general_handler.head_call(self.main_df, count, "head")
+        if cmd == "sort":
+            cols = [c.lstrip("+-").strip(",") for c in seg_tokens[1:]]
+            direction = "+" if seg_tokens[1].startswith("+") else "-"
+            return self.general_handler.sort_df_by_columns(
+                self.main_df, cols, direction
+            )
+        if cmd == "reverse":
+            return self.general_handler.reverse_df_rows(self.main_df)
+        if cmd == "regex":
+            arg = seg_tokens[1]
+            field, regex = arg.split("=", 1)
+            return self.general_handler.filter_df_by_regex(self.main_df, field, regex)
+        if cmd == "fields":
+            mode = "+"
+            cols = []
+            for tok in seg_tokens[1:]:
+                if tok.startswith("-"):
+                    mode = "-"
+                    cols.append(tok[1:].strip(","))
+                else:
+                    cols.append(tok.strip(","))
+            return self.general_handler.filter_df_columns(self.main_df, cols, mode)
+        if cmd == "rename":
+            pairs = [p.strip() for p in " ".join(seg_tokens[1:]).split(",")]
+            for pair in pairs:
+                if "as" in pair:
+                    old, new = [s.strip() for s in pair.split("as")]
+                    self.main_df = self.general_handler.rename_column(
+                        self.main_df, old, new
+                    )
+            return self.main_df
+        if cmd == "fieldsummary":
+            return self.general_handler.execute_fieldsummary(self.main_df)
+        if cmd == "fillnull":
+            return self.general_handler.execute_fillnull(self.main_df, seg_tokens[1:])
+        if cmd == "table":
+            cols = [c.strip(",") for c in seg_tokens[1:]]
+            return self.general_handler.filter_df_columns(self.main_df, cols, "+")
+        if cmd == "maketable":
+            cols = [c.strip(",") for c in seg_tokens[1:]]
+            return self.general_handler.create_empty_dataframe(cols)
+        if cmd == "base64":
+            return self.general_handler.handle_base64(self.main_df, seg_tokens)
+        if cmd == "bin":
+            field = seg_tokens[1]
+            span = (
+                seg_tokens[seg_tokens.index("span") + 2]
+                if "span" in seg_tokens
+                else "1h"
+            )
+            return self.general_handler.execute_bin(self.main_df, field, span)
+        if cmd == "join":
+            join_type = "inner"
+            fields = []
+            idx = 1
+            while idx < len(seg_tokens) and seg_tokens[idx] != "[":
+                tok = seg_tokens[idx]
+                if tok.startswith("type="):
+                    join_type = tok.split("=", 1)[1]
+                else:
+                    fields.extend([x.strip(",") for x in tok.split(",") if x])
+                idx += 1
+            sub_df = None
+            if "[" in seg_tokens:
+                start = seg_tokens.index("[") + 1
+                end = seg_tokens.index("]")
+                sub_df = process_index_calls(seg_tokens[start:end])
+            if sub_df is not None:
+                return self.general_handler.execute_join(
+                    self.main_df, sub_df, fields, join_type
+                )
+            return self.main_df
+        if cmd == "append":
+            if "[" in seg_tokens:
+                start = seg_tokens.index("[") + 1
+                end = seg_tokens.index("]")
+                add_df = process_index_calls(seg_tokens[start:end])
+                return self.general_handler.execute_append(self.main_df, add_df)
+            return self.main_df
+        if cmd == "appendpipe":
+            if "[" in seg_tokens:
+                start = seg_tokens.index("[") + 1
+                end = seg_tokens.index("]")
+                sub_tokens = seg_tokens[start:end]
+                sub_df = self.run_subsearch(sub_tokens, self.main_df)
+                return self.general_handler.execute_append(self.main_df, sub_df)
+            return self.main_df
+        if cmd == "multisearch":
+            subs = []
+            idx = 1
+            while idx < len(seg_tokens):
+                if seg_tokens[idx] == "[":
+                    end = seg_tokens.index("]", idx)
+                    subs.append(seg_tokens[idx + 1 : end])
+                    idx = end + 1
+                else:
+                    idx += 1
+            return self.multisearch_handler.run_multisearch(subs, process_index_calls)
+        if cmd == "lookup":
+            filename = seg_tokens[1]
+            key = seg_tokens[2]
+            output_fields = (
+                [t.strip(",") for t in seg_tokens[4:]] if "OUTPUT" in seg_tokens else []
+            )
+            lookup_df = self.lookup_handler.load_data(
+                os.path.join(self.lookup_root, filename)
+            )
+            if lookup_df is not None:
+                self.main_df = self.general_handler.execute_join(
+                    self.main_df, lookup_df, [key], "left"
+                )
+                if output_fields:
+                    self.main_df = self.general_handler.filter_df_columns(
+                        self.main_df, self.main_df.columns.tolist(), "+"
+                    )
+            return self.main_df
+        if cmd == "outputlookup":
+            args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
+            if isinstance(args, str):
+                kwargs = {"filename": os.path.join(self.lookup_root, args)}
+            else:
+                args["filename"] = os.path.join(
+                    self.lookup_root, args.get("filename", "output.csv")
+                )
+                kwargs = args
+            self.general_handler.execute_outputlookup(self.main_df, **kwargs)
+            return self.main_df
+        if cmd == "coalesce":
+            if "(" in seg_str and ")" in seg_str:
+                inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
+                fields = [f.strip().strip(",") for f in inside.split(",")]
+            else:
+                fields = [t.strip(",") for t in seg_tokens[1:]]
+            return self.general_handler.execute_coalesce(self.main_df, fields)
+        if cmd == "mvexpand":
+            field = seg_tokens[1]
+            return self.general_handler.execute_mvexpand(self.main_df, field)
+        if cmd == "mvreverse":
+            field = seg_tokens[1]
+            return self.general_handler.execute_mvreverse(self.main_df, field)
+        if cmd == "mvcombine":
+            field = None
+            delim = " "
+            for t in seg_tokens[1:]:
+                if t.startswith("delim="):
+                    delim = t.split("=", 1)[1].strip('"')
+                else:
+                    field = t.strip(",")
+            if field:
+                return self.general_handler.execute_mvcombine(
+                    self.main_df, field, delim
+                )
+            return self.main_df
+        if cmd == "mvdedup":
+            field = seg_tokens[1]
+            return self.general_handler.execute_mvdedup(self.main_df, field)
+        if cmd == "mvappend":
+            fields = [t.strip(",") for t in seg_tokens[1:]]
+            return self.general_handler.execute_mvappend(
+                self.main_df, fields, fields[0]
+            )
+        if cmd == "mvfilter":
+            field = seg_tokens[1]
+            value = (
+                seg_tokens[2].split("=")[1] if "=" in seg_tokens[2] else seg_tokens[2]
+            )
+            return self.general_handler.execute_mvfilter(self.main_df, field, value)
+        if cmd == "mvcount":
+            field = seg_tokens[1]
+            return self.general_handler.execute_mvcount(
+                self.main_df, field, f"{field}_count"
+            )
+        if cmd == "mvdc":
+            field = seg_tokens[1]
+            return self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
+        if cmd == "mvfind":
+            field = seg_tokens[1]
+            pattern = seg_tokens[2] if len(seg_tokens) > 2 else ""
+            return self.general_handler.execute_mvfind(self.main_df, field, pattern)
+        if cmd == "mvzip":
+            field1 = seg_tokens[1].rstrip(",")
+            field2 = seg_tokens[2].rstrip(",")
+            delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else "_"
+            return self.general_handler.execute_mvzip(
+                self.main_df, field1, field2, delim, "mvzip"
+            )
+        if cmd == "mvjoin":
+            field = seg_tokens[1]
+            delim = seg_tokens[2].split("=")[1] if len(seg_tokens) > 2 else " "
+            return self.general_handler.execute_mvjoin(self.main_df, field, delim)
+        if cmd == "mvindex":
+            field = seg_tokens[1]
+            idxs = [int(i.strip(",")) for i in seg_tokens[2:]]
+            return self.general_handler.execute_mvindex(
+                self.main_df, field, idxs, "mvindex"
+            )
+        if cmd in ("if_", "case", "tonumber"):
+            from handlers.EvalHandler import EvalHandler
+
+            return EvalHandler().run_eval(seg_tokens, self.main_df)
+        if seg_str.startswith("`") and seg_str.endswith("`"):
+            macro_body = seg_str[1:-1]
+            if "(" in macro_body and macro_body.endswith(")"):
+                name, arg_str = macro_body.split("(", 1)
+                arg_str = arg_str[:-1]
+            else:
+                name, arg_str = macro_body, ""
+            args = self.macro_handler.parse_arguments(arg_str)
+            return self.macro_handler.execute_macro(name, args, self.main_df)
+        logging.warning(f"[!] Unhandled transformation '{cmd}', defaulting to eval")
+        from handlers.EvalHandler import EvalHandler
+
+        return EvalHandler().run_eval(seg_tokens, self.main_df)
 
     # Enter a parse tree produced by speakQueryParser#initialSequence.
     def enterInitialSequence(self, ctx: speakQueryParser.InitialSequenceContext):
@@ -632,7 +491,6 @@ class speakQueryListener(ParseTreeListener):
         self.initial_sequence_enabled = False
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#expression.
     def exitExpression(self, ctx: speakQueryParser.ExpressionContext):
         current_parsed_index_call = self.ctx_flatten(ctx)
@@ -642,66 +500,53 @@ class speakQueryListener(ParseTreeListener):
             self.main_df = process_index_calls(current_parsed_index_call)
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#conjunction.
     def exitConjunction(self, ctx: speakQueryParser.ConjunctionContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#comparison.
     def exitComparison(self, ctx: speakQueryParser.ComparisonContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#additiveExpr.
     def exitAdditiveExpr(self, ctx: speakQueryParser.AdditiveExprContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#multiplicativeExpr.
     def exitMultiplicativeExpr(self, ctx: speakQueryParser.MultiplicativeExprContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#unaryExpr.
     def exitUnaryExpr(self, ctx: speakQueryParser.UnaryExprContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#primary.
     def exitPrimary(self, ctx: speakQueryParser.PrimaryContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#timeClause.
     def exitTimeClause(self, ctx: speakQueryParser.TimeClauseContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#earliestClause.
     def exitEarliestClause(self, ctx: speakQueryParser.EarliestClauseContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#latestClause.
     def exitLatestClause(self, ctx: speakQueryParser.LatestClauseContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#indexClause.
     def exitIndexClause(self, ctx: speakQueryParser.IndexClauseContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#comparisonOperator.
     def exitComparisonOperator(self, ctx: speakQueryParser.ComparisonOperatorContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#inExpression.
     def exitInExpression(self, ctx: speakQueryParser.InExpressionContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#inputlookupInit.
     def exitInputlookupInit(self, ctx: speakQueryParser.InputlookupInitContext):
@@ -715,7 +560,6 @@ class speakQueryListener(ParseTreeListener):
         self.main_df = self.lookup_handler.load_data(f"{self.current_inputlookup_path}")
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#loadjobInit.
     def exitLoadjobInit(self, ctx: speakQueryParser.LoadjobInitContext):
         self.current_loadjob_call = self.ctx_flatten(ctx)
@@ -728,51 +572,41 @@ class speakQueryListener(ParseTreeListener):
         )
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#validLine.
     def exitValidLine(self, ctx: speakQueryParser.ValidLineContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#directive.
     def exitDirective(self, ctx: speakQueryParser.DirectiveContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#macro.
     def exitMacro(self, ctx: speakQueryParser.MacroContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#statsAgg.
     def exitStatsAgg(self, ctx: speakQueryParser.StatsAggContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#variableList.
     def exitVariableList(self, ctx: speakQueryParser.VariableListContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#subsearch.
     def exitSubsearch(self, ctx: speakQueryParser.SubsearchContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#functionCall.
     def exitFunctionCall(self, ctx: speakQueryParser.FunctionCallContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#numericFunctionCall.
     def exitNumericFunctionCall(self, ctx: speakQueryParser.NumericFunctionCallContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#stringFunctionCall.
     def exitStringFunctionCall(self, ctx: speakQueryParser.StringFunctionCallContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#specificFunctionCall.
     def exitSpecificFunctionCall(
@@ -780,46 +614,37 @@ class speakQueryListener(ParseTreeListener):
     ):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#statsFunctionCall.
     def exitStatsFunctionCall(self, ctx: speakQueryParser.StatsFunctionCallContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#regexTarget.
     def exitRegexTarget(self, ctx: speakQueryParser.RegexTargetContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#mvfindObject.
     def exitMvfindObject(self, ctx: speakQueryParser.MvfindObjectContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#mvindexIndex.
     def exitMvindexIndex(self, ctx: speakQueryParser.MvindexIndexContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#mvDelim.
     def exitMvDelim(self, ctx: speakQueryParser.MvDelimContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#inputCron.
     def exitInputCron(self, ctx: speakQueryParser.InputCronContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#cronformat.
     def exitCronformat(self, ctx: speakQueryParser.CronformatContext):
         self.validate_exceptions(ctx)
 
-
     # Exit a parse tree produced by speakQueryParser#timespan.
     def exitTimespan(self, ctx: speakQueryParser.TimespanContext):
         self.validate_exceptions(ctx)
-
 
     # Exit a parse tree produced by speakQueryParser#variableName.
     def exitVariableName(self, ctx: speakQueryParser.VariableNameContext):
