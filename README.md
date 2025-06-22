@@ -37,8 +37,9 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
    ```
    You can also build a single component with `--component`.
 5. **Run the application**
-   - Start the Flask server:
+   - Start the Flask server (requires a `SECRET_KEY` environment variable):
      ```bash
+     export SECRET_KEY="your_secret_value"
      python app.py
      ```
    - Run the query engine (in a separate terminal):
