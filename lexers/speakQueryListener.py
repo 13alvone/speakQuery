@@ -134,9 +134,6 @@ class speakQueryListener(ParseTreeListener):
         self.macro_handler = MacroHandler()
         self.multisearch_handler = MultiSearchHandler()
 
-    # Enter a parse tree produced by speakQueryParser#speakQuery.
-    def enterSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#speakQuery.
     def exitSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
@@ -635,9 +632,6 @@ class speakQueryListener(ParseTreeListener):
         self.initial_sequence_enabled = False
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#expression.
-    def enterExpression(self, ctx: speakQueryParser.ExpressionContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#expression.
     def exitExpression(self, ctx: speakQueryParser.ExpressionContext):
@@ -648,105 +642,66 @@ class speakQueryListener(ParseTreeListener):
             self.main_df = process_index_calls(current_parsed_index_call)
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#conjunction.
-    def enterConjunction(self, ctx: speakQueryParser.ConjunctionContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#conjunction.
     def exitConjunction(self, ctx: speakQueryParser.ConjunctionContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#comparison.
-    def enterComparison(self, ctx: speakQueryParser.ComparisonContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#comparison.
     def exitComparison(self, ctx: speakQueryParser.ComparisonContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#additiveExpr.
-    def enterAdditiveExpr(self, ctx: speakQueryParser.AdditiveExprContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#additiveExpr.
     def exitAdditiveExpr(self, ctx: speakQueryParser.AdditiveExprContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#multiplicativeExpr.
-    def enterMultiplicativeExpr(self, ctx: speakQueryParser.MultiplicativeExprContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#multiplicativeExpr.
     def exitMultiplicativeExpr(self, ctx: speakQueryParser.MultiplicativeExprContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#unaryExpr.
-    def enterUnaryExpr(self, ctx: speakQueryParser.UnaryExprContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#unaryExpr.
     def exitUnaryExpr(self, ctx: speakQueryParser.UnaryExprContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#primary.
-    def enterPrimary(self, ctx: speakQueryParser.PrimaryContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#primary.
     def exitPrimary(self, ctx: speakQueryParser.PrimaryContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#timeClause.
-    def enterTimeClause(self, ctx: speakQueryParser.TimeClauseContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#timeClause.
     def exitTimeClause(self, ctx: speakQueryParser.TimeClauseContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#earliestClause.
-    def enterEarliestClause(self, ctx: speakQueryParser.EarliestClauseContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#earliestClause.
     def exitEarliestClause(self, ctx: speakQueryParser.EarliestClauseContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#latestClause.
-    def enterLatestClause(self, ctx: speakQueryParser.LatestClauseContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#latestClause.
     def exitLatestClause(self, ctx: speakQueryParser.LatestClauseContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#indexClause.
-    def enterIndexClause(self, ctx: speakQueryParser.IndexClauseContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#indexClause.
     def exitIndexClause(self, ctx: speakQueryParser.IndexClauseContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#comparisonOperator.
-    def enterComparisonOperator(self, ctx: speakQueryParser.ComparisonOperatorContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#comparisonOperator.
     def exitComparisonOperator(self, ctx: speakQueryParser.ComparisonOperatorContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#inExpression.
-    def enterInExpression(self, ctx: speakQueryParser.InExpressionContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#inExpression.
     def exitInExpression(self, ctx: speakQueryParser.InExpressionContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#inputlookupInit.
-    def enterInputlookupInit(self, ctx: speakQueryParser.InputlookupInitContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#inputlookupInit.
     def exitInputlookupInit(self, ctx: speakQueryParser.InputlookupInitContext):
@@ -760,9 +715,6 @@ class speakQueryListener(ParseTreeListener):
         self.main_df = self.lookup_handler.load_data(f"{self.current_inputlookup_path}")
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#loadjobInit.
-    def enterLoadjobInit(self, ctx: speakQueryParser.LoadjobInitContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#loadjobInit.
     def exitLoadjobInit(self, ctx: speakQueryParser.LoadjobInitContext):
@@ -776,85 +728,51 @@ class speakQueryListener(ParseTreeListener):
         )
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#validLine.
-    def enterValidLine(self, ctx: speakQueryParser.ValidLineContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#validLine.
     def exitValidLine(self, ctx: speakQueryParser.ValidLineContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#directive.
-    def enterDirective(self, ctx: speakQueryParser.DirectiveContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#directive.
     def exitDirective(self, ctx: speakQueryParser.DirectiveContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#macro.
-    def enterMacro(self, ctx: speakQueryParser.MacroContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#macro.
     def exitMacro(self, ctx: speakQueryParser.MacroContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#statsAgg.
-    def enterStatsAgg(self, ctx: speakQueryParser.StatsAggContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#statsAgg.
     def exitStatsAgg(self, ctx: speakQueryParser.StatsAggContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#variableList.
-    def enterVariableList(self, ctx: speakQueryParser.VariableListContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#variableList.
     def exitVariableList(self, ctx: speakQueryParser.VariableListContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#subsearch.
-    def enterSubsearch(self, ctx: speakQueryParser.SubsearchContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#subsearch.
     def exitSubsearch(self, ctx: speakQueryParser.SubsearchContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#functionCall.
-    def enterFunctionCall(self, ctx: speakQueryParser.FunctionCallContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#functionCall.
     def exitFunctionCall(self, ctx: speakQueryParser.FunctionCallContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#numericFunctionCall.
-    def enterNumericFunctionCall(
-        self, ctx: speakQueryParser.NumericFunctionCallContext
-    ):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#numericFunctionCall.
     def exitNumericFunctionCall(self, ctx: speakQueryParser.NumericFunctionCallContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#stringFunctionCall.
-    def enterStringFunctionCall(self, ctx: speakQueryParser.StringFunctionCallContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#stringFunctionCall.
     def exitStringFunctionCall(self, ctx: speakQueryParser.StringFunctionCallContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#specificFunctionCall.
-    def enterSpecificFunctionCall(
-        self, ctx: speakQueryParser.SpecificFunctionCallContext
-    ):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#specificFunctionCall.
     def exitSpecificFunctionCall(
@@ -862,73 +780,46 @@ class speakQueryListener(ParseTreeListener):
     ):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#statsFunctionCall.
-    def enterStatsFunctionCall(self, ctx: speakQueryParser.StatsFunctionCallContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#statsFunctionCall.
     def exitStatsFunctionCall(self, ctx: speakQueryParser.StatsFunctionCallContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#regexTarget.
-    def enterRegexTarget(self, ctx: speakQueryParser.RegexTargetContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#regexTarget.
     def exitRegexTarget(self, ctx: speakQueryParser.RegexTargetContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#mvfindObject.
-    def enterMvfindObject(self, ctx: speakQueryParser.MvfindObjectContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#mvfindObject.
     def exitMvfindObject(self, ctx: speakQueryParser.MvfindObjectContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#mvindexIndex.
-    def enterMvindexIndex(self, ctx: speakQueryParser.MvindexIndexContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#mvindexIndex.
     def exitMvindexIndex(self, ctx: speakQueryParser.MvindexIndexContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#mvDelim.
-    def enterMvDelim(self, ctx: speakQueryParser.MvDelimContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#mvDelim.
     def exitMvDelim(self, ctx: speakQueryParser.MvDelimContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#inputCron.
-    def enterInputCron(self, ctx: speakQueryParser.InputCronContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#inputCron.
     def exitInputCron(self, ctx: speakQueryParser.InputCronContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#cronformat.
-    def enterCronformat(self, ctx: speakQueryParser.CronformatContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#cronformat.
     def exitCronformat(self, ctx: speakQueryParser.CronformatContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#timespan.
-    def enterTimespan(self, ctx: speakQueryParser.TimespanContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#timespan.
     def exitTimespan(self, ctx: speakQueryParser.TimespanContext):
         self.validate_exceptions(ctx)
 
-    # Enter a parse tree produced by speakQueryParser#variableName.
-    def enterVariableName(self, ctx: speakQueryParser.VariableNameContext):
-        pass
 
     # Exit a parse tree produced by speakQueryParser#variableName.
     def exitVariableName(self, ctx: speakQueryParser.VariableNameContext):
