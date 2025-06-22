@@ -107,6 +107,8 @@ directive
     | SPATH variableName OUTPUT EQUALS variableName
     | JOIN (TYPE EQUALS (LEFT | CENTER | RIGHT))? variableName (COMMA variableName)* subsearch
     | APPEND subsearch
+    | APPENDPIPE subsearch
+    | MULTISEARCH subsearch+
     | COALESCE LPAREN variableName (COMMA variableName)+ RPAREN
     | MVJOIN LPAREN expression COMMA mvDelim RPAREN
     | MVINDEX LPAREN expression COMMA mvindexIndex RPAREN
