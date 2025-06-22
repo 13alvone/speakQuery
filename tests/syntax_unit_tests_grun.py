@@ -115,9 +115,9 @@ if __name__ == "__main__":
     # Load the test queries from YAML file
     test_queries = load_test_queries_from_yaml('syntax_unit_tests.yaml')  # Path to your YAML file
     try:
-        sys.path.append(os.path.abspath('lexers/antlr4_active/lexers'))  # Append the generated directory to sys.path
-        from speakQueryLexer import speakQueryLexer  # Import the regenerated lexer
-        from speakQueryParser import speakQueryParser  # Import the regenerated parser
+        sys.path.append(os.path.abspath('lexers'))
+        from lexers.antlr4_active.speakQueryLexer import speakQueryLexer  # Import the regenerated lexer
+        from lexers.antlr4_active.speakQueryParser import speakQueryParser  # Import the regenerated parser
     except Exception as e:
         logging.error(f'[!] Failure to import the updated components\n\t{e}')
     run_unit_tests(log_filename)  # Run unit tests

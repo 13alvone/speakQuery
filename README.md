@@ -54,3 +54,13 @@ After building the C++ extensions, run the unit tests located in `tests/`:
 pytest -vv
 ```
 The script `tests/automated_build_test.sh` demonstrates compiling the extensions and running the tests in one step.
+
+## Regenerating the parser
+
+Parser files under `lexers/antlr4_active/` are generated from `lexers/speakQuery.g4`.
+To regenerate them, place `antlr-4.13.1-complete.jar` in the `utils/` directory and run:
+
+```bash
+java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor \
+  -o lexers/antlr4_active lexers/speakQuery.g4
+```

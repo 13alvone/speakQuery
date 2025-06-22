@@ -11,8 +11,8 @@ import pandas as pd
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
-from lexers.speakQueryLexer import speakQueryLexer
-from lexers.speakQueryParser import speakQueryParser
+from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
+from lexers.antlr4_active.speakQueryParser import speakQueryParser
 from lexers.speakQueryListener import speakQueryListener
 
 from handlers.JavaHandler import JavaHandler

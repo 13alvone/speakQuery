@@ -4,8 +4,8 @@ import types
 
 # Mock heavy modules before importing app
 mock_modules = {
-    'lexers.speakQueryLexer': types.SimpleNamespace(speakQueryLexer=object),
-    'lexers.speakQueryParser': types.SimpleNamespace(speakQueryParser=object),
+    'lexers.antlr4_active.speakQueryLexer': types.SimpleNamespace(speakQueryLexer=object),
+    'lexers.antlr4_active.speakQueryParser': types.SimpleNamespace(speakQueryParser=object),
     'lexers.speakQueryListener': types.SimpleNamespace(speakQueryListener=object),
     'handlers.JavaHandler': types.SimpleNamespace(JavaHandler=lambda *a, **k: None),
     'validation.SavedSearchValidation': types.SimpleNamespace(SavedSearchValidation=lambda *a, **k: None),

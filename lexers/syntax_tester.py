@@ -2,8 +2,8 @@
 
 import antlr4
 import logging
-from lexers.speakQueryLexer import speakQueryLexer
-from lexers.speakQueryParser import speakQueryParser
+from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
+from lexers.antlr4_active.speakQueryParser import speakQueryParser
 from lexers.speakQueryListener import speakQueryListener
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
