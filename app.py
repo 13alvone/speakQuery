@@ -158,7 +158,8 @@ def initialize_database():
     conn.close()
 
     # Initialization for app_settings
-    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])  # Assuming same DB; adjust if different
+    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
+    # Assuming same DB; adjust if different
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS app_settings (
@@ -193,7 +194,8 @@ def initialize_database():
     conn.close()
 
     # Initialize history.db and create history table
-    history_db_path = app.config.get('HISTORY_DB', 'history.db')  # Fallback to 'history.db' if not set
+    history_db_path = app.config.get('HISTORY_DB', 'history.db')
+    # Fallback to 'history.db' if not set
     conn = sqlite3.connect(history_db_path)
     cursor = conn.cursor()
     cursor.execute('''
@@ -208,7 +210,8 @@ def initialize_database():
 
 
 def load_settings_into_config():
-    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])  # Assuming same DB; adjust if different
+    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
+    # Assuming same DB; adjust if different
     cursor = conn.cursor()
     cursor.execute('SELECT key, value FROM app_settings')
     _settings = cursor.fetchall()
@@ -366,7 +369,10 @@ def toggle_disable_scheduled_input(input_id):
             return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
         current_disabled = result[0]
         new_disabled = 0 if current_disabled else 1
-        cursor.execute('UPDATE scheduled_inputs SET disabled = ? WHERE id = ?', (new_disabled, input_id))
+        cursor.execute(
+            'UPDATE scheduled_inputs SET disabled = ? WHERE id = ?',
+            (new_disabled, input_id)
+        )
         conn.commit()
         conn.close()
         return jsonify({'status': 'success', 'new_disabled': new_disabled})
@@ -395,17 +401,35 @@ def clone_scheduled_input(input_id):
         conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
         cursor = conn.cursor()
         # Fetch the input to be cloned
-        cursor.execute('SELECT title, description, code, cron_schedule, overwrite, '
-                       'subdirectory FROM scheduled_inputs WHERE id = ?', (input_id,))
+        cursor.execute(
+            'SELECT title, description, code, cron_schedule, overwrite, '
+            'subdirectory FROM scheduled_inputs WHERE id = ?',
+            (input_id,)
+        )
         result = cursor.fetchone()
         if result is None:
             return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
         title, description, code, cron_schedule, overwrite, subdirectory = result
         # Create a new scheduled input with similar data
-        cursor.execute('''
-            INSERT INTO scheduled_inputs (title, description, code, cron_schedule, overwrite, subdirectory, created_at, disabled)
+        cursor.execute(
+            '''
+            INSERT INTO scheduled_inputs (
+                title, description, code, cron_schedule,
+                overwrite, subdirectory, created_at, disabled
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (f"{title} (Clone)", description, code, cron_schedule, overwrite, subdirectory, int(time.time()), 0))
+            ''',
+            (
+                f"{title} (Clone)",
+                description,
+                code,
+                cron_schedule,
+                overwrite,
+                subdirectory,
+                int(time.time()),
+                0,
+            ),
+        )
         conn.commit()
         conn.close()
         return jsonify({'status': 'success'})
@@ -456,8 +480,9 @@ def delete_search(search_id):
 def clone_search(search_id):
     try:
         query = '''
-        SELECT title, description, query, cron_schedule, trigger, lookback, throttle, throttle_time_period, throttle_by, 
-        event_message, send_email, email_address, email_content
+        SELECT title, description, query, cron_schedule, trigger, lookback,
+               throttle, throttle_time_period, throttle_by,
+               event_message, send_email, email_address, email_content
         FROM saved_searches WHERE id = ?
         '''
         search_data = execute_sql_query(app.config['SAVED_SEARCHES_DB'], query, (search_id,))
@@ -545,12 +570,16 @@ def scheduled_input(scheduled_input_id):
     cursor = conn.cursor()
 
     if request.method == 'GET':
-        cursor.execute('''
-            SELECT title, id, description, code, cron_schedule, subdirectory, created_at, overwrite, 
-                   disabled 
+        cursor.execute(
+            '''
+            SELECT title, id, description, code, cron_schedule, subdirectory,
+                   created_at, overwrite,
+                   disabled
             FROM scheduled_inputs
             WHERE id = ?
-        ''', (scheduled_input_id,))
+            ''',
+            (scheduled_input_id,)
+        )
 
         result = cursor.fetchone()
 
@@ -602,14 +631,32 @@ def scheduled_input(scheduled_input_id):
 
         # Validate required fields
         if not title or not code or not cron_schedule:
-            return jsonify({'status': 'error', 'message': 'Title, Code, and Cron Schedule are required.'}), 400
+            return jsonify(
+                {
+                    'status': 'error',
+                    'message': 'Title, Code, and Cron Schedule are required.'
+                }
+            ), 400
 
         # Update the scheduled input in the database
-        cursor.execute('''
+        cursor.execute(
+            '''
             UPDATE scheduled_inputs
-            SET title = ?, description = ?, code = ?, cron_schedule = ?, subdirectory = ?, overwrite = ?, disabled = ?
+            SET title = ?, description = ?, code = ?, cron_schedule = ?,
+                subdirectory = ?, overwrite = ?, disabled = ?
             WHERE id = ?
-        ''', (title, description, code, cron_schedule, subdirectory, overwrite, disabled, scheduled_input_id))
+            ''',
+            (
+                title,
+                description,
+                code,
+                cron_schedule,
+                subdirectory,
+                overwrite,
+                disabled,
+                scheduled_input_id,
+            ),
+        )
 
         conn.commit()
         cursor.close()
