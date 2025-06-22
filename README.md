@@ -11,17 +11,17 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
 
 ## Setup
 
-1. **Python version** – The project targets Python 3.11 as defined in `config/environment.yml`.
+1. **Python version** – The project targets Python 3.11 as defined in `environment.yml`.
 2. **Install dependencies**
    - Using `pip`:
      ```bash
      python3 -m venv env
      source env/bin/activate
-     pip install -r config/requirements.txt
+     pip install -r requirements.txt
      ```
    - Using conda:
      ```bash
-     conda env create -f config/environment.yml
+     conda env create -f environment.yml
      conda activate speakQueryEnv
      ```
 3. **Required build tools**
@@ -60,9 +60,18 @@ pytest -vv
 ```
 The script `tests/automated_build_test.sh` demonstrates compiling the extensions and running a small sample test in one step.
 
+## Helper scripts
+
+Two small utilities help inspect your data and server setup:
+
+- **`describe_indexes.py`** – prints summary information about the index files
+  stored under `indexes/`.
+- **`describe_frontend.sh`** – outputs basic environment information helpful when
+  debugging the web frontend.
+
 ## Regenerating the parser
 
-Parser files under `lexers/antlr4_active/` are generated from `lexers/speakQuery.g4`.
+`lexers/speakQuery.g4` is the authoritative grammar for the query language. Parser files under `lexers/antlr4_active/` are generated from this grammar.
 To regenerate them, place `antlr-4.13.1-complete.jar` in the `utils/` directory and run:
 
 ```bash
