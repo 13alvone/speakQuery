@@ -53,8 +53,9 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
 
 ## Testing
 
-After building the C++ extensions, run the unit tests located in `tests/`:
+Install the Python requirements first, then run the unit tests located in `tests/`:
 ```bash
+pip install -r requirements.txt
 python build_custom_components.py --rebuild
 pytest -vv
 ```
