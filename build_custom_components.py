@@ -25,6 +25,7 @@ import logging
 import subprocess
 import shutil
 import sysconfig
+import site
 import platform
 import re
 
@@ -58,25 +59,43 @@ def run_command(cmd, cwd):
     return result.stdout
 
 
-def ensure_pybind11():
-    """Ensure that pybind11 is installed and return its CMake directory."""
+def get_pybind11_cmake_dir():
+    """Return the pybind11 CMake directory if available."""
     try:
         import pybind11  # type: ignore
     except ModuleNotFoundError:
-        logging.info("[i] pybind11 not found. Installing with pip...")
-        try:
-            run_command([sys.executable, "-m", "pip", "install", "pybind11"], cwd=os.getcwd())
-        except SystemExit:
-            logging.error("[x] Failed to install pybind11")
-            sys.exit(1)
-        import pybind11  # type: ignore
+        logging.error(
+            "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
+        )
+        sys.exit(1)
     try:
         cmake_dir = pybind11.get_cmake_dir()  # type: ignore
         logging.debug(f"[DEBUG] Found pybind11 CMake dir: {cmake_dir}")
         return cmake_dir
     except Exception:
-        logging.debug("[DEBUG] Could not determine pybind11 CMake dir; falling back to system paths.")
+        logging.debug(
+            "[DEBUG] Could not determine pybind11 CMake dir; falling back to system paths."
+        )
         return ""
+
+
+def get_site_packages_path():
+    """Return the path to the current Python environment's site-packages."""
+    paths = site.getsitepackages()
+    if paths:
+        site_packages = paths[0]
+    else:
+        if os.name == "nt":
+            site_packages = os.path.join(sys.prefix, "Lib", "site-packages")
+        else:
+            site_packages = os.path.join(
+                sys.prefix,
+                "lib",
+                f"python{sys.version_info.major}.{sys.version_info.minor}",
+                "site-packages",
+            )
+    logging.debug(f"[DEBUG] Python site-packages directory: {site_packages}")
+    return site_packages
 
 
 def build_component(source_dir, build_dir):
@@ -128,14 +147,11 @@ def build_component(source_dir, build_dir):
     logging.debug(f"[DEBUG] Python include directory: {python_include_dir}")
     logging.debug(f"[DEBUG] Python library: {python_library}")
 
-    # Determine the site-packages directory from the virtual environment.
-    site_packages = os.path.join(
-        sys.prefix, "lib", f"python{sys.version_info.major}.{sys.version_info.minor}", "site-packages"
-    )
-    logging.debug(f"[DEBUG] Python site-packages directory: {site_packages}")
+    # Determine the site-packages directory from the current environment.
+    site_packages = get_site_packages_path()
 
-    # Ensure pybind11 is installed and get its CMake directory
-    pybind11_cmake_dir = ensure_pybind11()
+    # Ensure pybind11 is available and get its CMake directory
+    pybind11_cmake_dir = get_pybind11_cmake_dir()
 
     # Build the CMake configuration command.
     cmake_config_cmd = [
@@ -193,6 +209,21 @@ def main():
         help="Force a clean rebuild by deleting the existing build directory (if it exists)"
     )
     args = parser.parse_args()
+
+    # Ensure required tools are available before proceeding.
+    if shutil.which("cmake") is None:
+        logging.error(
+            "[x] cmake is not installed or not found in PATH. Please install cmake to build the components."
+        )
+        sys.exit(1)
+
+    try:
+        import pybind11  # type: ignore
+    except ModuleNotFoundError:
+        logging.error(
+            "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
+        )
+        sys.exit(1)
 
     # Determine the project root (assuming this script is placed at the project root).
     project_root = os.path.abspath(os.path.dirname(__file__))
