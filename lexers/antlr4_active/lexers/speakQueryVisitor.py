@@ -9,78 +9,28 @@ else:
 
 class speakQueryVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by speakQueryParser#query.
-    def visitQuery(self, ctx:speakQueryParser.QueryContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by speakQueryParser#speakQuery.
     def visitSpeakQuery(self, ctx:speakQueryParser.SpeakQueryContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#filterExpression.
-    def visitFilterExpression(self, ctx:speakQueryParser.FilterExpressionContext):
+    # Visit a parse tree produced by speakQueryParser#initialSequence.
+    def visitInitialSequence(self, ctx:speakQueryParser.InitialSequenceContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#filterTerm.
-    def visitFilterTerm(self, ctx:speakQueryParser.FilterTermContext):
+    # Visit a parse tree produced by speakQueryParser#expression.
+    def visitExpression(self, ctx:speakQueryParser.ExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#preTimeFilter.
-    def visitPreTimeFilter(self, ctx:speakQueryParser.PreTimeFilterContext):
+    # Visit a parse tree produced by speakQueryParser#conjunction.
+    def visitConjunction(self, ctx:speakQueryParser.ConjunctionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#earliestClause.
-    def visitEarliestClause(self, ctx:speakQueryParser.EarliestClauseContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#latestClause.
-    def visitLatestClause(self, ctx:speakQueryParser.LatestClauseContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#logicalExpr.
-    def visitLogicalExpr(self, ctx:speakQueryParser.LogicalExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#logicalOrExpr.
-    def visitLogicalOrExpr(self, ctx:speakQueryParser.LogicalOrExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#logicalAndExpr.
-    def visitLogicalAndExpr(self, ctx:speakQueryParser.LogicalAndExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#logicalNotExpr.
-    def visitLogicalNotExpr(self, ctx:speakQueryParser.LogicalNotExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#logicalPrimaryExpr.
-    def visitLogicalPrimaryExpr(self, ctx:speakQueryParser.LogicalPrimaryExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#indexClause.
-    def visitIndexClause(self, ctx:speakQueryParser.IndexClauseContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#comparisonExpr.
-    def visitComparisonExpr(self, ctx:speakQueryParser.ComparisonExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#comparisonOperator.
-    def visitComparisonOperator(self, ctx:speakQueryParser.ComparisonOperatorContext):
+    # Visit a parse tree produced by speakQueryParser#comparison.
+    def visitComparison(self, ctx:speakQueryParser.ComparisonContext):
         return self.visitChildren(ctx)
 
 
@@ -99,13 +49,33 @@ class speakQueryVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#primaryExpr.
-    def visitPrimaryExpr(self, ctx:speakQueryParser.PrimaryExprContext):
+    # Visit a parse tree produced by speakQueryParser#primary.
+    def visitPrimary(self, ctx:speakQueryParser.PrimaryContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#booleanExpr.
-    def visitBooleanExpr(self, ctx:speakQueryParser.BooleanExprContext):
+    # Visit a parse tree produced by speakQueryParser#timeClause.
+    def visitTimeClause(self, ctx:speakQueryParser.TimeClauseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by speakQueryParser#earliestClause.
+    def visitEarliestClause(self, ctx:speakQueryParser.EarliestClauseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by speakQueryParser#latestClause.
+    def visitLatestClause(self, ctx:speakQueryParser.LatestClauseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by speakQueryParser#indexClause.
+    def visitIndexClause(self, ctx:speakQueryParser.IndexClauseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by speakQueryParser#comparisonOperator.
+    def visitComparisonOperator(self, ctx:speakQueryParser.ComparisonOperatorContext):
         return self.visitChildren(ctx)
 
 
@@ -114,8 +84,13 @@ class speakQueryVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#alternateStartingCall.
-    def visitAlternateStartingCall(self, ctx:speakQueryParser.AlternateStartingCallContext):
+    # Visit a parse tree produced by speakQueryParser#inputlookupInit.
+    def visitInputlookupInit(self, ctx:speakQueryParser.InputlookupInitContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by speakQueryParser#loadjobInit.
+    def visitLoadjobInit(self, ctx:speakQueryParser.LoadjobInitContext):
         return self.visitChildren(ctx)
 
 
@@ -129,6 +104,11 @@ class speakQueryVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by speakQueryParser#macro.
+    def visitMacro(self, ctx:speakQueryParser.MacroContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by speakQueryParser#statsAgg.
     def visitStatsAgg(self, ctx:speakQueryParser.StatsAggContext):
         return self.visitChildren(ctx)
@@ -139,58 +119,8 @@ class speakQueryVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by speakQueryParser#subsearchList.
-    def visitSubsearchList(self, ctx:speakQueryParser.SubsearchListContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by speakQueryParser#subsearch.
     def visitSubsearch(self, ctx:speakQueryParser.SubsearchContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#sharedField.
-    def visitSharedField(self, ctx:speakQueryParser.SharedFieldContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#filename.
-    def visitFilename(self, ctx:speakQueryParser.FilenameContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#specialFunctionName.
-    def visitSpecialFunctionName(self, ctx:speakQueryParser.SpecialFunctionNameContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#expression.
-    def visitExpression(self, ctx:speakQueryParser.ExpressionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#ifExpression.
-    def visitIfExpression(self, ctx:speakQueryParser.IfExpressionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#caseExpression.
-    def visitCaseExpression(self, ctx:speakQueryParser.CaseExpressionContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#caseMatch.
-    def visitCaseMatch(self, ctx:speakQueryParser.CaseMatchContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#caseTrue.
-    def visitCaseTrue(self, ctx:speakQueryParser.CaseTrueContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#catchAllExpression.
-    def visitCatchAllExpression(self, ctx:speakQueryParser.CatchAllExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -216,41 +146,6 @@ class speakQueryVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by speakQueryParser#statsFunctionCall.
     def visitStatsFunctionCall(self, ctx:speakQueryParser.StatsFunctionCallContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#staticNumber.
-    def visitStaticNumber(self, ctx:speakQueryParser.StaticNumberContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#staticString.
-    def visitStaticString(self, ctx:speakQueryParser.StaticStringContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#multivalueField.
-    def visitMultivalueField(self, ctx:speakQueryParser.MultivalueFieldContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#multivalueStringField.
-    def visitMultivalueStringField(self, ctx:speakQueryParser.MultivalueStringFieldContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#multivalueNumericField.
-    def visitMultivalueNumericField(self, ctx:speakQueryParser.MultivalueNumericFieldContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#staticMultivalueStringField.
-    def visitStaticMultivalueStringField(self, ctx:speakQueryParser.StaticMultivalueStringFieldContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#staticMultivalueNumericField.
-    def visitStaticMultivalueNumericField(self, ctx:speakQueryParser.StaticMultivalueNumericFieldContext):
         return self.visitChildren(ctx)
 
 
@@ -281,16 +176,6 @@ class speakQueryVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by speakQueryParser#cronformat.
     def visitCronformat(self, ctx:speakQueryParser.CronformatContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#executionMacro.
-    def visitExecutionMacro(self, ctx:speakQueryParser.ExecutionMacroContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by speakQueryParser#timeStringValue.
-    def visitTimeStringValue(self, ctx:speakQueryParser.TimeStringValueContext):
         return self.visitChildren(ctx)
 
 

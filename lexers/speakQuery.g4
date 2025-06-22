@@ -183,6 +183,9 @@ specificFunctionCall
     | TO_CRON LPAREN inputCron RPAREN
     | FROM_CRON LPAREN inputCron COMMA cronformat RPAREN
     | COALESCE LPAREN variableName (COMMA variableName)+ RPAREN
+    | IF_ LPAREN expression COMMA expression COMMA expression RPAREN
+    | CASE LPAREN expression (COMMA expression)+ RPAREN
+    | TONUMBER LPAREN expression RPAREN
     ;
 
 statsFunctionCall
@@ -254,9 +257,10 @@ OR                      : ('OR' | 'or') ;
 BY                      : ('BY' | 'by') ;
 AS                      : ('AS' | 'as') ;
 IN                      : ('IN' | 'in') ;
-IF                      : 'if' ;
+IF_                     : 'if_' ;
 ELSE                    : 'else' ;
 CASE                    : 'case' ;
+TONUMBER                : 'tonumber' ;
 EQUALS                  : '=' ;
 NOT_EQUALS              : '!=' ;
 GT                      : '>' ;
