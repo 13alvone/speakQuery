@@ -18,12 +18,12 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
 
     try:
         # Connect to the SQLite database
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
 
-        # Query to retrieve all cron schedules
-        cursor.execute("SELECT cron_schedule FROM saved_searches")
-        cron_schedules = cursor.fetchall()
+            # Query to retrieve all cron schedules
+            cursor.execute("SELECT cron_schedule FROM saved_searches")
+            cron_schedules = cursor.fetchall()
 
         # Initialize a Counter for minutes in a 24-hour period (0-59 for each hour)
         cron_count = Counter()
@@ -55,7 +55,7 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
                     logging.error(f"Failed to parse cron expression '{cron_expr}': {e}")
                     continue
 
-        # Now, find the minute and hour with the least scheduled jobs
+            # Now, find the minute and hour with the least scheduled jobs
         least_jobs = float('inf')
         best_time = None
 
@@ -77,10 +77,6 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
     except sqlite3.Error as e:
         logging.error(f"[x] SQLite error: {str(e)}")
         return None
-
-    finally:
-        if conn:
-            conn.close()
 
 
 # Example usage

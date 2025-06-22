@@ -87,11 +87,10 @@ def get_query_for_loadjob(filename):
             return jsonify({'error': 'Invalid filename format. Expected a .pkl file.'}), 400
 
         request_id = filename[:-4]
-        conn = sqlite3.connect(app.config['HISTORY_DB'])
-        cursor = conn.cursor()
-        cursor.execute('SELECT query FROM history WHERE query_id = ?', (request_id,))
-        row = cursor.fetchone()
-        conn.close()
+        with sqlite3.connect(app.config['HISTORY_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT query FROM history WHERE query_id = ?', (request_id,))
+            row = cursor.fetchone()
 
         if row:
             original_query = row[0]

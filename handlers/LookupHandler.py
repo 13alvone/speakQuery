@@ -74,19 +74,18 @@ class LookupHandler:
         Returns:
         pandas.DataFrame: Combined data from all tables, or None if an error occurs.
         """
-        conn = sqlite3.connect(filename)
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")  # Get all table names
-        tables = cursor.fetchall()
+        with sqlite3.connect(filename) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")  # Get all table names
+            tables = cursor.fetchall()
 
-        dfs = []  # Load all tables
-        for table_name in tables:
-            table_name = table_name[0]
-            df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
-            df.columns = [f"{table_name}_{col}" for col in df.columns]  # Prefix columns with table name
-            dfs.append(df)
+            dfs = []  # Load all tables
+            for table_name in tables:
+                table_name = table_name[0]
+                df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+                df.columns = [f"{table_name}_{col}" for col in df.columns]  # Prefix columns with table name
+                dfs.append(df)
 
-        conn.close()
 
         if dfs:  # Combine all dataframes horizontally
             combined_df = pd.concat(dfs, axis=1)

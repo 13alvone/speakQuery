@@ -15,7 +15,6 @@ import requests
 import pandas as pd
 import antlr4
 from flask import Flask, request, jsonify, render_template
-from flask import g  # For application-level database connection management
 from flask_wtf import CSRFProtect
 from werkzeug.utils import secure_filename
 from croniter import croniter
@@ -105,43 +104,25 @@ def is_allowed_api_url(api_url):
         return False
 
 
-def get_db(db_name):
-    """Get a database connection, ensuring it's unique per request."""
-    if 'db' not in g:
-        g.db = {}
-    if db_name not in g.db:
-        g.db[db_name] = sqlite3.connect(db_name)
-    return g.db[db_name]
-
-
-@app.teardown_appcontext
-def close_db(exception):
-    """Close database connections at the end of the request."""
-    db_dict = g.pop('db', {})
-    # logging.info(f'[i] close_db() Function Exception: {exception}')
-    for db_conn in db_dict.values():
-        db_conn.close()
 
 
 def load_config():
-    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])  # Adjust if different
-    cursor = conn.cursor()
-    cursor.execute('SELECT key, value FROM app_settings')
-    _settings = cursor.fetchall()
-    for key, value in _settings:
-        # Attempt to convert numerical settings to integers if applicable
-        if value.isdigit():
-            app.config[key] = int(value)
-        else:
-            app.config[key] = value
-    conn.close()
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT key, value FROM app_settings')
+        _settings = cursor.fetchall()
+        for key, value in _settings:
+            if value.isdigit():
+                app.config[key] = int(value)
+            else:
+                app.config[key] = value
 
 
 def initialize_database():
     # Existing initialization for saved_searches
-    conn = sqlite3.connect(app.config['SAVED_SEARCHES_DB'])
-    cursor = conn.cursor()
-    cursor.execute('''
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS saved_searches (
             id TEXT PRIMARY KEY,
             title TEXT,
@@ -160,26 +141,25 @@ def initialize_database():
             file_location TEXT
         )
     ''')
-    conn.commit()
-    conn.close()
+        conn.commit()
 
     # Initialization for app_settings
-    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
-    # Assuming same DB; adjust if different
-    cursor = conn.cursor()
-    cursor.execute('''
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        # Assuming same DB; adjust if different
+        cursor = conn.cursor()
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS app_settings (
             key TEXT PRIMARY KEY,
             value TEXT
         )
     ''')
-    conn.commit()
+        conn.commit()
 
-    # Insert default settings if table is empty
-    cursor.execute('SELECT COUNT(*) FROM app_settings')
-    count = cursor.fetchone()[0]
-    if count == 0:
-        default_settings = {
+        # Insert default settings if table is empty
+        cursor.execute('SELECT COUNT(*) FROM app_settings')
+        count = cursor.fetchone()[0]
+        if count == 0:
+            default_settings = {
             'UPLOAD_FOLDER': 'lookups',
             'ALLOWED_EXTENSIONS': 'sqlite3,system4.system4.parquet,csv,json',
             'MAX_CONTENT_LENGTH': '16777216',  # 16 MB in bytes
@@ -194,34 +174,31 @@ def initialize_database():
             'KEEP_LATEST_FILES': '20',
             'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com'
         }
-        for key, value in default_settings.items():
-            cursor.execute('INSERT INTO app_settings (key, value) VALUES (?, ?)', (key, value))
-        conn.commit()
-    conn.close()
+            for key, value in default_settings.items():
+                cursor.execute('INSERT INTO app_settings (key, value) VALUES (?, ?)', (key, value))
+            conn.commit()
 
     # Initialize history.db and create history table
     history_db_path = app.config.get('HISTORY_DB', 'history.db')
     # Fallback to 'history.db' if not set
-    conn = sqlite3.connect(history_db_path)
-    cursor = conn.cursor()
-    cursor.execute('''
+    with sqlite3.connect(history_db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             query_id TEXT PRIMARY KEY,
             query TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    conn.commit()
-    conn.close()
+        conn.commit()
 
 
 def load_settings_into_config():
-    conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
-    # Assuming same DB; adjust if different
-    cursor = conn.cursor()
-    cursor.execute('SELECT key, value FROM app_settings')
-    _settings = cursor.fetchall()
-    conn.close()
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        # Assuming same DB; adjust if different
+        cursor = conn.cursor()
+        cursor.execute('SELECT key, value FROM app_settings')
+        _settings = cursor.fetchall()
 
     for key, value in _settings:
         # Convert types based on expected setting
@@ -298,16 +275,16 @@ def is_title_unique(title):
     Checks if the given title is unique in the 'saved_searches' table.
     """
     try:
-        conn = get_db(app.config['SAVED_SEARCHES_DB'])
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM saved_searches WHERE title = ?", (title,))
-        count = cursor.fetchone()[0]
-        if count > 0:
-            logging.info(f"Title '{title}' already exists in the database.")
-            return False
-        else:
-            logging.info(f"Title '{title}' is unique.")
-            return True
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM saved_searches WHERE title = ?", (title,))
+            count = cursor.fetchone()[0]
+            if count > 0:
+                logging.info(f"Title '{title}' already exists in the database.")
+                return False
+            else:
+                logging.info(f"Title '{title}' is unique.")
+                return True
     except sqlite3.Error as e:
         logging.error(f"SQLite error: {str(e)}")
         return False
@@ -339,21 +316,20 @@ def settings():
 @app.route('/toggle_disable_scheduled_input/<int:input_id>', methods=['POST'])
 def toggle_disable_scheduled_input(input_id):
     try:
-        conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-        cursor = conn.cursor()
-        # Fetch current disabled status
-        cursor.execute('SELECT disabled FROM scheduled_inputs WHERE id = ?', (input_id,))
-        result = cursor.fetchone()
-        if result is None:
-            return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
-        current_disabled = result[0]
-        new_disabled = 0 if current_disabled else 1
-        cursor.execute(
-            'UPDATE scheduled_inputs SET disabled = ? WHERE id = ?',
-            (new_disabled, input_id)
-        )
-        conn.commit()
-        conn.close()
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            # Fetch current disabled status
+            cursor.execute('SELECT disabled FROM scheduled_inputs WHERE id = ?', (input_id,))
+            result = cursor.fetchone()
+            if result is None:
+                return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
+            current_disabled = result[0]
+            new_disabled = 0 if current_disabled else 1
+            cursor.execute(
+                'UPDATE scheduled_inputs SET disabled = ? WHERE id = ?',
+                (new_disabled, input_id)
+            )
+            conn.commit()
         return jsonify({'status': 'success', 'new_disabled': new_disabled})
     except Exception as e:
         logging.error(f"Error toggling disable for input {input_id}: {str(e)}")
@@ -363,11 +339,10 @@ def toggle_disable_scheduled_input(input_id):
 @app.route('/delete_scheduled_input/<int:input_id>', methods=['POST'])
 def delete_scheduled_input(input_id):
     try:
-        conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM scheduled_inputs WHERE id = ?', (input_id,))
-        conn.commit()
-        conn.close()
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM scheduled_inputs WHERE id = ?', (input_id,))
+            conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
         logging.error(f"Error deleting scheduled input {input_id}: {str(e)}")
@@ -377,40 +352,39 @@ def delete_scheduled_input(input_id):
 @app.route('/clone_scheduled_input/<int:input_id>', methods=['POST'])
 def clone_scheduled_input(input_id):
     try:
-        conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-        cursor = conn.cursor()
-        # Fetch the input to be cloned
-        cursor.execute(
-            'SELECT title, description, code, cron_schedule, overwrite, '
-            'subdirectory FROM scheduled_inputs WHERE id = ?',
-            (input_id,)
-        )
-        result = cursor.fetchone()
-        if result is None:
-            return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
-        title, description, code, cron_schedule, overwrite, subdirectory = result
-        # Create a new scheduled input with similar data
-        cursor.execute(
-            '''
-            INSERT INTO scheduled_inputs (
-                title, description, code, cron_schedule,
-                overwrite, subdirectory, created_at, disabled
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            # Fetch the input to be cloned
+            cursor.execute(
+                'SELECT title, description, code, cron_schedule, overwrite, '
+                'subdirectory FROM scheduled_inputs WHERE id = ?',
+                (input_id,)
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''',
-            (
-                f"{title} (Clone)",
-                description,
-                code,
-                cron_schedule,
-                overwrite,
-                subdirectory,
-                int(time.time()),
-                0,
-            ),
-        )
-        conn.commit()
-        conn.close()
+            result = cursor.fetchone()
+            if result is None:
+                return jsonify({'status': 'error', 'message': 'Scheduled input not found.'}), 404
+            title, description, code, cron_schedule, overwrite, subdirectory = result
+            # Create a new scheduled input with similar data
+            cursor.execute(
+                '''
+                INSERT INTO scheduled_inputs (
+                    title, description, code, cron_schedule,
+                    overwrite, subdirectory, created_at, disabled
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''',
+                (
+                    f"{title} (Clone)",
+                    description,
+                    code,
+                    cron_schedule,
+                    overwrite,
+                    subdirectory,
+                    int(time.time()),
+                    0,
+                ),
+            )
+            conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
         logging.error(f"Error cloning scheduled input {input_id}: {str(e)}")
@@ -437,16 +411,15 @@ def toggle_disable_search(search_id):
 @app.route('/delete_search/<search_id>', methods=['POST'])
 def delete_search(search_id):
     try:
-        conn = sqlite3.connect(app.config['SAVED_SEARCHES_DB'])
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM saved_searches WHERE id = ?', (search_id,))
-        search = cursor.fetchone()
-        if not search:
-            return jsonify({'status': 'error', 'message': 'Saved search not found.'}), 404
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM saved_searches WHERE id = ?', (search_id,))
+            search = cursor.fetchone()
+            if not search:
+                return jsonify({'status': 'error', 'message': 'Saved search not found.'}), 404
 
-        cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
-        conn.commit()
-        conn.close()
+            cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
+            conn.commit()
 
         logging.info(f"Deleted saved search with ID {search_id}")
         return jsonify({'status': 'success'})
@@ -545,11 +518,11 @@ def scheduled_input_html():
 # Consolidated the route to handle both GET and POST
 @app.route('/scheduled_input/<scheduled_input_id>', methods=['GET', 'POST'])
 def scheduled_input(scheduled_input_id):
-    conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-    cursor = conn.cursor()
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
 
-    if request.method == 'GET':
-        cursor.execute(
+        if request.method == 'GET':
+            cursor.execute(
             '''
             SELECT title, id, description, code, cron_schedule, subdirectory,
                    created_at, overwrite,
@@ -560,88 +533,82 @@ def scheduled_input(scheduled_input_id):
             (scheduled_input_id,)
         )
 
-        result = cursor.fetchone()
+            result = cursor.fetchone()
 
-        if result is None:
-            return jsonify({'status': 'error', 'message': f'No saved search found with ID {scheduled_input_id}'}), 404
+            if result is None:
+                return jsonify({'status': 'error', 'message': f'No saved search found with ID {scheduled_input_id}'}), 404
 
-        search = {
-            "title": result[0],
-            "id": result[1],
-            "description": result[2],
-            "code": result[3],
-            "cron_schedule": result[4],
-            "subdirectory": result[5],
-            "created_at": result[6],
-            "overwrite": result[7],
-            "disabled": result[8]
-        }
+            search = {
+                "title": result[0],
+                "id": result[1],
+                "description": result[2],
+                "code": result[3],
+                "cron_schedule": result[4],
+                "subdirectory": result[5],
+                "created_at": result[6],
+                "overwrite": result[7],
+                "disabled": result[8]
+            }
 
-        # Pre-process the data to determine the selected options
-        disabled_checked = 'checked' if search['disabled'] else ''
+            disabled_checked = 'checked' if search['disabled'] else ''
 
-        return render_template(
-            'schedule_input.html',
-            title=search['title'],
-            description=search['description'],
-            code=search['code'],
-            cron_schedule=search['cron_schedule'],
-            overwrite=search['overwrite'],
-            subdirectory=search['subdirectory'],
-            created_at=search['created_at'],
-            disabled=disabled_checked,
-            scheduled_input_id=search['id']  # Pass the ID to the template if needed
-        )
+            return render_template(
+                'schedule_input.html',
+                title=search['title'],
+                description=search['description'],
+                code=search['code'],
+                cron_schedule=search['cron_schedule'],
+                overwrite=search['overwrite'],
+                subdirectory=search['subdirectory'],
+                created_at=search['created_at'],
+                disabled=disabled_checked,
+                scheduled_input_id=search['id']
+            )
 
-    elif request.method == 'POST':
-        # Handle POST request: Process form data
-        data = request.form or request.get_json()
+        elif request.method == 'POST':
+            data = request.form or request.get_json()
 
-        if not data:
-            return jsonify({'status': 'error', 'message': 'No data provided.'}), 400
+            if not data:
+                return jsonify({'status': 'error', 'message': 'No data provided.'}), 400
 
-        title = data.get('title')
-        description = data.get('description')
-        code = data.get('code')
-        cron_schedule = data.get('cron_schedule')
-        overwrite = data.get('overwrite') == 'true'
-        subdirectory = data.get('subdirectory')
-        disabled = data.get('disabled') == 'true'
+            title = data.get('title')
+            description = data.get('description')
+            code = data.get('code')
+            cron_schedule = data.get('cron_schedule')
+            overwrite = data.get('overwrite') == 'true'
+            subdirectory = data.get('subdirectory')
+            disabled = data.get('disabled') == 'true'
 
-        # Validate required fields
-        if not title or not code or not cron_schedule:
-            return jsonify(
-                {
-                    'status': 'error',
-                    'message': 'Title, Code, and Cron Schedule are required.'
-                }
-            ), 400
+            if not title or not code or not cron_schedule:
+                return jsonify(
+                    {
+                        'status': 'error',
+                        'message': 'Title, Code, and Cron Schedule are required.'
+                    }
+                ), 400
 
-        # Update the scheduled input in the database
-        cursor.execute(
-            '''
-            UPDATE scheduled_inputs
-            SET title = ?, description = ?, code = ?, cron_schedule = ?,
-                subdirectory = ?, overwrite = ?, disabled = ?
-            WHERE id = ?
-            ''',
-            (
-                title,
-                description,
-                code,
-                cron_schedule,
-                subdirectory,
-                overwrite,
-                disabled,
-                scheduled_input_id,
-            ),
-        )
+            cursor.execute(
+                '''
+                UPDATE scheduled_inputs
+                SET title = ?, description = ?, code = ?, cron_schedule = ?,
+                    subdirectory = ?, overwrite = ?, disabled = ?
+                WHERE id = ?
+                ''',
+                (
+                    title,
+                    description,
+                    code,
+                    cron_schedule,
+                    subdirectory,
+                    overwrite,
+                    disabled,
+                    scheduled_input_id,
+                ),
+            )
 
-        conn.commit()
-        cursor.close()
-        conn.close()
+            conn.commit()
 
-        return jsonify({'status': 'success', 'message': 'Scheduled input updated successfully.'}), 200
+            return jsonify({'status': 'success', 'message': 'Scheduled input updated successfully.'}), 200
 
 
 @app.route('/scheduled_inputs.html')
@@ -691,8 +658,8 @@ def commit_saved_search():
             email_content = "N/A"
         dest_file = app.config['TEMP_DIR']
 
-        # Save to SQLite3
-        conn = get_db(app.config['SAVED_SEARCHES_DB'])
+    # Save to SQLite3
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -709,7 +676,7 @@ def commit_saved_search():
 
         conn.commit()
 
-        return jsonify({'status': 'success', 'message': f"Successfully saved search: '{title}'"}), 200
+    return jsonify({'status': 'success', 'message': f"Successfully saved search: '{title}'"}), 200
 
     except Exception as e:
         logging.error(f"Error committing saved search: {str(e)}")
@@ -779,29 +746,28 @@ def create_saved_search():
 @app.route('/get_saved_searches', methods=['GET'])
 def get_saved_searches():
     try:
-        conn = sqlite3.connect(app.config['SAVED_SEARCHES_DB'])
-        conn.row_factory = sqlite3.Row  # To access columns by name
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM saved_searches')
-        rows = cursor.fetchall()
-        _saved_searches = []
-        for row in rows:
-            next_runtime = get_next_runtime(row['cron_schedule'])
-            _saved_search = {
-                'id': row['id'],
-                'title': row['title'],
-                'description': row['description'],
-                'cron_schedule': row['cron_schedule'],
-                'trigger': row['trigger'],
-                'lookback': row['lookback'],
-                'owner': row['owner'],
-                'execution_count': row['execution_count'],
-                'disabled': bool(row['disabled']),
-                'send_email': bool(row['send_email']),
-                'next_scheduled_time': next_runtime if next_runtime else 'N/A'
-            }
-            _saved_searches.append(_saved_search)
-        conn.close()
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            conn.row_factory = sqlite3.Row  # To access columns by name
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM saved_searches')
+            rows = cursor.fetchall()
+            _saved_searches = []
+            for row in rows:
+                next_runtime = get_next_runtime(row['cron_schedule'])
+                _saved_search = {
+                    'id': row['id'],
+                    'title': row['title'],
+                    'description': row['description'],
+                    'cron_schedule': row['cron_schedule'],
+                    'trigger': row['trigger'],
+                    'lookback': row['lookback'],
+                    'owner': row['owner'],
+                    'execution_count': row['execution_count'],
+                    'disabled': bool(row['disabled']),
+                    'send_email': bool(row['send_email']),
+                    'next_scheduled_time': next_runtime if next_runtime else 'N/A'
+                }
+                _saved_searches.append(_saved_search)
         return jsonify({'status': 'success', 'searches': _saved_searches})
     except Exception as e:
         logging.error(f"Error fetching saved searches: {str(e)}")
@@ -810,8 +776,8 @@ def get_saved_searches():
 
 @app.route('/saved_search/<search_id>', methods=['GET'])
 def get_saved_search(search_id):
-    conn = get_db(app.config['SAVED_SEARCHES_DB'])
-    cursor = conn.cursor()
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
 
     cursor.execute('''
         SELECT title, description, query, cron_schedule, trigger, lookback, 
@@ -858,15 +824,15 @@ def get_saved_search(search_id):
     }
     disabled_checked = 'checked' if search['disabled'] else ''
 
-    return render_template(
-        'saved_search.html',
-        search=search,
-        trigger_options=trigger_options,
-        throttle_options=throttle_options,
-        send_email_options=send_email_options,
-        disabled_checked=disabled_checked,  # Pass the checked status
-        search_id=search_id  # Pass the search_id for use in JavaScript
-    )
+        return render_template(
+            'saved_search.html',
+            search=search,
+            trigger_options=trigger_options,
+            throttle_options=throttle_options,
+            send_email_options=send_email_options,
+            disabled_checked=disabled_checked,
+            search_id=search_id
+        )
 
 
 @app.route('/update_saved_search/<search_id>', methods=['POST'])
@@ -888,8 +854,8 @@ def update_saved_search(search_id):
     # Optional: Add further validation (e.g., email format, cron syntax)
 
     try:
-        conn = get_db(app.config['SAVED_SEARCHES_DB'])
-        cursor = conn.cursor()
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
 
         cursor.execute('''
             UPDATE saved_searches
@@ -915,9 +881,9 @@ def update_saved_search(search_id):
             search_id
         ))
 
-        conn.commit()
+            conn.commit()
 
-        return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
+            return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
 
     except Exception as e:
         logging.error(f"Error updating saved search: {e}")
@@ -926,63 +892,60 @@ def update_saved_search(search_id):
 
 @app.route('/get_scheduled_inputs', methods=['GET'])
 def get_scheduled_inputs():
-    conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-    cursor = conn.cursor()
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
 
-    cursor.execute('''
+        cursor.execute('''
         SELECT id, title, description, code, cron_schedule, overwrite, subdirectory, created_at, disabled
         FROM scheduled_inputs
     ''')
 
-    inputs = cursor.fetchall()
+        inputs = cursor.fetchall()
 
-    input_list = []
-    for input_item in inputs:
-        input_list.append({
-            'id': input_item[0],
-            'title': input_item[1],
-            'description': input_item[2],
-            'code': input_item[3],
-            'cron_schedule': input_item[4],
-            'overwrite': input_item[5],
-            'subdirectory': input_item[6],
-            'created_at': input_item[7],
-            'disabled': input_item[8],  # Ensure this is 1 or 0
-            'status': 'Disabled' if input_item[8] else 'Enabled'  # Optional
-        })
+        input_list = []
+        for input_item in inputs:
+            input_list.append({
+                'id': input_item[0],
+                'title': input_item[1],
+                'description': input_item[2],
+                'code': input_item[3],
+                'cron_schedule': input_item[4],
+                'overwrite': input_item[5],
+                'subdirectory': input_item[6],
+                'created_at': input_item[7],
+                'disabled': input_item[8],  # Ensure this is 1 or 0
+                'status': 'Disabled' if input_item[8] else 'Enabled'  # Optional
+            })
 
-    return jsonify({'status': 'success', 'inputs': input_list})
+        return jsonify({'status': 'success', 'inputs': input_list})
 
 
 @app.route('/run_scheduled_input/<int:input_id>', methods=['POST'])
 def run_scheduled_input(input_id):
-    conn = get_db(app.config['SCHEDULED_INPUTS_DB'])
-    cursor = conn.cursor()
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT code FROM scheduled_inputs WHERE id = ?', (input_id,))
+        input_code = cursor.fetchone()
 
-    cursor.execute('SELECT code FROM scheduled_inputs WHERE id = ?', (input_id,))
-    input_code = cursor.fetchone()
-
-    if input_code:
-        # Execute the code in a safe, controlled environment
-        try:
-            executor = SIExecution(input_code[0], test_mode=True)
-            executor.execute_code_test()
-            return jsonify({'status': 'success'})
-        except Exception as e:
-            logging.error(f"Error executing scheduled input: {str(e)}")
-            return jsonify({'status': 'error', 'message': str(e)}), 500
-    else:
-        return jsonify({'status': 'error', 'message': 'Scheduled input not found'}), 404
+        if input_code:
+            try:
+                executor = SIExecution(input_code[0], test_mode=True)
+                executor.execute_code_test()
+                return jsonify({'status': 'success'})
+            except Exception as e:
+                logging.error(f"Error executing scheduled input: {str(e)}")
+                return jsonify({'status': 'error', 'message': str(e)}), 500
+        else:
+            return jsonify({'status': 'error', 'message': 'Scheduled input not found'}), 404
 
 
 @app.route('/edit_scheduled_input/<int:input_id>', methods=['GET'])
 def edit_scheduled_input(input_id):
     # Fetch the scheduled input from the database
-    conn = sqlite3.connect('scheduled_inputs.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM scheduled_inputs WHERE Id = ?", (input_id,))
-    row = cursor.fetchone()
-    conn.close()
+    with sqlite3.connect('scheduled_inputs.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM scheduled_inputs WHERE Id = ?", (input_id,))
+        row = cursor.fetchone()
 
     if row:
         input_data = {
@@ -1014,9 +977,9 @@ def edit_scheduled_input(input_id):
 def update_scheduled_input(input_id):
     data = request.json
     try:
-        conn = sqlite3.connect('scheduled_inputs.db')
-        cursor = conn.cursor()
-        cursor.execute("""
+        with sqlite3.connect('scheduled_inputs.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
             UPDATE scheduled_inputs
             SET title = ?,
                 description = ?,
@@ -1036,9 +999,8 @@ def update_scheduled_input(input_id):
             int(data['disabled']),
             input_id
         ))
-        conn.commit()
-        conn.close()
-        return jsonify({'status': 'success'})
+            conn.commit()
+            return jsonify({'status': 'success'})
     except Exception as e:
         logging.error(e)
         return jsonify({'status': 'error', 'message': 'Failed to update scheduled input.'}), 500
@@ -1148,15 +1110,15 @@ def execute_sql_query(db_path, query, params=()):
     Executes an SQL query against the provided SQLite database.
     """
     try:
-        conn = get_db(db_path)
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        if query.strip().upper().startswith("SELECT"):
-            result = cursor.fetchall()
-        else:
-            conn.commit()
-            result = None
-        return result
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            if query.strip().upper().startswith("SELECT"):
+                result = cursor.fetchall()
+            else:
+                conn.commit()
+                result = None
+            return result
     except sqlite3.Error as e:
         logging.error(f"SQLite error: {e}")
         raise
