@@ -1498,4 +1498,6 @@ if __name__ == '__main__':
     initialize_database()
     load_settings_into_config()  # Load settings into app.config
     # start_background_engines()  # Initialize Background Engines as Services
-    app.run(host='0.0.0.0', debug=True)
+    # Allow FLASK_DEBUG environment variable to override default debug mode
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in {'1', 'true', 't'}
+    app.run(host='0.0.0.0', debug=debug_mode)
