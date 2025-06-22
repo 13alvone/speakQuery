@@ -16,6 +16,7 @@ import pandas as pd
 import antlr4
 from flask import Flask, request, jsonify, render_template
 from flask import g  # For application-level database connection management
+from flask_wtf import CSRFProtect
 from werkzeug.utils import secure_filename
 from croniter import croniter
 
@@ -38,6 +39,9 @@ app = Flask(
     template_folder='frontend/templates',
     static_folder='frontend/static'
 )
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
+csrf = CSRFProtect(app)
 
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'lookups'

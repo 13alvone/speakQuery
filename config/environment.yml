@@ -10,6 +10,7 @@ dependencies:
   - apscheduler
   - croniter
   - flask
+  - flask-wtf
   - pandas
   - pyarrow
   - pyparsing

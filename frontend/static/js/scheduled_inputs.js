@@ -1,12 +1,6 @@
 // scheduled_inputs.js
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Retrieve CSRF token from meta tag (if CSRF protection is implemented)
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    if (csrfToken) {
-        // Set Axios to include the CSRF token in headers
-        axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
-    }
 
     loadScheduledInputs();
 
