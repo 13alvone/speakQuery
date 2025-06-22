@@ -19,4 +19,6 @@ dependencies:
   - aiosmtplib
   - restrictedpython
   - jpype1
+  - playwright
+  - pytest-playwright
 prefix: /home/cspeakes/anaconda3/envs/speakQueryEnv
