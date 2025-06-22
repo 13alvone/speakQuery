@@ -15,7 +15,7 @@ import os
 import re
 
 from antlr4.tree.Tree import TerminalNodeImpl
-from antlr4 import *
+from antlr4 import ParseTreeListener
 # import pyarrow.dataset as ds
 # import pyarrow.compute as pc
 # import pyarrow as pa
@@ -30,9 +30,9 @@ from handlers.MultiSearchHandler import MultiSearchHandler
 
 # Import speakQueryParser (support for relative or absolute import)
 if "." in __name__:
-    from .speakQueryParser import speakQueryParser
+    from .antlr4_active.speakQueryParser import speakQueryParser
 else:
-    from speakQueryParser import speakQueryParser
+    from antlr4_active.speakQueryParser import speakQueryParser
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
