@@ -16,7 +16,6 @@ import sys
 import logging
 import argparse
 import yaml
-import pandas as pd
 import time
 
 # Configure logging – using a dedicated logger for this module.
@@ -83,23 +82,24 @@ def load_test_cases(yaml_file):
         test_cases = yaml.safe_load(f)
     return test_cases
 
-parser = argparse.ArgumentParser(description="Run eval test cases.")
-parser.add_argument(
-    "-t", "--tests", 
-    type=str, 
-    help=("Test id(s) to run. Can be a single id (e.g., '4'), a comma-separated list (e.g., '1,5,19'), "
-          "or a range (e.g., '3-7'). If not specified, all tests are run.")
-)
-parser.add_argument(
-    "--output_mode",
-    type=str,
-    default="error_only",
-    choices=["verbose", "error_only_verbose", "error_only"],
-    help=("Output mode: verbose logs complete output for all tests; "
-          "error_only_verbose logs detailed output only for failed tests; "
-          "error_only (default) logs only minimal output (header, original query, error message) for failed tests.")
-)
-args = parser.parse_args()
+def parse_cli_args():
+    parser = argparse.ArgumentParser(description="Run eval test cases.")
+    parser.add_argument(
+        "-t", "--tests",
+        type=str,
+        help=("Test id(s) to run. Can be a single id (e.g., '4'), a comma-separated list (e.g., '1,5,19'), "
+              "or a range (e.g., '3-7'). If not specified, all tests are run.")
+    )
+    parser.add_argument(
+        "--output_mode",
+        type=str,
+        default="error_only",
+        choices=["verbose", "error_only_verbose", "error_only"],
+        help=("Output mode: verbose logs complete output for all tests; "
+              "error_only_verbose logs detailed output only for failed tests; "
+              "error_only (default) logs only minimal output (header, original query, error message) for failed tests.")
+    )
+    return parser.parse_args()
 
 def select_tests(test_cases, selection):
     if not selection:
@@ -168,9 +168,14 @@ def run_tests(selected_tests, output_mode):
                f"Elapsed time: {elapsed:.2f} seconds\n")
     logger.info(summary)
 
-if __name__ == '__main__':
+def main() -> None:
+    args = parse_cli_args()
     yaml_file = os.path.join(project_root, "tests", "eval_test_cases.yaml")
     all_tests = load_test_cases(yaml_file)
     selected_tests = select_tests(all_tests, args.tests)
     run_tests(selected_tests, args.output_mode)
+
+
+if __name__ == '__main__':
+    main()
 
