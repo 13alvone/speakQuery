@@ -131,3 +131,84 @@ document.addEventListener('click', function(event) {
         activeDropdowns.forEach(dropdown => dropdown.classList.remove('is-active'));
     }
 });
+
+/**
+ * Create a dropdown menu appended to the body.
+ * @param {string|number} id - Identifier used for the menu element.
+ * @param {Array} actions - Array of action objects with properties:
+ *   text, href, className, id, onClick.
+ * @returns {HTMLElement} The created menu element.
+ */
+function createBodyDropdownMenu(id, actions) {
+    const menu = document.createElement('div');
+    menu.className = 'dropdown-menu';
+    menu.id = `dropdown-menu-${id}`;
+
+    const content = document.createElement('div');
+    content.className = 'dropdown-content';
+
+    actions.forEach(action => {
+        const item = document.createElement('a');
+        item.href = action.href || '#';
+        item.className = `dropdown-item ${action.className || ''}`.trim();
+        if (action.id !== undefined) {
+            item.dataset.id = action.id;
+        }
+        item.textContent = action.text;
+        if (action.onClick) {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                action.onClick(e);
+            });
+        }
+        content.appendChild(item);
+    });
+
+    menu.appendChild(content);
+    document.body.appendChild(menu);
+    return menu;
+}
+
+/**
+ * Toggle the visibility of a dropdown menu and position it near the button.
+ * @param {string|number} menuId - The identifier passed to createBodyDropdownMenu.
+ * @param {DOMRect} buttonRect - Bounding rectangle of the clicked button.
+ */
+function toggleDropdownMenu(menuId, buttonRect) {
+    closeAllDropdowns();
+
+    const menu = document.getElementById(`dropdown-menu-${menuId}`);
+    if (menu) {
+        menu.style.position = 'fixed';
+
+        const menuTop = buttonRect.bottom;
+        const menuLeft = buttonRect.left;
+
+        const menuHeight = menu.offsetHeight;
+        const menuWidth = menu.offsetWidth;
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+
+        if (menuTop + menuHeight > viewportHeight) {
+            menu.style.top = `${buttonRect.top - menuHeight}px`;
+        } else {
+            menu.style.top = `${menuTop}px`;
+        }
+
+        if (menuLeft + menuWidth > viewportWidth) {
+            menu.style.left = `${viewportWidth - menuWidth - 10}px`;
+        } else {
+            menu.style.left = `${menuLeft}px`;
+        }
+
+        menu.classList.add('is-active');
+    }
+}
+
+/** Close all open dropdown menus. */
+function closeAllDropdowns() {
+    const menus = document.querySelectorAll('.dropdown-menu.is-active');
+    menus.forEach(menu => {
+        menu.classList.remove('is-active');
+    });
+}

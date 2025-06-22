@@ -164,7 +164,30 @@ document.addEventListener('DOMContentLoaded', function() {
             tbody.appendChild(row);
 
             // Create the dropdown menu for this input
-            createDropdownMenu(input);
+            createBodyDropdownMenu(input.id, [
+                {
+                    text: 'Edit Input',
+                    href: `/edit_scheduled_input/${input.id}`
+                },
+                {
+                    text: 'Delete',
+                    className: 'delete-btn',
+                    id: input.id,
+                    onClick: () => { deleteScheduledInput(input.id); closeAllDropdowns(); }
+                },
+                {
+                    text: (input.disabled === 1 || input.disabled === '1' || input.disabled === true || input.disabled === 'true') ? 'Enable' : 'Disable',
+                    className: 'toggle-disable-btn',
+                    id: input.id,
+                    onClick: () => { toggleDisable(input.id); closeAllDropdowns(); }
+                },
+                {
+                    text: 'Clone',
+                    className: 'clone-btn',
+                    id: input.id,
+                    onClick: () => { cloneScheduledInput(input.id); closeAllDropdowns(); }
+                }
+            ]);
         });
 
         table.appendChild(tbody);
@@ -172,105 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Append the table to the container
         tableContainer.appendChild(table);
     }
-
-    /**
-     * Create the dropdown menu for a scheduled input and append it to the body.
-     * @param {Object} input - The scheduled input object.
-     */
-    function createDropdownMenu(input) {
-        const menu = document.createElement('div');
-        menu.className = 'dropdown-menu';
-        menu.id = `dropdown-menu-${input.id}`;
-
-        const content = document.createElement('div');
-        content.className = 'dropdown-content';
-
-        // Edit Input
-        const editInput = document.createElement('a');
-        editInput.href = `/edit_scheduled_input/${input.id}`;
-        editInput.className = 'dropdown-item';
-        editInput.textContent = 'Edit Input';
-        content.appendChild(editInput);
-
-        // Delete Action
-        const deleteAction = document.createElement('a');
-        deleteAction.href = '#';
-        deleteAction.className = 'dropdown-item delete-btn';
-        deleteAction.dataset.id = input.id;
-        deleteAction.textContent = 'Delete';
-        content.appendChild(deleteAction);
-
-        // Toggle Disable/Enable Action
-        const toggleDisableAction = document.createElement('a');
-        toggleDisableAction.href = '#';
-        toggleDisableAction.className = 'dropdown-item toggle-disable-btn';
-        toggleDisableAction.dataset.id = input.id;
-        toggleDisableAction.textContent = (input.disabled === 1 || input.disabled === '1' || input.disabled === true || input.disabled === 'true') ? 'Enable' : 'Disable';
-        content.appendChild(toggleDisableAction);
-
-        // Clone Action
-        const cloneAction = document.createElement('a');
-        cloneAction.href = '#';
-        cloneAction.className = 'dropdown-item clone-btn';
-        cloneAction.dataset.id = input.id;
-        cloneAction.textContent = 'Clone';
-        content.appendChild(cloneAction);
-
-        menu.appendChild(content);
-        document.body.appendChild(menu); // Append directly to the body
-    }
-
-    /**
-     * Toggle the visibility of a dropdown menu and position it near the button.
-     * @param {string} inputId - The ID of the scheduled input.
-     * @param {DOMRect} buttonRect - The bounding rectangle of the clicked button.
-     */
-    function toggleDropdownMenu(inputId, buttonRect) {
-        closeAllDropdowns();
-
-        const menu = document.getElementById(`dropdown-menu-${inputId}`);
-        if (menu) {
-            // Position the menu
-            menu.style.position = 'fixed';
-
-            // Position relative to the viewport
-            const menuTop = buttonRect.bottom;
-            const menuLeft = buttonRect.left;
-
-            // Adjust position if the menu goes beyond the viewport
-            const menuHeight = menu.offsetHeight;
-            const menuWidth = menu.offsetWidth;
-            const viewportHeight = window.innerHeight;
-            const viewportWidth = window.innerWidth;
-
-            // Adjust vertical position if necessary
-            if (menuTop + menuHeight > viewportHeight) {
-                menu.style.top = `${buttonRect.top - menuHeight}px`; // Position above the button
-            } else {
-                menu.style.top = `${menuTop}px`; // Position below the button
-            }
-
-            // Adjust horizontal position if necessary
-            if (menuLeft + menuWidth > viewportWidth) {
-                menu.style.left = `${viewportWidth - menuWidth - 10}px`; // Align to the right edge
-            } else {
-                menu.style.left = `${menuLeft}px`; // Align to the left of the button
-            }
-
-            menu.classList.add('is-active');
-        }
-    }
-
-    /**
-     * Close all open dropdown menus.
-     */
-    function closeAllDropdowns() {
-        const menus = document.querySelectorAll('.dropdown-menu.is-active');
-        menus.forEach(menu => {
-            menu.classList.remove('is-active');
-        });
-    }
-
     /**
      * Execute a scheduled input.
      * @param {string} inputId - The ID of the scheduled input.
