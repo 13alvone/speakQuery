@@ -68,7 +68,7 @@ def execute_query(_speak_query):
     lexer = speakQueryLexer(input_stream)
     stream = antlr4.CommonTokenStream(lexer)
     parser = speakQueryParser(stream)
-    tree = parser.program()
+    tree = parser.speakQuery()
     listener = speakQueryListener(_speak_query)
     walker = antlr4.ParseTreeWalker()
     walker.walk(listener, tree)
