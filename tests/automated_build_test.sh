@@ -9,6 +9,10 @@ echo "[i] Project Root: $PROJECT_ROOT"
 PYTHON_EXE=$(python3 -c "import sys; print(sys.executable)")
 echo "[i] Using Python executable: $PYTHON_EXE"
 
+# Install Python dependencies for the tests.
+echo "[i] Installing requirements from requirements.txt"
+"$PYTHON_EXE" -m pip install -r "$PROJECT_ROOT/requirements.txt"
+
 # Auto-detect PYBIND11_ROOT if not set.
 if [ -z "$PYBIND11_ROOT" ]; then
   echo "[i] PYBIND11_ROOT is not set. Attempting to auto-detect using $PYTHON_EXE..."
