@@ -88,6 +88,7 @@ directive
     | WHERE (NOT? (NEWLINE | WS)* | (NEWLINE | WS)* NOT?) (expression COMMA?)+
     | EVAL (DOUBLE_QUOTED_STRING | variableName) EQUALS expression (COMMA (NEWLINE | WS)* (DOUBLE_QUOTED_STRING | variableName) EQUALS expression)*
     | TABLE variableName (COMMA? variableName)*
+    | MAKETABLE variableName (COMMA variableName)*
     | EVENTSTATS (NEWLINE | WS)* (statsAgg (COMMA? NEWLINE? statsAgg)*)? ((NEWLINE | WS)* COUNT (AS variableName)?)? (BY variableList)?
     | STATS (NEWLINE | WS)* statsAgg (COMMA? (NEWLINE | WS)* statsAgg)* ((NEWLINE | WS)* BY variableList)?
     | TIMECHART (NEWLINE | WS)* (SPAN EQUALS timespan)? statsAgg (COMMA? (NEWLINE | WS)* statsAgg)* ((NEWLINE | WS)* BY variableList)?
@@ -284,6 +285,7 @@ RBRACK                  : ']' ;
 COMMA                   : ',' ;
 SEMICOLON               : ';' ;
 TABLE                   : 'table' ;
+MAKETABLE               : 'maketable' ;
 CONSECUTIVE             : 'consecutive' ;
 REPEAT                  : 'repeat' ;
 MAX_MATCH               : ('max_match' | 'MAX_MATCH') ;

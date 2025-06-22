@@ -17,30 +17,79 @@ from itertools import dropwhile
 
 class DataFrameError(Exception):
     """Custom exception for DataFrame operation errors."""
+
     pass
 
 
 class GeneralHandler:
     def __init__(self):
         self.all_functions = [
-            'round (', 'min (', 'max (', 'avg (', 'sum (', 'range (', 'median (', 'sqrt (', 'random (', 'tonumb (',
-            'dcount (', 'concat (', 'replace (', 'upper (', 'lower(', 'capitalize (', 'trim (', 'ltrim (', 'rtrim (',
-            'substr (', 'len (', 'tostring (', 'match (', 'urlencode (', 'defang (', 'type (']
+            "round (",
+            "min (",
+            "max (",
+            "avg (",
+            "sum (",
+            "range (",
+            "median (",
+            "sqrt (",
+            "random (",
+            "tonumb (",
+            "dcount (",
+            "concat (",
+            "replace (",
+            "upper (",
+            "lower(",
+            "capitalize (",
+            "trim (",
+            "ltrim (",
+            "rtrim (",
+            "substr (",
+            "len (",
+            "tostring (",
+            "match (",
+            "urlencode (",
+            "defang (",
+            "type (",
+        ]
         self.all_funcs = [
-            "concat", "replace", "upper", "lower", "capitalize", "trim", "rtrim", "ltrim", "substr", "len", "tostring",
-            "match", "urlencode", "urldecode", "defang", "type"]
+            "concat",
+            "replace",
+            "upper",
+            "lower",
+            "capitalize",
+            "trim",
+            "rtrim",
+            "ltrim",
+            "substr",
+            "len",
+            "tostring",
+            "match",
+            "urlencode",
+            "urldecode",
+            "defang",
+            "type",
+        ]
 
     @staticmethod
     def is_valid_expression(expr):
         """Check if the expression is a valid numeric/mathematics expression."""
         allowed_nodes = {
-            ast.Expression, ast.BinOp, ast.UnaryOp,
-            ast.Num, ast.Constant, ast.Add, ast.Sub, ast.Mult, ast.Div,
-            ast.Pow, ast.Mod, ast.USub
+            ast.Expression,
+            ast.BinOp,
+            ast.UnaryOp,
+            ast.Num,
+            ast.Constant,
+            ast.Add,
+            ast.Sub,
+            ast.Mult,
+            ast.Div,
+            ast.Pow,
+            ast.Mod,
+            ast.USub,
         }
 
         try:
-            tree = ast.parse(expr, mode='eval')
+            tree = ast.parse(expr, mode="eval")
         except SyntaxError as e:
             logging.error(f"[x] Invalid syntax: {e}")
             return False
@@ -62,7 +111,9 @@ class GeneralHandler:
     def examine_string_args(input_str: str, replacement: str = "REPLACEMENT") -> list:
         # Enhanced patterns to identify list-like structures, considering nested lists encoded as strings
         list_pattern = r"\[(?:[^\[\]]*?)\]"
-        replacements = {}  # Dictionary to store original structures with their placeholders
+        replacements = (
+            {}
+        )  # Dictionary to store original structures with their placeholders
 
         def replacer(match):  # Function to replace with unique placeholders
             _original_text = match.group(0)
@@ -72,7 +123,9 @@ class GeneralHandler:
 
         # Replace complex list-like structures and quoted strings with placeholders
         modified_str = re.sub(list_pattern, replacer, input_str)
-        parts = modified_str.split(',')  # Split the modified string by commas not within any complex structures
+        parts = modified_str.split(
+            ","
+        )  # Split the modified string by commas not within any complex structures
         restored_parts = []  # Initialize restored parts
 
         for part in parts:
@@ -94,13 +147,17 @@ class GeneralHandler:
         logging.info("[i] Split and replacement process completed successfully.")
         return literal_parts
 
-    def split_and_preserve(self, all_vars: dict, input_str: str, replacement: str = "REPLACEMENT") -> list:
+    def split_and_preserve(
+        self, all_vars: dict, input_str: str, replacement: str = "REPLACEMENT"
+    ) -> list:
         # Enhanced patterns to identify list-like structures, considering nested lists encoded as strings
         list_pattern = r"\[(?:[^\[\]]*|\[(?:[^\[\]]*|\[[^\[\]]*\])*\])*\]"
         quote_pattern = r'"[^"]*"'
         nested_list_pattern = r'"\[.*?\]"'
         combined_pattern = f"({list_pattern})|({quote_pattern})|({nested_list_pattern})"
-        replacements = {}  # Dictionary to store original structures with their placeholders
+        replacements = (
+            {}
+        )  # Dictionary to store original structures with their placeholders
 
         def replacer(match):  # Function to replace with unique placeholders
             _original_text = match.group(0)
@@ -110,7 +167,9 @@ class GeneralHandler:
 
         # Replace complex list-like structures and quoted strings with placeholders
         modified_str = re.sub(combined_pattern, replacer, input_str)
-        parts = modified_str.split(',')  # Split the modified string by commas not within any complex structures
+        parts = modified_str.split(
+            ","
+        )  # Split the modified string by commas not within any complex structures
         restored_parts = []  # Initialize restored parts
 
         for part in parts:
@@ -153,12 +212,16 @@ class GeneralHandler:
                 for _index, entry in enumerate(arg):
                     entry = self.validate_ast(str(entry))
                     if isinstance(entry, list):
-                        logging.warning(f'[!] This depth hasn\'t been built yet. See GeneralHandler.ast_args().')
+                        logging.warning(
+                            f"[!] This depth hasn't been built yet. See GeneralHandler.ast_args()."
+                        )
             args[index] = arg
         return args
 
     def clean_args(self, all_variables, _unchanged_params):
-        _unchanged_args = self.split_and_preserve(all_variables, _unchanged_params.strip())
+        _unchanged_args = self.split_and_preserve(
+            all_variables, _unchanged_params.strip()
+        )
         if len(_unchanged_args) == 1 and "[" in _unchanged_args[0]:
             _unchanged_args = self.ast_args(_unchanged_args[0])
         _args = []
@@ -176,7 +239,9 @@ class GeneralHandler:
             else:
                 _args.append(orig_arg)
         if rerun_split_and_preserve:
-            _args = self.split_and_preserve(all_variables, str(_args).replace('"[', '[').replace(']"', ']'))[0]
+            _args = self.split_and_preserve(
+                all_variables, str(_args).replace('"[', "[").replace(']"', "]")
+            )[0]
         return _args
 
     @staticmethod
@@ -199,8 +264,14 @@ class GeneralHandler:
                 evaluated_arg = ast.literal_eval(arg)
                 # If the result is a list, further process each element (if they are strings)
                 if isinstance(evaluated_arg, list):
-                    return [ast.literal_eval(element) if isinstance(element, str) else element for element in
-                            evaluated_arg]
+                    return [
+                        (
+                            ast.literal_eval(element)
+                            if isinstance(element, str)
+                            else element
+                        )
+                        for element in evaluated_arg
+                    ]
                 return evaluated_arg
             except (ValueError, SyntaxError):
                 # Return the argument as is if it's not a string representation of a list
@@ -209,7 +280,9 @@ class GeneralHandler:
         logging.info("[i] Processed input arguments successfully.")
         return [evaluate_argument(arg) for arg in args]
 
-    def contains_known_function(self, input_string, known_functions, position=0, is_root=False):
+    def contains_known_function(
+        self, input_string, known_functions, position=0, is_root=False
+    ):
         if not input_string:
             return None, None, 0
         expression = []
@@ -224,39 +297,49 @@ class GeneralHandler:
                 func_name = input_string[start:position]
 
                 # Skip optional spaces between function name and '('
-                while position < len(input_string) and input_string[position] == ' ':
+                while position < len(input_string) and input_string[position] == " ":
                     position += 1
 
-                if func_name in known_functions and input_string[position] == '(':
+                if func_name in known_functions and input_string[position] == "(":
                     expression.append(func_name)
                     position += 1  # Skip '('
-                    nested_expression, nested_has_nested_function, position = \
-                        self.contains_known_function(input_string, known_functions, position)
+                    nested_expression, nested_has_nested_function, position = (
+                        self.contains_known_function(
+                            input_string, known_functions, position
+                        )
+                    )
                     expression.append(nested_expression)
-                    has_nested_function = True  # Any found function is considered nested
+                    has_nested_function = (
+                        True  # Any found function is considered nested
+                    )
                     continue
 
-            if char == '(':
+            if char == "(":
                 position += 1  # Skip '('
-                nested_expression, nested_has_nested_function, position = \
-                    self.contains_known_function(input_string, known_functions, position)
-                expression.append('(' + nested_expression + ')')
+                nested_expression, nested_has_nested_function, position = (
+                    self.contains_known_function(
+                        input_string, known_functions, position
+                    )
+                )
+                expression.append("(" + nested_expression + ")")
                 if nested_has_nested_function:
                     has_nested_function = True
-            elif char == ')':
+            elif char == ")":
                 position += 1  # Skip ')'
                 break  # End of current expression
             else:
                 expression_start = position
-                while position < len(input_string) and input_string[position] not in ',()':
+                while (
+                    position < len(input_string) and input_string[position] not in ",()"
+                ):
                     position += 1
                 expression.append(input_string[expression_start:position])
 
             # Skip delimiters
-            if position < len(input_string) and input_string[position] in ', ':
+            if position < len(input_string) and input_string[position] in ", ":
                 position += 1
 
-        return ' '.join(expression), has_nested_function, position
+        return " ".join(expression), has_nested_function, position
 
     @staticmethod
     def extract_outermost_parentheses(expression_list):
@@ -271,22 +354,24 @@ class GeneralHandler:
         depth = 0
 
         for i, element in enumerate(expression_list):
-            if element == '(':
+            if element == "(":
                 if depth == 0:
                     start = i
                 depth += 1
-            elif element == ')':
+            elif element == ")":
                 depth -= 1
                 if depth == 0 and start is not None:
-                    return expression_list[start + 1:i]  # Exclude the parentheses themselves
+                    return expression_list[
+                        start + 1 : i
+                    ]  # Exclude the parentheses themselves
 
         return expression_list  # No matching closing parenthesis found
 
     @staticmethod
     def process_ctx_children(ctx_children):
         # Concatenate with '###', then strip in the same order as the original
-        concatenated = '###'.join([str(obj) for obj in ctx_children])
-        stripped = concatenated.strip('\n').strip(' ').strip('\n').strip("###")
+        concatenated = "###".join([str(obj) for obj in ctx_children])
+        stripped = concatenated.strip("\n").strip(" ").strip("\n").strip("###")
         # Split based on '###', which now reflects the original manipulation more closely
         split = stripped.split("###")
         # Convert to string again as takewhile checks against the string "\n", not the newline character itself
@@ -295,9 +380,11 @@ class GeneralHandler:
     @staticmethod
     def extract_function_name(function_call: str) -> str:
         try:
-            match = re.match(r'^(\w+)\s*\(', function_call)
+            match = re.match(r"^(\w+)\s*\(", function_call)
             if match:
-                return match.group(1)  # Return the first captured group, which is the function name
+                return match.group(
+                    1
+                )  # Return the first captured group, which is the function name
             else:
                 logging.warning("[!] No function name found in the input.")
                 return ""
@@ -311,13 +398,17 @@ class GeneralHandler:
             match = re.search(r'file\s*=\s*"([^"]+)"', input_string)
             if match:
                 # Splitting the matched group by commas and stripping any whitespace
-                db_names = [db.strip() for db in match.group(1).split(',')]
+                db_names = [db.strip() for db in match.group(1).split(",")]
                 logging.info("[i] Database names extracted successfully.")
                 return db_names
             else:
                 # If the pattern is not found in the input string
-                logging.error("[x] No database names could be extracted from the input string.")
-                raise ValueError("No database names could be extracted from the input string.")
+                logging.error(
+                    "[x] No database names could be extracted from the input string."
+                )
+                raise ValueError(
+                    "No database names could be extracted from the input string."
+                )
         except Exception as e:
             logging.error(f"[x] An error occurred while extracting database names: {e}")
             raise
@@ -335,7 +426,7 @@ class GeneralHandler:
         func_names = [re.escape(func.strip()) for func in self.all_funcs]
 
         # Join the function names with '|' to create a regex pattern that matches any of them
-        pattern = r'((' + '|'.join(func_names) + r')\s*\((.*?)\))'
+        pattern = r"((" + "|".join(func_names) + r")\s*\((.*?)\))"
 
         # Use non-greedy matching to capture parameters
         match = re.search(pattern, _input_string, re.DOTALL)
@@ -347,8 +438,12 @@ class GeneralHandler:
 
     @staticmethod
     def remove_outer_newlines(string_list):
-        temp_list = list(dropwhile(lambda x: x == "\n", string_list))  # Remove leading "\n" entries
-        result_list = list(dropwhile(lambda x: x == "\n", reversed(temp_list)))  # Remove trailing "\n" entries
+        temp_list = list(
+            dropwhile(lambda x: x == "\n", string_list)
+        )  # Remove leading "\n" entries
+        result_list = list(
+            dropwhile(lambda x: x == "\n", reversed(temp_list))
+        )  # Remove trailing "\n" entries
         return list(reversed(result_list))
 
     @staticmethod
@@ -370,7 +465,9 @@ class GeneralHandler:
             logging.error(f"[x] TypeError encountered in flatten_outer_lists: {e}")
             return nested_list
         except Exception as e:
-            logging.error(f"[x] Unexpected error encountered in flatten_outer_lists: {e}")
+            logging.error(
+                f"[x] Unexpected error encountered in flatten_outer_lists: {e}"
+            )
             return nested_list
 
     @staticmethod
@@ -390,7 +487,9 @@ class GeneralHandler:
             # Check if the object is an instance of TerminalNodeImpl
             if isinstance(obj, antlr4.tree.Tree.TerminalNodeImpl):
                 try:
-                    value = ast.literal_eval(obj.getText())  # Attempt to resolve the terminal node's text content
+                    value = ast.literal_eval(
+                        obj.getText()
+                    )  # Attempt to resolve the terminal node's text content
                     resolved_values.append(value)
                 except (ValueError, SyntaxError) as e:
                     try:
@@ -398,7 +497,9 @@ class GeneralHandler:
                     except Exception as e:
                         resolved_values.append(str(obj.getText()))
             else:
-                logging.debug(f"[DEBUG] Object {obj} is not of type TerminalNodeImpl and was skipped.")
+                logging.debug(
+                    f"[DEBUG] Object {obj} is not of type TerminalNodeImpl and was skipped."
+                )
         return resolved_values
 
     @staticmethod
@@ -406,19 +507,23 @@ class GeneralHandler:
         try:
             # Ensure that self.main_df is a pandas DataFrame
             if not isinstance(main_df, pd.DataFrame):
-                logging.error('[x] The main_df attribute is not a pandas DataFrame.')
+                logging.error("[x] The main_df attribute is not a pandas DataFrame.")
                 return main_df
 
             # Extract keys from the date_dict which represent the date strings to filter by
             filter_dates = list(date_dict.keys())
 
             # Filter the DataFrame where the TIMESTAMP column matches any of the keys in date_dict
-            filtered_df = main_df[main_df['TIMESTAMP'].isin(filter_dates)]
-            logging.info(f'[i] Filtered DataFrame with {len(filtered_df)} rows based on TIMESTAMP matching.')
+            filtered_df = main_df[main_df["TIMESTAMP"].isin(filter_dates)]
+            logging.info(
+                f"[i] Filtered DataFrame with {len(filtered_df)} rows based on TIMESTAMP matching."
+            )
 
             return filtered_df
         except Exception as e:
-            logging.error(f'[!] Failed to filter dataframe for the following Timestamp(s):\n{date_dict}.\n\t{e}')
+            logging.error(
+                f"[!] Failed to filter dataframe for the following Timestamp(s):\n{date_dict}.\n\t{e}"
+            )
             return main_df
 
     @staticmethod
@@ -427,27 +532,32 @@ class GeneralHandler:
             start = time_handler.parse_input_date(start_time.strip().strip('"'))
             finish = time_handler.parse_input_date(end_time.strip().strip('"'))
             if not isinstance(target_field, list):
-                logging.error('[!] Timerange was called but the third parameter was NOT a list as expected.')
+                logging.error(
+                    "[!] Timerange was called but the third parameter was NOT a list as expected."
+                )
                 return {}
 
             # Use a dictionary comprehension with a single call to parse_input_date per item
-            results = {x: epoch_time for x in target_field
-                       if (epoch_time := time_handler.parse_input_date(x)) >= start
-                       and epoch_time <= finish}
+            results = {
+                x: epoch_time
+                for x in target_field
+                if (epoch_time := time_handler.parse_input_date(x)) >= start
+                and epoch_time <= finish
+            }
 
             # Logging the filtered dates with their epoch values
-            logging.info(f'[i] Filtered dates and their epoch values: {results}')
+            logging.info(f"[i] Filtered dates and their epoch values: {results}")
             return results
 
         except Exception as e:
-            logging.error(f'[x] An error occurred: {e}')
+            logging.error(f"[x] An error occurred: {e}")
             return {}
 
     @staticmethod
     def prep_variables(all_variables):
         for variable_name, var_value in all_variables.items():
             if not var_value:
-                all_variables[variable_name] = ''
+                all_variables[variable_name] = ""
                 continue
             try:
                 literal_value = ast.literal_eval(var_value)
@@ -457,17 +567,19 @@ class GeneralHandler:
                 try:
                     all_variables[variable_name] = float(var_value)
                 except Exception as e:
-                    logging.error(f'[!] Issue converting {var_value} for {variable_name}.\n[!] {e}')
+                    logging.error(
+                        f"[!] Issue converting {var_value} for {variable_name}.\n[!] {e}"
+                    )
 
     @staticmethod
     def parse_comments(comments, _original_query):
-        all_lines = [x.strip() for x in _original_query.split('\n')]
-        output_query_without_comments = ''
+        all_lines = [x.strip() for x in _original_query.split("\n")]
+        output_query_without_comments = ""
         for index, line in enumerate(all_lines):
-            if line.startswith('#'):
-                comments[index] = f'{line}\n'
+            if line.startswith("#"):
+                comments[index] = f"{line}\n"
             else:
-                output_query_without_comments += f'{line}\n'
+                output_query_without_comments += f"{line}\n"
         return output_query_without_comments
 
     @staticmethod
@@ -481,7 +593,9 @@ class GeneralHandler:
             try:
                 if isinstance(value, list):
                     if len(value) != len(main_df):
-                        logging.warning(f"[!] List length for '{variable}' doesn't match DataFrame length. Skipping.")
+                        logging.warning(
+                            f"[!] List length for '{variable}' doesn't match DataFrame length. Skipping."
+                        )
                         continue
                     main_df[variable] = value
                 else:
@@ -502,17 +616,21 @@ class GeneralHandler:
         """
         try:
             if main_df.empty:  # Ensure the DataFrame is not empty
-                logging.warning('[!] The DataFrame is empty.')
+                logging.warning("[!] The DataFrame is empty.")
                 return None
 
             # Log the total count of rows and columns
             total_rows, total_columns = main_df.shape
-            logging.info(f'[+] FIELD SUMMARY:\n[i] Total Rows: {total_rows}, Total Columns: {total_columns}')
-            overview_df = main_df.head(2).transpose()  # Select the first 2 entries of each column
+            logging.info(
+                f"[+] FIELD SUMMARY:\n[i] Total Rows: {total_rows}, Total Columns: {total_columns}"
+            )
+            overview_df = main_df.head(
+                2
+            ).transpose()  # Select the first 2 entries of each column
             return overview_df
 
         except Exception as e:
-            logging.error(f'[x] Error generating overview: {e}')
+            logging.error(f"[x] Error generating overview: {e}")
             return None
 
     @staticmethod
@@ -531,12 +649,16 @@ class GeneralHandler:
         try:
             # Check if the field_name exists in the DataFrame
             if field_name not in main_df.columns:
-                logging.error(f"[x] The field '{field_name}' does not exist in the DataFrame.")
+                logging.error(
+                    f"[x] The field '{field_name}' does not exist in the DataFrame."
+                )
                 return main_df
 
             # Check if the length of field_values matches the number of rows in the DataFrame
             if len(field_values) != len(main_df):
-                logging.error("[x] The length of field_values does not match the DataFrame's length.")
+                logging.error(
+                    "[x] The length of field_values does not match the DataFrame's length."
+                )
                 return main_df
 
             # Update the column with the new values
@@ -559,12 +681,16 @@ class GeneralHandler:
             if not list_of_lists:
                 raise ValueError("Input list is empty")
 
-            list_length = len(list_of_lists[0])  # Check all lists are of the same length
+            list_length = len(
+                list_of_lists[0]
+            )  # Check all lists are of the same length
             if not all(len(lst) == list_length for lst in list_of_lists):
                 raise ValueError("Not all lists are of the same length")
 
             result = []  # Coalesce values
-            for i in range(list_length):  # Find the first non-empty, non-None value in each 'column'
+            for i in range(
+                list_length
+            ):  # Find the first non-empty, non-None value in each 'column'
                 for lst in list_of_lists:
                     value = lst[i]
                     if value not in ["", None]:
@@ -597,7 +723,9 @@ class GeneralHandler:
         def simplify_list(_nested_list):
             # If it's not a list or a single-element list, return it as is
             if not isinstance(_nested_list, list) or (
-                    is_single_element_list(_nested_list) and not isinstance(_nested_list[0], list)):
+                is_single_element_list(_nested_list)
+                and not isinstance(_nested_list[0], list)
+            ):
                 return _nested_list
             # If the list contains exactly one list element, dive deeper without losing its structure
             if is_single_element_list(_nested_list):
@@ -659,7 +787,7 @@ class GeneralHandler:
         for i, obj in enumerate(custom_objects):
             if "=" in str(obj):
                 left_part = custom_objects[i - 1] if i > 0 else None
-                right_parts = custom_objects[i + 1:]
+                right_parts = custom_objects[i + 1 :]
                 return left_part, right_parts
         return None, []
 
@@ -693,7 +821,9 @@ class GeneralHandler:
             new_dict[k] = v
 
         if not key_found:
-            logging.warning("[!] Key not found in the OrderedDict or type mismatch. Returning partial OrderedDict.")
+            logging.warning(
+                "[!] Key not found in the OrderedDict or type mismatch. Returning partial OrderedDict."
+            )
             return new_dict  # Return what was accumulated up to the point of failure.
 
         return new_dict
@@ -719,7 +849,7 @@ class GeneralHandler:
             return mixed_list
 
         # Return the list up to (and including) the last sublist
-        return mixed_list[:last_sublist_index + 1]
+        return mixed_list[: last_sublist_index + 1]
 
     @staticmethod
     def preprocess_string_values(df, column_names):
@@ -732,10 +862,12 @@ class GeneralHandler:
         """
         for col in column_names:
             if col in df.columns:
-                df[col] = df[col].str.strip('"')  # Strip double quotes from start and end of each string
+                df[col] = df[col].str.strip(
+                    '"'
+                )  # Strip double quotes from start and end of each string
 
     @staticmethod
-    def join_values(values: List[Union[Any, List[Any]]], separator: str = ' ') -> str:
+    def join_values(values: List[Union[Any, List[Any]]], separator: str = " ") -> str:
         """
         Recursively concatenates all single values from a nested list or a list of single values
         into one single string, separated by a specified separator.
@@ -765,14 +897,18 @@ class GeneralHandler:
                 if is_single_value(item):
                     result.append(str(item))  # Convert all single values to strings
                 elif isinstance(item, list):
-                    result.append(recurse_items(item))  # Recursive call for nested lists
+                    result.append(
+                        recurse_items(item)
+                    )  # Recursive call for nested lists
                 else:
                     logging.warning(f"[!] Unsupported item type: {type(item)}")
             return separator.join(result)
 
         if not isinstance(values, list):
-            logging.error(f"[x] Invalid input type: {type(values)}. Expected a list or a list of lists.")
-            return ''
+            logging.error(
+                f"[x] Invalid input type: {type(values)}. Expected a list or a list of lists."
+            )
+            return ""
 
         return recurse_items(values)
 
@@ -793,11 +929,11 @@ class GeneralHandler:
             elif isinstance(item, antlr4.tree.Tree.TerminalNodeImpl):
                 parts.append(self.antlr_obj_to_str(item))
             elif isinstance(item, str):
-                if item == 'AND':
-                    parts.append('and')  # Correct logical operator
-                elif item == 'OR':
-                    parts.append('or')  # Correct logical operator
-                elif item in ['(', ')']:
+                if item == "AND":
+                    parts.append("and")  # Correct logical operator
+                elif item == "OR":
+                    parts.append("or")  # Correct logical operator
+                elif item in ["(", ")"]:
                     parts.append(item)  # Keep parentheses
                 else:
                     # Assume string literals are column names or operators; literals should be handled outside
@@ -809,20 +945,24 @@ class GeneralHandler:
     def print_final_command(self, __last_val):
         for index, entry in enumerate(self.convert_nested_list(__last_val)):
 
-            query_line_formatted = ''
+            query_line_formatted = ""
             for _index, sub_entry in enumerate(entry):
-                if sub_entry in ('\n', '<EOF>', '[', ']'):
+                if sub_entry in ("\n", "<EOF>", "[", "]"):
                     pass
                 else:
-                    query_line_formatted += f' {sub_entry}'
+                    query_line_formatted += f" {sub_entry}"
 
-            space_buffer = (4 - len(str(index))) * ' '
+            space_buffer = (4 - len(str(index))) * " "
             logging.info(f"{index}{space_buffer}{query_line_formatted}")
 
     def convert_to_query_string(self, expression):
         """Converts the structured logical expression into a query string."""
-        return self.list_to_query_part(expression) \
-            .replace('AND', 'and').replace('OR', 'or').replace('"', "'")
+        return (
+            self.list_to_query_part(expression)
+            .replace("AND", "and")
+            .replace("OR", "or")
+            .replace('"', "'")
+        )
 
     def filter_df_with_logical_expression(self, main_df, expression):
         """Converts a complex logical expression into a pandas query string and filters the DataFrame."""
@@ -841,15 +981,33 @@ class GeneralHandler:
         :param new_name: The new name for the column.
         """
         if old_name not in df.columns:
-            logging.error(f"[x] The column '{old_name}' does not exist in the DataFrame.")
+            logging.error(
+                f"[x] The column '{old_name}' does not exist in the DataFrame."
+            )
             return df
         if new_name in df.columns:
             logging.warning(
-                f"[!] A column named '{new_name}' already exists. Proceeding with rename might cause issues.")
+                f"[!] A column named '{new_name}' already exists. Proceeding with rename might cause issues."
+            )
 
         df.rename(columns={old_name: new_name}, inplace=True)
         logging.info(f"[i] Column '{old_name}' renamed to '{new_name}'.")
         return df
+
+    @staticmethod
+    def create_empty_dataframe(columns):
+        """Create an empty pandas DataFrame with the specified columns."""
+        try:
+            if not isinstance(columns, list) or not all(
+                isinstance(c, str) for c in columns
+            ):
+                raise DataFrameError("Columns must be a list of strings.")
+            df = pd.DataFrame(columns=columns)
+            logging.info(f"[i] Created empty DataFrame with columns: {columns}")
+            return df
+        except Exception as e:
+            logging.error(f"[x] Failed to create empty DataFrame: {e}")
+            return pd.DataFrame()
 
     @staticmethod  # FIELD Call Handling
     def filter_df_columns(df, columns, mode):
@@ -866,30 +1024,42 @@ class GeneralHandler:
         if not isinstance(df, pd.DataFrame):
             raise DataFrameError("The provided df is not a pandas DataFrame.")
 
-        if not isinstance(columns, list) or not all(isinstance(col, str) for col in columns):
+        if not isinstance(columns, list) or not all(
+            isinstance(col, str) for col in columns
+        ):
             raise DataFrameError("The columns parameter must be a list of strings.")
 
-        if mode not in ['-', '+']:
-            raise DataFrameError("The mode parameter must be either '-' or '+', but defaults to '+'.")
+        if mode not in ["-", "+"]:
+            raise DataFrameError(
+                "The mode parameter must be either '-' or '+', but defaults to '+'."
+            )
 
         # Handle 'include' mode
         filtered_df = None
-        if mode == '+':
+        if mode == "+":
             missing_columns = [col for col in columns if col not in df.columns]
             if missing_columns:
-                logging.warning(f"[!] The following specified columns do not exist in the DataFrame: {missing_columns}")
+                logging.warning(
+                    f"[!] The following specified columns do not exist in the DataFrame: {missing_columns}"
+                )
 
             existing_columns = [col for col in columns if col in df.columns]
             if not existing_columns:
-                raise DataFrameError("None of the specified columns exist in the DataFrame.")
+                raise DataFrameError(
+                    "None of the specified columns exist in the DataFrame."
+                )
 
             filtered_df = df[existing_columns].copy()
-            logging.info(f"[i] DataFrame filtered to include specified columns. Columns retained: {existing_columns}")
+            logging.info(
+                f"[i] DataFrame filtered to include specified columns. Columns retained: {existing_columns}"
+            )
 
         # Handle 'exclude' mode
-        elif mode == '-':
-            filtered_df = df.drop(columns=columns, errors='ignore').copy()
-            logging.info(f"[i] DataFrame filtered to exclude specified columns. Columns removed: {columns}")
+        elif mode == "-":
+            filtered_df = df.drop(columns=columns, errors="ignore").copy()
+            logging.info(
+                f"[i] DataFrame filtered to exclude specified columns. Columns removed: {columns}"
+            )
 
         return filtered_df
 
@@ -909,22 +1079,25 @@ class GeneralHandler:
             raise DataFrameError("The provided df is not a pandas DataFrame.")
 
         if not isinstance(n, int) or n < 1:  # Validate inputs
-            raise DataFrameError("The number of rows to return must be a positive integer.")
+            raise DataFrameError(
+                "The number of rows to return must be a positive integer."
+            )
 
         if n > len(df):  # Check if n is larger than the DataFrame
             logging.warning(
                 f"[!] HEAD CALL: Requested number of rows ({n}) exceeds DataFrame row count ({len(df)}). "
-                f"Returning all rows.")
+                f"Returning all rows."
+            )
 
-        if str(_mode).lower() == 'head':
+        if str(_mode).lower() == "head":
             return df.head(n)
-        elif str(_mode).lower() == 'tail':
+        elif str(_mode).lower() == "tail":
             return df.tail(n)
         else:
             raise DataFrameError('Error: Mode must be "head" or "tail".')
 
     @staticmethod  # SORT Call handling
-    def sort_df_by_columns(df, columns, is_ascending='+'):
+    def sort_df_by_columns(df, columns, is_ascending="+"):
         """
         Sorts a DataFrame by the given column names, entirely in ascending or descending order.
 
@@ -938,19 +1111,25 @@ class GeneralHandler:
 
         if not isinstance(df, pd.DataFrame):  # Validate input DataFrame
             raise DataFrameError("The provided object is not a pandas DataFrame.")
-        if not isinstance(columns, list) or not all(isinstance(col, str) for col in columns):  # Validate columns list
-            raise DataFrameError("The columns parameter must be a list of string column names.")
+        if not isinstance(columns, list) or not all(
+            isinstance(col, str) for col in columns
+        ):  # Validate columns list
+            raise DataFrameError(
+                "The columns parameter must be a list of string column names."
+            )
 
         # Check for existence of all columns in DataFrame
         missing_columns = [col for col in columns if col not in df.columns]
         if missing_columns:
-            raise DataFrameError(f"The DataFrame does not contain the specified columns: {missing_columns}")
-        if is_ascending == '+':
+            raise DataFrameError(
+                f"The DataFrame does not contain the specified columns: {missing_columns}"
+            )
+        if is_ascending == "+":
             return df.sort_values(by=columns, ascending=True)  # Perform sorting
-        elif is_ascending == '-':
+        elif is_ascending == "-":
             return df.sort_values(by=columns, ascending=False)  # Perform sorting
         else:
-            raise DataFrameError('')
+            raise DataFrameError("")
 
     @staticmethod
     def reverse_df_rows(df):
@@ -975,7 +1154,10 @@ class GeneralHandler:
         """
         for item in lst:
             if isinstance(item, (list, np.ndarray)):
-                logging.info("[i] Sublist or numpy array found: %s", self.convert_nested_list(item))
+                logging.info(
+                    "[i] Sublist or numpy array found: %s",
+                    self.convert_nested_list(item),
+                )
                 return True
         logging.info("[i] No sublist or numpy array found in the provided list.")
         return False
@@ -1005,13 +1187,18 @@ class GeneralHandler:
         """
         for item in lst:
             if isinstance(item, (list, np.ndarray)):
-                logging.info("[i] Sublist or numpy array found: %s", self.convert_nested_list(item))
+                logging.info(
+                    "[i] Sublist or numpy array found: %s",
+                    self.convert_nested_list(item),
+                )
                 return True
         logging.info("[i] No sublist or numpy array found in the provided list.")
         return False
 
     @staticmethod
-    def filter_df_by_regex(dataframe: pd.DataFrame, column_header: str, regex_pattern_str: str) -> pd.DataFrame:
+    def filter_df_by_regex(
+        dataframe: pd.DataFrame, column_header: str, regex_pattern_str: str
+    ) -> pd.DataFrame:
         """
         Filters a pandas DataFrame based on a regular expression pattern applied to the specified column.
 
@@ -1023,21 +1210,27 @@ class GeneralHandler:
         try:
             # Verify if the column header exists in the DataFrame
             if column_header not in dataframe.columns:
-                logging.warning(f"[!] The column header '{column_header}' does not exist in the DataFrame.")
+                logging.warning(
+                    f"[!] The column header '{column_header}' does not exist in the DataFrame."
+                )
                 return pd.DataFrame()
 
             # Compile the regex with the unescaped pattern
-            compiled_regex = re.compile(regex_pattern_str.strip(' ').strip('"'))
+            compiled_regex = re.compile(regex_pattern_str.strip(" ").strip('"'))
 
             # Apply the compiled regex to the specified column and filter rows
             # matched_rows = dataframe[dataframe[column_header].astype(str).str.match(compiled_regex)]
-            matched_rows = dataframe[dataframe[column_header].astype(str).str.contains(compiled_regex)]
+            matched_rows = dataframe[
+                dataframe[column_header].astype(str).str.contains(compiled_regex)
+            ]
 
             # Log the result
             if matched_rows.empty:
                 logging.info("[i] No rows match the provided regular expression.")
             else:
-                logging.info(f"[i] Found {len(matched_rows)} rows that match the regular expression.")
+                logging.info(
+                    f"[i] Found {len(matched_rows)} rows that match the regular expression."
+                )
 
             return matched_rows
 
@@ -1062,7 +1255,9 @@ class GeneralHandler:
         Recursively converts a nested list containing TerminalNodeImpl instances and other lists
         into a Python-native structure, with strings and floats.
         """
-        if isinstance(nested_list, antlr4.tree.Tree.TerminalNodeImpl):  # Directly convert terminal nodes
+        if isinstance(
+            nested_list, antlr4.tree.Tree.TerminalNodeImpl
+        ):  # Directly convert terminal nodes
             return self.convert_terminal_node(str(nested_list))
         elif isinstance(nested_list, list):  # Recursively handle lists
             return [self.convert_nested_list(item) for item in nested_list]
@@ -1104,13 +1299,15 @@ class GeneralHandler:
         # Parse arguments
         i = 0
         while i < len(args):
-            if isinstance(args[i], (int, float)) and not isinstance(args[i], bool):  # Check if the argument is a number
+            if isinstance(args[i], (int, float)) and not isinstance(
+                args[i], bool
+            ):  # Check if the argument is a number
                 keep_first_n = int(args[i])
                 i += 1
-            elif args[i] == 'consecutive':
-                consecutive = args[i + 2].lower() == 'true'
+            elif args[i] == "consecutive":
+                consecutive = args[i + 2].lower() == "true"
                 i += 3  # Skip 'consecutive', '=', 'TRUE/FALSE'
-            elif args[i] == ',':
+            elif args[i] == ",":
                 i += 1  # Skip commas
             else:
                 field_list.append(str(args[i]))
@@ -1125,19 +1322,30 @@ class GeneralHandler:
         try:
             if consecutive:
                 # Apply back-fill and check for consecutive duplicates
-                main_df['temp_shifted'] = main_df[field_list].shift(1).bfill().eq(main_df[field_list]).all(axis=1)
-                main_df['temp_group'] = main_df['temp_shifted'].cumsum()
-                filtered_df = main_df.groupby('temp_group').head(keep_first_n).drop(
-                    columns=['temp_shifted', 'temp_group'])
+                main_df["temp_shifted"] = (
+                    main_df[field_list]
+                    .shift(1)
+                    .bfill()
+                    .eq(main_df[field_list])
+                    .all(axis=1)
+                )
+                main_df["temp_group"] = main_df["temp_shifted"].cumsum()
+                filtered_df = (
+                    main_df.groupby("temp_group")
+                    .head(keep_first_n)
+                    .drop(columns=["temp_shifted", "temp_group"])
+                )
             else:
                 # Drop duplicates based on the specified fields
-                filtered_df = main_df.drop_duplicates(subset=field_list, keep='first')
+                filtered_df = main_df.drop_duplicates(subset=field_list, keep="first")
                 if keep_first_n > 1:
-                    main_df['temp_group'] = main_df[field_list].apply(
-                        lambda row: '_'.join(row.values.astype(str)), axis=1)
-                    main_df['temp_rank'] = main_df.groupby('temp_group').cumcount() + 1
-                    filtered_df = main_df[main_df['temp_rank'] <= keep_first_n].drop(
-                        columns=['temp_group', 'temp_rank'])
+                    main_df["temp_group"] = main_df[field_list].apply(
+                        lambda row: "_".join(row.values.astype(str)), axis=1
+                    )
+                    main_df["temp_rank"] = main_df.groupby("temp_group").cumcount() + 1
+                    filtered_df = main_df[main_df["temp_rank"] <= keep_first_n].drop(
+                        columns=["temp_group", "temp_rank"]
+                    )
 
             logging.info("Duplicates removed successfully.")
             return filtered_df
@@ -1161,30 +1369,32 @@ class GeneralHandler:
 
         for column in df.columns:
             stats = {
-                'field': column,
-                'count': df[column].count(),
-                'distinct_count': df[column].nunique(),
-                'is_exact': 1  # Assuming count is always exact in this context
+                "field": column,
+                "count": df[column].count(),
+                "distinct_count": df[column].nunique(),
+                "is_exact": 1,  # Assuming count is always exact in this context
             }
 
             # Handle non-numeric data gracefully
             if pd.api.types.is_numeric_dtype(df[column]):
-                stats['max'] = df[column].max()
-                stats['min'] = df[column].min()
-                stats['mean'] = df[column].mean()
-                stats['stdev'] = df[column].std()
-                stats['numeric_count'] = df[column].dropna().shape[0]
+                stats["max"] = df[column].max()
+                stats["min"] = df[column].min()
+                stats["mean"] = df[column].mean()
+                stats["stdev"] = df[column].std()
+                stats["numeric_count"] = df[column].dropna().shape[0]
             else:
-                stats['max'] = df[column].dropna().max()
-                stats['min'] = df[column].dropna().min()
-                stats['mean'] = None
-                stats['stdev'] = None
-                stats['numeric_count'] = 0  # Non-numeric columns do not contribute to numeric counts
+                stats["max"] = df[column].dropna().max()
+                stats["min"] = df[column].dropna().min()
+                stats["mean"] = None
+                stats["stdev"] = None
+                stats["numeric_count"] = (
+                    0  # Non-numeric columns do not contribute to numeric counts
+                )
 
             # Calculate top values and their counts
             distinct_values = df[column].dropna().value_counts().reset_index()
-            distinct_values.columns = ['value', 'count']
-            stats['values'] = distinct_values.head(maxvals).to_dict(orient='records')
+            distinct_values.columns = ["value", "count"]
+            stats["values"] = distinct_values.head(maxvals).to_dict(orient="records")
 
             summary.append(stats)
 
@@ -1193,28 +1403,28 @@ class GeneralHandler:
     @staticmethod
     def execute_rex(df, args):
         field = None
-        mode = 'regex'  # Default to regex mode
+        mode = "regex"  # Default to regex mode
         max_match = 1
         sed_expression = None
 
         # Parse arguments
-        if 'field' in args:
-            field_index = args.index('field') + 2
+        if "field" in args:
+            field_index = args.index("field") + 2
             field = args[field_index]
-        if 'mode' in args:
-            mode_index = args.index('mode') + 2
+        if "mode" in args:
+            mode_index = args.index("mode") + 2
             mode = args[mode_index]
             sed_expression = args[-1].strip('"')
 
         # Mode Fork: Regex or SED?
-        if mode == 'regex':
+        if mode == "regex":
             regex = args[-1].strip('"')
-            if 'max_match' in args:
-                max_match_index = args.index('max_match') + 2
+            if "max_match" in args:
+                max_match_index = args.index("max_match") + 2
                 max_match = int(args[max_match_index])
 
             # Compile regex pattern with appropriate flags
-            regex = re.sub(r'\?<([^>]+)>', r'P<\1>', regex)
+            regex = re.sub(r"\?<([^>]+)>", r"P<\1>", regex)
             pattern = re.compile(regex, flags=re.IGNORECASE | re.DOTALL)
 
             def extract_matches(row):
@@ -1232,9 +1442,9 @@ class GeneralHandler:
                 else:
                     df[column] = extracted_df[column].explode()
 
-        elif mode == 'sed' and sed_expression:
-            parts = sed_expression.split('/')
-            if len(parts) == 4 and parts[0] == 's':
+        elif mode == "sed" and sed_expression:
+            parts = sed_expression.split("/")
+            if len(parts) == 4 and parts[0] == "s":
                 regex, replacement, flags = parts[1], parts[2], parts[3]
                 df[field] = df[field].replace(regex, replacement, regex=True)
 
@@ -1252,25 +1462,31 @@ class GeneralHandler:
             if column not in df.columns:
                 raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
 
-            if operation == 'encode':
-                df[column] = df[column].apply(lambda x: base64.b64encode(x.encode()).decode())
-            elif operation == 'decode':
+            if operation == "encode":
+                df[column] = df[column].apply(
+                    lambda x: base64.b64encode(x.encode()).decode()
+                )
+            elif operation == "decode":
                 df[column] = df[column].apply(lambda x: base64.b64decode(x).decode())
             else:
-                raise ValueError(f"Unsupported operation '{operation}' in BASE64 command.")
+                raise ValueError(
+                    f"Unsupported operation '{operation}' in BASE64 command."
+                )
 
         return df
 
     @staticmethod
     def execute_fillnull(df, args):
-        if len(args) < 4 or 'value' not in args:
+        if len(args) < 4 or "value" not in args:
             raise ValueError("Incorrect arguments for fillnull operation.")
 
         # Extract the value to fill NaNs with, which comes right after 'value', '='
-        value_index = args.index('value') + 2
+        value_index = args.index("value") + 2
         fill_value = args[value_index].strip('"')
         if len(args) == 5:
-            fields = args[value_index + 1:]  # The fields to fill start right after the fill value
+            fields = args[
+                value_index + 1 :
+            ]  # The fields to fill start right after the fill value
         else:
             fields = list(df.columns)
 
@@ -1295,11 +1511,14 @@ class GeneralHandler:
         arg_dict = {}
         i = 0
         while i < len(args):
-            if args[i] == '=':
+            if args[i] == "=":
                 key = args[i - 1].lower()
                 value = args[i + 1]
-                if value.lower() in ['true', 'false']:  # Convert the value to a boolean if necessary
-                    value = value.lower() == 'true'
+                if value.lower() in [
+                    "true",
+                    "false",
+                ]:  # Convert the value to a boolean if necessary
+                    value = value.lower() == "true"
                 arg_dict[key] = value
                 i += 2  # skip the next position as it's the value we just processed
             else:
@@ -1308,24 +1527,28 @@ class GeneralHandler:
 
     @staticmethod
     def execute_outputlookup(df, **kwargs):
-        filename = kwargs.get('filename')
-        append = kwargs.get('append', False)
-        override_if_empty = kwargs.get('override_if_empty', True)
-        overwrite = kwargs.get('overwrite', False)
+        filename = kwargs.get("filename")
+        append = kwargs.get("append", False)
+        override_if_empty = kwargs.get("override_if_empty", True)
+        overwrite = kwargs.get("overwrite", False)
 
         logging.info("[i] Starting the data output process.")
 
         # Exit if append and overwrite are added in the same, as these are mutually exclusive.
         if append:
             if overwrite:
-                raise SyntaxError(f'EXECUTE_LOOKUP() options "append" and "overwrite" are mutually exclusive.')
+                raise SyntaxError(
+                    f'EXECUTE_LOOKUP() options "append" and "overwrite" are mutually exclusive.'
+                )
 
         # Determine the output format from the file extension
-        if '.' in filename:
-            _format = filename.split('.')[-1]
+        if "." in filename:
+            _format = filename.split(".")[-1]
         else:
             logging.error("[x] Invalid filename. Please include a file extension.")
-            raise ValueError("Filename must include a valid extension (.csv, .tsv, .json, .yaml, .sqlite)")
+            raise ValueError(
+                "Filename must include a valid extension (.csv, .tsv, .json, .yaml, .sqlite)"
+            )
 
         # Check if file exists and handle append, overwrite, and override_if_empty logic
         file_exists = os.path.exists(filename)
@@ -1333,38 +1556,51 @@ class GeneralHandler:
             if not append and not overwrite:
                 if override_if_empty:
                     if df.empty:
-                        logging.info("[i] No data to output and override_if_empty is set. Deleting the file.")
+                        logging.info(
+                            "[i] No data to output and override_if_empty is set. Deleting the file."
+                        )
                         os.remove(filename)
                         return
                 else:
-                    logging.info("[i] No operation performed as no overwrite or append is specified.")
+                    logging.info(
+                        "[i] No operation performed as no overwrite or append is specified."
+                    )
                     return
 
         # Handling data output based on the format
-        if _format in ['csv', 'tsv']:
-            sep = ',' if _format == 'csv' else '\t'
+        if _format in ["csv", "tsv"]:
+            sep = "," if _format == "csv" else "\t"
             if append and file_exists:
                 df_existing = pd.read_csv(filename, sep=sep)
                 df = pd.concat([df_existing, df], ignore_index=True)
             df.to_csv(filename, sep=sep, index=False)
             logging.info(f"[i] Data written to {filename} in {_format.upper()} format.")
-        elif _format == 'json':
-            df.to_json(filename, orient='records', lines=True)
+        elif _format == "json":
+            df.to_json(filename, orient="records", lines=True)
             logging.info(f"[i] Data written to {filename} in JSON format.")
-        elif _format == 'yaml':
-            with open(filename, 'w') as f:
-                yaml.dump(df.to_dict(orient='records'), f)
+        elif _format == "yaml":
+            with open(filename, "w") as f:
+                yaml.dump(df.to_dict(orient="records"), f)
             logging.info(f"[i] Data written to {filename} in YAML format.")
-        elif _format == 'sqlite':
+        elif _format == "sqlite":
             with sqlite3.connect(filename) as conn:
-                df.to_sql(name='data', con=conn, if_exists='replace' if overwrite else 'append', index=False)
+                df.to_sql(
+                    name="data",
+                    con=conn,
+                    if_exists="replace" if overwrite else "append",
+                    index=False,
+                )
             logging.info(f"[i] Data written to {filename} in SQLite database.")
         else:
             logging.error("[x] Unsupported file format.")
-            raise ValueError("Unsupported file format. Supported formats: csv, tsv, json, yaml, sqlite")
+            raise ValueError(
+                "Unsupported file format. Supported formats: csv, tsv, json, yaml, sqlite"
+            )
 
     @staticmethod
-    def replace_variable_in_self_dot_values(stack: OrderedDict, var_name: str, replacement: List[Any]) -> None:
+    def replace_variable_in_self_dot_values(
+        stack: OrderedDict, var_name: str, replacement: List[Any]
+    ) -> None:
         """
         Recursively replace occurrences of a variable name with a given list in an OrderedDict.
 
@@ -1379,7 +1615,9 @@ class GeneralHandler:
             elif isinstance(data, dict):
                 return {k: recursive_replace(v) for k, v in data.items()}
             elif isinstance(data, str) and data == var_name:
-                logging.debug(f"[DEBUG] Replacing variable '{var_name}' with {replacement}")
+                logging.debug(
+                    f"[DEBUG] Replacing variable '{var_name}' with {replacement}"
+                )
                 return replacement
 
         for key, value in stack.items():
@@ -1412,7 +1650,7 @@ class GeneralHandler:
     # CRITICAL COMPONENTS - NEW STUFF 11/02/2024
     # *********************************************************************************
     @staticmethod
-    def expand_file_paths(path_pattern, file_extension='.parquet'):
+    def expand_file_paths(path_pattern, file_extension=".parquet"):
         """
         Expands a directory path or file path pattern that may include wildcards
         and returns a list of matching file paths, recursively including all files
@@ -1433,21 +1671,21 @@ class GeneralHandler:
 
         # If the path_pattern is a directory, append the recursive wildcard pattern
         if os.path.isdir(path_pattern):
-            search_pattern = os.path.join(path_pattern, '**', f'*{file_extension}')
+            search_pattern = os.path.join(path_pattern, "**", f"*{file_extension}")
         else:
             # If the path_pattern already includes wildcards, use it as is
             # Ensure it includes the file extension
             if not path_pattern.endswith(file_extension):
                 # Replace any trailing wildcard with the file extension
-                if path_pattern.endswith('*'):
-                    path_pattern = path_pattern.rstrip('*')
-                path_pattern += f'*{file_extension}'
+                if path_pattern.endswith("*"):
+                    path_pattern = path_pattern.rstrip("*")
+                path_pattern += f"*{file_extension}"
 
             # Ensure recursive search
-            if '**' not in path_pattern:
+            if "**" not in path_pattern:
                 # Insert '**/' before the last component
                 path_parts = os.path.split(path_pattern)
-                search_pattern = os.path.join(path_parts[0], '**', path_parts[1])
+                search_pattern = os.path.join(path_parts[0], "**", path_parts[1])
             else:
                 search_pattern = path_pattern
 
@@ -1473,14 +1711,21 @@ class GeneralHandler:
         if os.path.exists(request_id_file_path):
             return pd.read_pickle(request_id_file_path)
         else:
-            raise FileNotFoundError(f"No saved DataFrame found for request_id: {request_id_file_path}")
+            raise FileNotFoundError(
+                f"No saved DataFrame found for request_id: {request_id_file_path}"
+            )
 
     # ------------------------------------------------------------------
     # New helper functions for directive processing
     # ------------------------------------------------------------------
 
     @staticmethod
-    def execute_join(main_df: pd.DataFrame, sub_df: pd.DataFrame, fields: list, join_type: str = "inner") -> pd.DataFrame:
+    def execute_join(
+        main_df: pd.DataFrame,
+        sub_df: pd.DataFrame,
+        fields: list,
+        join_type: str = "inner",
+    ) -> pd.DataFrame:
         """Perform a pandas merge using the specified join type and fields."""
         try:
             return main_df.merge(sub_df, on=fields, how=join_type)
@@ -1498,7 +1743,9 @@ class GeneralHandler:
             return main_df
 
     @staticmethod
-    def execute_spath(df: pd.DataFrame, input_col: str, output_col: str, json_path: str) -> pd.DataFrame:
+    def execute_spath(
+        df: pd.DataFrame, input_col: str, output_col: str, json_path: str
+    ) -> pd.DataFrame:
         """Extract JSON path from a column into a new column."""
         try:
             import json
@@ -1506,7 +1753,7 @@ class GeneralHandler:
             def extract(obj):
                 try:
                     data = obj if isinstance(obj, dict) else json.loads(str(obj))
-                    for part in json_path.split('.'):
+                    for part in json_path.split("."):
                         if isinstance(data, dict):
                             data = data.get(part)
                         else:
@@ -1538,19 +1785,27 @@ class GeneralHandler:
     @staticmethod
     def execute_mvreverse(df: pd.DataFrame, field: str) -> pd.DataFrame:
         if field in df.columns:
-            df[field] = df[field].apply(lambda x: list(reversed(x)) if isinstance(x, list) else x)
+            df[field] = df[field].apply(
+                lambda x: list(reversed(x)) if isinstance(x, list) else x
+            )
         return df
 
     @staticmethod
-    def execute_mvcombine(df: pd.DataFrame, field: str, delim: str = " ") -> pd.DataFrame:
+    def execute_mvcombine(
+        df: pd.DataFrame, field: str, delim: str = " "
+    ) -> pd.DataFrame:
         if field in df.columns:
-            df[field] = df[field].apply(lambda x: delim.join(map(str, x)) if isinstance(x, list) else x)
+            df[field] = df[field].apply(
+                lambda x: delim.join(map(str, x)) if isinstance(x, list) else x
+            )
         return df
 
     @staticmethod
     def execute_mvdedup(df: pd.DataFrame, field: str) -> pd.DataFrame:
         if field in df.columns:
-            df[field] = df[field].apply(lambda x: list(dict.fromkeys(x)) if isinstance(x, list) else x)
+            df[field] = df[field].apply(
+                lambda x: list(dict.fromkeys(x)) if isinstance(x, list) else x
+            )
         return df
 
     @staticmethod
@@ -1559,7 +1814,11 @@ class GeneralHandler:
             return df
         try:
             df[target] = df.apply(
-                lambda row: [item for f in fields for item in (row[f] if isinstance(row[f], list) else [row[f]])],
+                lambda row: [
+                    item
+                    for f in fields
+                    for item in (row[f] if isinstance(row[f], list) else [row[f]])
+                ],
                 axis=1,
             )
         except Exception as e:
@@ -1569,29 +1828,44 @@ class GeneralHandler:
     @staticmethod
     def execute_mvfilter(df: pd.DataFrame, field: str, value) -> pd.DataFrame:
         if field in df.columns:
-            df[field] = df[field].apply(lambda x: [v for v in x if str(v) == str(value)] if isinstance(x, list) else x)
+            df[field] = df[field].apply(
+                lambda x: (
+                    [v for v in x if str(v) == str(value)] if isinstance(x, list) else x
+                )
+            )
         return df
 
     @staticmethod
-    def execute_mvcount(df: pd.DataFrame, field: str, result_field: str) -> pd.DataFrame:
+    def execute_mvcount(
+        df: pd.DataFrame, field: str, result_field: str
+    ) -> pd.DataFrame:
         if field in df.columns:
-            df[result_field] = df[field].apply(lambda x: len(x) if isinstance(x, list) else 0)
+            df[result_field] = df[field].apply(
+                lambda x: len(x) if isinstance(x, list) else 0
+            )
         return df
 
     @staticmethod
     def execute_mvdc(df: pd.DataFrame, field: str, result_field: str) -> pd.DataFrame:
         if field in df.columns:
-            df[result_field] = df[field].apply(lambda x: len(set(x)) if isinstance(x, list) else 0)
+            df[result_field] = df[field].apply(
+                lambda x: len(set(x)) if isinstance(x, list) else 0
+            )
         return df
 
     @staticmethod
-    def execute_mvzip(df: pd.DataFrame, field1: str, field2: str, delim: str, result_field: str) -> pd.DataFrame:
+    def execute_mvzip(
+        df: pd.DataFrame, field1: str, field2: str, delim: str, result_field: str
+    ) -> pd.DataFrame:
         try:
             df[result_field] = df.apply(
-                lambda r: [f"{a}{delim}{b}" for a, b in zip(
-                    r[field1] if isinstance(r[field1], list) else [r[field1]],
-                    r[field2] if isinstance(r[field2], list) else [r[field2]],
-                )],
+                lambda r: [
+                    f"{a}{delim}{b}"
+                    for a, b in zip(
+                        r[field1] if isinstance(r[field1], list) else [r[field1]],
+                        r[field2] if isinstance(r[field2], list) else [r[field2]],
+                    )
+                ],
                 axis=1,
             )
         except Exception as e:
@@ -1601,11 +1875,15 @@ class GeneralHandler:
     @staticmethod
     def execute_mvjoin(df: pd.DataFrame, field: str, delim: str) -> pd.DataFrame:
         if field in df.columns:
-            df[field] = df[field].apply(lambda x: delim.join(map(str, x)) if isinstance(x, list) else x)
+            df[field] = df[field].apply(
+                lambda x: delim.join(map(str, x)) if isinstance(x, list) else x
+            )
         return df
 
     @staticmethod
-    def execute_mvindex(df: pd.DataFrame, field: str, indexes: list, result_field: str) -> pd.DataFrame:
+    def execute_mvindex(
+        df: pd.DataFrame, field: str, indexes: list, result_field: str
+    ) -> pd.DataFrame:
         def pick(lst):
             if not isinstance(lst, list):
                 return None
@@ -1641,7 +1919,9 @@ class GeneralHandler:
         return df
 
     @staticmethod
-    def execute_coalesce(df: pd.DataFrame, fields: list, result_field: str = "coalesce") -> pd.DataFrame:
+    def execute_coalesce(
+        df: pd.DataFrame, fields: list, result_field: str = "coalesce"
+    ) -> pd.DataFrame:
         """Return the first non-null/empty value across the provided fields."""
         missing = [f for f in fields if f not in df.columns]
         if missing:
@@ -1657,4 +1937,3 @@ class GeneralHandler:
 
         df[result_field] = df.apply(pick, axis=1)
         return df
-
