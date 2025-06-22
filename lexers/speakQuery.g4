@@ -123,6 +123,9 @@ directive
     | MVCOUNT LPAREN expression RPAREN
     | MVDC LPAREN expression RPAREN
     | MVZIP LPAREN expression (COMMA variableName)+ COMMA mvDelim RPAREN
+    | FIELDSUMMARY (LPAREN RPAREN)?
+    | OUTPUTLOOKUP (variableName | DOUBLE_QUOTED_STRING) (WINDOW EQUALS NUMBER)? (OVERWRITE | OVERWRITE_IF_EMPTY | CREATE_EMPTY)*
+    | OUTPUTNEW (variableName | DOUBLE_QUOTED_STRING)
     ;
 
 macro
@@ -184,6 +187,7 @@ stringFunctionCall
 specificFunctionCall
     : NULL LPAREN RPAREN
     | (NOT (NEWLINE | WS)*)? ISNULL LPAREN variableName RPAREN
+    | (NOT (NEWLINE | WS)*)? ISNOTNULL LPAREN variableName RPAREN
     | TO_CRON LPAREN inputCron RPAREN
     | FROM_CRON LPAREN inputCron COMMA cronformat RPAREN
     | COALESCE LPAREN variableName (COMMA variableName)+ RPAREN
