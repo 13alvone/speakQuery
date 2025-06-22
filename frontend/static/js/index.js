@@ -182,25 +182,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const end = Math.min(start + rowsPerPage, totalRows);
             const rows = queryResults.slice(start, end);
 
-            // NOTE: Removed "is-fullwidth" to allow horizontal scrolling
-            // if columns exceed container width
-            let html = '<table class="table is-striped is-hoverable"><thead><tr>';
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.className = 'table is-striped is-hoverable';
+
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
             columnNames.forEach(col => {
-                html += `<th>${col}</th>`;
+                const th = document.createElement('th');
+                th.textContent = col;
+                headerRow.appendChild(th);
             });
-            html += '</tr></thead><tbody>';
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
 
+            const tbody = document.createElement('tbody');
             rows.forEach(row => {
-                html += '<tr>';
+                const tr = document.createElement('tr');
                 columnNames.forEach(col => {
+                    const td = document.createElement('td');
                     const value = row[col] !== undefined && row[col] !== null ? row[col] : 'N/A';
-                    html += `<td>${value}</td>`;
+                    td.textContent = value;
+                    tr.appendChild(td);
                 });
-                html += '</tr>';
+                tbody.appendChild(tr);
             });
-            html += '</tbody></table>';
+            table.appendChild(tbody);
 
-            document.getElementById('results').innerHTML = html;
+            resultsContainer.appendChild(table);
         } catch (error) {
             console.error('[x] Error rendering results:', error);
             showError('Error rendering results.');
@@ -316,32 +327,5 @@ earliest="2024-01-04" latest="2024-01-05"
      * @param {string} message - The message to display.
      * @param {string} type - The type of notification ('is-primary', 'is-danger', etc.).
      */
-    function showNotification(message, type = 'is-primary') {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <button class="delete"></button>
-            ${message}
-        `;
-        container.appendChild(notification);
-
-        // Automatically remove the notification after 5 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-
-        // Add event listener to the delete button
-        notification.querySelector('.delete').addEventListener('click', () => {
-            notification.remove();
-        });
-    }
-
-    /**
-     * Display an error notification.
-     * @param {string} message - The error message to display.
-     */
-    function showError(message) {
-        showNotification(message, 'is-danger');
-    }
+    // Notifications are provided by common.js
 });

@@ -314,49 +314,5 @@ document.addEventListener('DOMContentLoaded', function() {
      * Display a notification using Bulma's notification component.
      * @param {string} message - The message to display.
      */
-    function showNotification(message) {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = 'notification is-primary';
-        notification.innerHTML = `
-            <button class="delete"></button>
-            ${message}
-        `;
-        container.appendChild(notification);
-
-        // Automatically remove the notification after 5 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-
-        // Add event listener to the delete button
-        notification.querySelector('.delete').addEventListener('click', () => {
-            notification.remove();
-        });
-    }
-
-    /**
-     * Display an error notification using Bulma's notification component.
-     * @param {string} message - The error message to display.
-     */
-    function showError(message) {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = 'notification is-danger';
-        notification.innerHTML = `
-            <button class="delete"></button>
-            ${message}
-        `;
-        container.appendChild(notification);
-
-        // Automatically remove the notification after 5 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-
-        // Add event listener to the delete button
-        notification.querySelector('.delete').addEventListener('click', () => {
-            notification.remove();
-        });
-    }
+    // Notifications are provided by common.js
 });
