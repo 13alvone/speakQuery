@@ -58,6 +58,27 @@ def run_command(cmd, cwd):
     return result.stdout
 
 
+def ensure_pybind11():
+    """Ensure that pybind11 is installed and return its CMake directory."""
+    try:
+        import pybind11  # type: ignore
+    except ModuleNotFoundError:
+        logging.info("[i] pybind11 not found. Installing with pip...")
+        try:
+            run_command([sys.executable, "-m", "pip", "install", "pybind11"], cwd=os.getcwd())
+        except SystemExit:
+            logging.error("[x] Failed to install pybind11")
+            sys.exit(1)
+        import pybind11  # type: ignore
+    try:
+        cmake_dir = pybind11.get_cmake_dir()  # type: ignore
+        logging.debug(f"[DEBUG] Found pybind11 CMake dir: {cmake_dir}")
+        return cmake_dir
+    except Exception:
+        logging.debug("[DEBUG] Could not determine pybind11 CMake dir; falling back to system paths.")
+        return ""
+
+
 def build_component(source_dir, build_dir):
     """
     Configures and builds the component using CMake in the specified build directory.
@@ -113,15 +134,8 @@ def build_component(source_dir, build_dir):
     )
     logging.debug(f"[DEBUG] Python site-packages directory: {site_packages}")
 
-    # Attempt to get the pip-installed pybind11 CMake directory.
-    try:
-        pybind11_cmake_dir = subprocess.check_output(
-            [python_executable, "-m", "pybind11", "--cmakedir"], text=True
-        ).strip()
-        logging.debug(f"[DEBUG] Found pybind11 CMake dir: {pybind11_cmake_dir}")
-    except subprocess.CalledProcessError:
-        pybind11_cmake_dir = ""
-        logging.debug("[DEBUG] Could not determine pybind11 CMake dir from pip; falling back to system paths.")
+    # Ensure pybind11 is installed and get its CMake directory
+    pybind11_cmake_dir = ensure_pybind11()
 
     # Build the CMake configuration command.
     cmake_config_cmd = [
