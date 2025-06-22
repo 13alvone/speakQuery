@@ -42,6 +42,7 @@ app = Flask(
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'lookups'
 app.config['ALLOWED_EXTENSIONS'] = {'sqlite3', 'system4.system4.parquet', 'csv', 'json'}
+app.config['ALLOWED_API_DOMAINS'] = {'jsonplaceholder.typicode.com'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
 app.config['TEMP_DIR'] = os.path.join('frontend', 'static', 'temp')
 app.config['LOOKUP_DIR'] = 'lookups'
@@ -78,6 +79,20 @@ def allowed_file(filename):
         if filename_lower.endswith(f".{ext_lower}"):
             return True
     return False
+
+
+def is_allowed_api_url(api_url):
+    """Return True if the api_url's domain matches ALLOWED_API_DOMAINS patterns."""
+    try:
+        parsed = requests.utils.urlparse(api_url)
+        hostname = parsed.hostname or ''
+        allowed_domains = app.config.get('ALLOWED_API_DOMAINS', set())
+        for pattern in allowed_domains:
+            if re.fullmatch(pattern, hostname):
+                return True
+        return False
+    except Exception:
+        return False
 
 
 def get_db(db_name):
@@ -165,7 +180,8 @@ def initialize_database():
             'SCHEDULED_INPUTS_DB': 'scheduled_inputs.db',
             'HISTORY_DB': 'history.db',  # Added HISTORY_DB to default settings
             'LOG_LEVEL': 'DEBUG',
-            'KEEP_LATEST_FILES': '20'
+            'KEEP_LATEST_FILES': '20',
+            'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com'
         }
         for key, value in default_settings.items():
             cursor.execute('INSERT INTO app_settings (key, value) VALUES (?, ?)', (key, value))
@@ -198,6 +214,8 @@ def load_settings_into_config():
         # Convert types based on expected setting
         if key == 'ALLOWED_EXTENSIONS':
             app.config[key] = set(ext.strip().lower() for ext in value.split(','))
+        elif key == 'ALLOWED_API_DOMAINS':
+            app.config[key] = set(d.strip() for d in value.split(',') if d.strip())
         elif key == 'MAX_CONTENT_LENGTH':
             app.config[key] = int(value)
         elif key in ['KEEP_LATEST_FILES']:
@@ -321,7 +339,9 @@ def fetch_api_data():
         return jsonify({'status': 'error', 'message': 'API URL is required.'}), 400
 
     try:
-        # Validate the URL (you may want to restrict allowed domains)
+        if not is_allowed_api_url(api_url):
+            return jsonify({'status': 'error', 'message': 'Domain not allowed.'}), 400
+
         response = requests.get(api_url, timeout=10)
         response.raise_for_status()
         api_data = response.json()
@@ -1316,6 +1336,8 @@ def get_settings():
             # Convert types based on key
             if key == 'ALLOWED_EXTENSIONS':
                 settings_dict[key] = ','.join(app.config.get(key, []))
+            elif key == 'ALLOWED_API_DOMAINS':
+                settings_dict[key] = ','.join(app.config.get(key, []))
             elif key in ['MAX_CONTENT_LENGTH', 'KEEP_LATEST_FILES']:
                 settings_dict[key] = int(app.config.get(key, 0))
             else:
@@ -1344,6 +1366,9 @@ def update_settings():
                 # Expecting a comma-separated string
                 cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
                 app.config[key] = set(ext.strip().lower() for ext in value.split(','))
+            elif key == 'ALLOWED_API_DOMAINS':
+                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
+                app.config[key] = set(d.strip() for d in value.split(',') if d.strip())
             elif key == 'MAX_CONTENT_LENGTH':
                 cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(int(value)), key))
                 app.config[key] = int(value)
