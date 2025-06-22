@@ -39,7 +39,7 @@
 
 /* Load Button Styles */
 .button.load-btn {
-    background-color: #28a745;
+    background-color: var(--primary-color);
     color: white;
     padding: 5px 10px;
     border: none;
