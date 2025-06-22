@@ -17,10 +17,15 @@ function showNotification(message, isError = false) {
 
     const notification = document.createElement('div');
     notification.className = `notification ${isError ? 'is-danger' : 'is-primary'}`;
-    notification.innerHTML = `
-        <button class="delete"></button>
-        ${message}
-    `;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete';
+    notification.appendChild(deleteBtn);
+
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    notification.appendChild(messageSpan);
+
     container.appendChild(notification);
 
     // Automatically remove the notification after 5 seconds
@@ -29,7 +34,7 @@ function showNotification(message, isError = false) {
     }, 5000);
 
     // Add event listener to the delete button
-    notification.querySelector('.delete').addEventListener('click', () => {
+    deleteBtn.addEventListener('click', () => {
         notification.remove();
     });
 }

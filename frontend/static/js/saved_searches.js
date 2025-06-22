@@ -406,24 +406,5 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {string} message - The message to display.
      * @param {string} type - Bulma notification type (e.g., 'is-primary', 'is-danger').
      */
-    function showNotification(message, type) {
-        const container = document.getElementById('notification-container');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <button class="delete"></button>
-            ${message}
-        `;
-        container.appendChild(notification);
-
-        // Automatically remove the notification after 5 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-
-        // Add event listener to the delete button
-        notification.querySelector('.delete').addEventListener('click', () => {
-            notification.remove();
-        });
-    }
+    // Notifications are provided by common.js
 });

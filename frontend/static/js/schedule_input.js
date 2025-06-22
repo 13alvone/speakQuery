@@ -167,44 +167,5 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    /**
-     * Display a notification using Bulma's notification component.
-     * @param {string} message - The message to display.
-     * @param {string} type - The type of notification ('is-primary', 'is-danger', etc.).
-     */
-    function showNotification(message, type = 'is-primary') {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <button class="delete"></button>
-            ${message}
-        `;
-        notificationContainer.appendChild(notification);
-
-        // Automatically remove the notification after 5 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-
-        // Add event listener to the delete button
-        notification.querySelector('.delete').addEventListener('click', () => {
-            notification.remove();
-        });
-    }
-
-    /**
-     * Display an error notification.
-     * @param {string} message - The error message to display.
-     */
-    function showError(message) {
-        showNotification(message, 'is-danger');
-    }
-
-    /**
-     * Display a success notification.
-     * @param {string} message - The success message to display.
-     */
-    function showSuccess(message) {
-        showNotification(message, 'is-success');
-    }
+    // Notifications are provided by common.js
 });
