@@ -8,11 +8,10 @@ settings_bp = Blueprint('settings_bp', __name__)
 @settings_bp.route('/get_settings', methods=['GET'])
 def get_settings():
     try:
-        conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
-        cursor = conn.cursor()
-        cursor.execute('SELECT key, value FROM app_settings')
-        _settings = cursor.fetchall()
-        conn.close()
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT key, value FROM app_settings')
+            _settings = cursor.fetchall()
 
         settings_dict = {}
         for key, value in _settings:
@@ -39,8 +38,8 @@ def update_settings():
             return jsonify({'status': 'error', 'message': 'No settings provided.'}), 400
 
         _settings = data['settings']
-        conn = sqlite3.connect(app.config['SCHEDULED_INPUTS_DB'])
-        cursor = conn.cursor()
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
 
         for key, value in _settings.items():
             if key == 'ALLOWED_EXTENSIONS':
@@ -59,8 +58,7 @@ def update_settings():
                 cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
                 app.config[key] = value
 
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         return jsonify({'status': 'success', 'message': 'Settings updated successfully.'}), 200
 
