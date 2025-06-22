@@ -49,7 +49,19 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
      ```bash
      python scheduled_input_engine/ScheduledInputEngine.py
      ```
-   These engines run continuously and can also be launched from within `app.py` by uncommenting `start_background_engines()`.
+
+  These engines run continuously and can also be launched from within `app.py` by uncommenting `start_background_engines()`.
+
+### SMTP configuration
+
+To enable email alerts, set your SMTP credentials as environment variables before running the query engine:
+
+```bash
+export SMTP_USER="your_email@example.com"
+export SMTP_PASSWORD="your_app_password"
+```
+
+`SMTP_SERVER` and `SMTP_PORT` can also be specified to override the default Gmail settings.
 
 ## Testing
 
