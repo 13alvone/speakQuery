@@ -235,6 +235,15 @@ class speakQueryListener(ParseTreeListener):
                     logging.error(f"[x] StatsHandler failure on '{seg_str}': {e}")
                     raise
 
+            elif cmd == 'timechart':
+                from handlers.ChartHandler import ChartHandler
+                chart_handler = ChartHandler()
+                try:
+                    self.main_df = chart_handler.run_timechart(seg_tokens, self.main_df)
+                except Exception as e:
+                    logging.error(f"[x] ChartHandler failure on '{seg_str}': {e}")
+                    raise
+
             elif cmd == 'eval':
                 from handlers.EvalHandler import EvalHandler
                 eval_handler = EvalHandler()
