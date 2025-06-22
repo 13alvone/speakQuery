@@ -2,6 +2,12 @@
 
 // Common functions for notifications and dropdown handling
 
+// Set Axios to include CSRF token if present
+const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+if (csrfMetaTag) {
+    axios.defaults.headers.common['X-CSRFToken'] = csrfMetaTag.getAttribute('content');
+}
+
 /**
  * Function to show notifications.
  * @param {string} message - The message to display.
