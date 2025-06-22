@@ -18,17 +18,13 @@
 
         // Function to toggle related fields based on select values
         function toggleFields() {
-            console.log('toggleFields called');
-            console.log('throttleSelect value:', throttleSelect.value);
 
             // Throttle Fields
             if (throttleSelect.value === 'yes') {
-                console.log('Showing throttle fields');
                 throttleFieldsContainer.classList.remove('is-hidden');
                 throttleByInput.disabled = false;
                 throttleTimePeriodInput.disabled = false;
             } else {
-                console.log('Hiding throttle fields');
                 throttleFieldsContainer.classList.add('is-hidden');
                 throttleByInput.disabled = true;
                 throttleTimePeriodInput.disabled = true;

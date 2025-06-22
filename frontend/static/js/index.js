@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     requestId = response.data.request_id;
                     if (requestId) {
                         localStorage.setItem('requestId', requestId);
-                        console.log("[i] Request ID stored:", requestId);
                     } else {
                         console.error("[x] No request_id found in the response");
                     }
@@ -177,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function renderResults(page) {
         try {
-            console.log('[DEBUG] Rendering results for page:', page);
             const start = (page - 1) * rowsPerPage;
             const end = Math.min(start + rowsPerPage, totalRows);
             const rows = queryResults.slice(start, end);

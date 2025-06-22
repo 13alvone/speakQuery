@@ -120,7 +120,6 @@
         const query = document.getElementById('query').value;
         axios.post('/run_query', { query: query })
             .then(response => {
-                console.log('[DEBUG] Raw query result:', response);
                 if (response.data.status === 'success') {
                     // Replace the entire document content with the returned HTML
                     const newDoc = document.open("text/html", "replace");

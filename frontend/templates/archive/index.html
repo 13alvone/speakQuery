@@ -113,7 +113,6 @@
         const query = document.getElementById('query').value;
         axios.post('/run_query', { query: query })
             .then(response => {
-                console.log('[DEBUG] Raw query result:', response);
                 if (response.data.status === 'success') {
                     queryResults = response.data.results;
                     totalRows = queryResults.length;

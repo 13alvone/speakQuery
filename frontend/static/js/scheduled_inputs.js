@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
         axios.get('/get_scheduled_inputs')
             .then(response => {
                 const data = response.data;
-                console.log('Received data:', data); // Debugging statement
                 if (data.status === 'success') {
                     const scheduledInputs = data.inputs;
                     renderScheduledInputsTable(scheduledInputs);
@@ -96,8 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputs.forEach(input => {
             const row = document.createElement('tr');
 
-            // Debugging: Log each input's disabled status
-            console.log(`Input ID: ${input.id}, Disabled: ${input.disabled}`);
 
             // Title with link
             const titleCell = document.createElement('td');
