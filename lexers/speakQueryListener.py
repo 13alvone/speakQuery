@@ -482,6 +482,15 @@ class speakQueryListener(ParseTreeListener):
                 idxs = [int(i.strip(',')) for i in seg_tokens[2:]]
                 self.main_df = self.general_handler.execute_mvindex(self.main_df, field, idxs, 'mvindex')
 
+            elif cmd in ('if_', 'case', 'tonumber'):
+                from handlers.EvalHandler import EvalHandler
+                eval_handler = EvalHandler()
+                try:
+                    self.main_df = eval_handler.run_eval(seg_tokens, self.main_df)
+                except Exception as e:
+                    logging.error(f"[x] EvalHandler failure on '{seg_str}': {e}")
+                    raise
+
             elif seg_str.startswith('`') and seg_str.endswith('`'):
                 macro_body = seg_str[1:-1]
                 if '(' in macro_body and macro_body.endswith(')'):
