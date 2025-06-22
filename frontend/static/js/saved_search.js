@@ -48,19 +48,6 @@ document.addEventListener("DOMContentLoaded", function() {
     throttleSelect.addEventListener('change', toggleFields);
     sendEmailSelect.addEventListener('change', toggleFields);
 
-    // Function to display error notifications
-    function showError(message) {
-        // Implement your notification logic here
-        // Example using a simple alert (replace with your modal logic)
-        alert(`Error: ${message}`);
-    }
-
-    // Function to display success notifications
-    function showNotification(message) {
-        // Implement your notification logic here
-        // Example using a simple alert (replace with your modal logic)
-        alert(`Success: ${message}`);
-    }
 
     // Function to handle form submission
     async function handleFormSubmission(event) {
