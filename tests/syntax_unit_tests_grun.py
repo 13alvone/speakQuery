@@ -22,7 +22,11 @@ def setup_logging():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     _log_filename = f"{output_dir}/unit_tests_parse_results_{timestamp}.testresults"
-    logging.basicConfig(filename=_log_filename, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    handler = logging.FileHandler(_log_filename)
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
     return _log_filename
 
 

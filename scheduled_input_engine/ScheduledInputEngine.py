@@ -20,9 +20,8 @@ try:
 except Exception as e:
     raise e
 
-# Setup logging
+# Setup logger
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 # Database paths
 CURRENT_SCRIPT_DIR = Path(__file__).parent.resolve()

@@ -6,7 +6,7 @@ import pandas as pd
 from handlers.StatsHandler import StatsHandler
 from handlers.GeneralHandler import GeneralHandler
 
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 class ChartHandler:
     def __init__(self):

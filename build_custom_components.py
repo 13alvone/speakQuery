@@ -29,8 +29,7 @@ import site
 import platform
 import re
 
-# Configure logging with the required prefixes.
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 
 def run_command(cmd, cwd):

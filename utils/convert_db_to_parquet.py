@@ -8,8 +8,7 @@ import pyarrow.parquet as pq
 import os
 import logging
 
-# Setup basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def convert_sqlite_to_arrow(db_path, output_dir):

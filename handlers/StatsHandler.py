@@ -11,8 +11,7 @@ import re
 import numpy as np
 import pandas as pd
 
-# Configure root logger
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 
 class StatsHandler:

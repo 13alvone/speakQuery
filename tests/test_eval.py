@@ -19,8 +19,6 @@ import yaml
 import time
 import pytest
 
-# Configure logging – using a dedicated logger for this module.
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 logger = logging.getLogger("test_eval")
 
 def find_project_root(start_path: str, marker_files=('app.py', '.git')):

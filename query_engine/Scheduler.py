@@ -7,8 +7,6 @@ from apscheduler.triggers.cron import CronTrigger
 import logging
 from aiosqlite import connect
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
 current_script_dir = os.path.dirname(os.path.abspath(__file__))

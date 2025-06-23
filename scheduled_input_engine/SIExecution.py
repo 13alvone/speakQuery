@@ -10,9 +10,8 @@ from RestrictedPython import compile_restricted
 from RestrictedPython.Guards import safe_builtins
 from RestrictedPython import utility_builtins
 
-# Configure logging
+# Module logger
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
 class SIExecution:

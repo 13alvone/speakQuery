@@ -12,8 +12,7 @@ import logging
 import importlib.util
 from types import ModuleType
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def resolve_and_import_so(module_dir: str, module_prefix: str) -> ModuleType:

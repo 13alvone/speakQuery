@@ -17,7 +17,7 @@ from handlers.MathematicOperations import MathHandler
 from handlers.StringHandler import StringHandler
 from handlers.GeneralHandler import GeneralHandler
 
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 
 class EvalHandler:

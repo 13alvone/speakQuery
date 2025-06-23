@@ -10,9 +10,8 @@ import random
 import uuid
 from datetime import datetime, timedelta, timezone
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logger = logging.getLogger()
+# Set up logger
+logger = logging.getLogger(__name__)
 
 # Allowed datetime formats from the TimeParser class
 datetime_formats = [

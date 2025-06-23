@@ -6,7 +6,7 @@ from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
 from lexers.antlr4_active.speakQueryParser import speakQueryParser
 from lexers.speakQueryListener import speakQueryListener
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 speak_query = '''
 index="output_parquets/test1.parquet" userRole="admin" errorCode=404
