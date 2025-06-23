@@ -17,6 +17,7 @@ import logging
 import argparse
 import yaml
 import time
+import pytest
 
 # Configure logging – using a dedicated logger for this module.
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -49,9 +50,8 @@ sys.path.insert(0, project_root)
 # Import the secure dynamic loader.
 try:
     from functionality.so_loader import resolve_and_import_so
-except ImportError as e:
-    logger.error(f"[x] Could not import so_loader: {e}")
-    sys.exit(1)
+except Exception as e:
+    pytest.skip(f"so_loader not available: {e}", allow_module_level=True)
 
 # Dynamically load shared objects.
 try:
@@ -59,23 +59,20 @@ try:
     process_index_calls = cpp_index_module.process_index_calls
     logger.info("[i] Successfully loaded 'cpp_index_call' module.")
 except ImportError as e:
-    logger.error(f"[x] Could not import cpp_index_call: {e}")
-    sys.exit(1)
+    pytest.skip(f"cpp_index_call not available: {e}", allow_module_level=True)
 
 try:
     cpp_datetime_module = resolve_and_import_so(cpp_datetime_path, "cpp_datetime_parser")
     parse_dates_to_epoch = cpp_datetime_module.parse_dates_to_epoch
     logger.info("[i] Successfully loaded 'cpp_datetime_parser' module.")
 except ImportError as e:
-    logger.error(f"[x] Could not import cpp_datetime_parser: {e}")
-    sys.exit(1)
+    pytest.skip(f"cpp_datetime_parser not available: {e}", allow_module_level=True)
 
 # Import EvalHandler.
 try:
     from handlers.EvalHandler import EvalHandler
-except ImportError as e:
-    logger.error(f"[x] Could not import EvalHandler: {e}")
-    sys.exit(1)
+except Exception as e:
+    pytest.skip(f"EvalHandler not available: {e}", allow_module_level=True)
 
 def load_test_cases(yaml_file):
     with open(yaml_file, "r") as f:

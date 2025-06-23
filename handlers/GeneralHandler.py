@@ -1823,7 +1823,7 @@ class GeneralHandler:
     def execute_bin(df: pd.DataFrame, field: str, span: str) -> pd.DataFrame:
         """Bin a field into the provided span using pandas floor."""
         try:
-            df[field] = pd.to_datetime(df[field], errors="ignore").dt.floor(span)
+            df[field] = pd.to_datetime(df[field]).dt.floor(span)
         except Exception as e:
             logging.error(f"[x] BIN failed: {e}")
         return df

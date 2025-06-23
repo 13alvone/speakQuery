@@ -134,6 +134,53 @@ class speakQueryListener(ParseTreeListener):
         self.macro_handler = MacroHandler()
         self.multisearch_handler = MultiSearchHandler()
 
+        # Map command keywords to handler functions for cleaner dispatch
+        self._command_map = {
+            "search": self._cmd_search,
+            "where": self._cmd_search,
+            "stats": self._cmd_stats,
+            "eventstats": self._cmd_stats,
+            "streamstats": self._cmd_stats,
+            "timechart": self._cmd_timechart,
+            "eval": self._cmd_eval,
+            "head": self._cmd_head,
+            "limit": self._cmd_head,
+            "sort": self._cmd_sort,
+            "reverse": self._cmd_reverse,
+            "rex": self._cmd_rex,
+            "regex": self._cmd_regex,
+            "fields": self._cmd_fields,
+            "rename": self._cmd_rename,
+            "fieldsummary": self._cmd_fieldsummary,
+            "fillnull": self._cmd_fillnull,
+            "table": self._cmd_table,
+            "maketable": self._cmd_maketable,
+            "base64": self._cmd_base64,
+            "bin": self._cmd_bin,
+            "dedup": self._cmd_dedup,
+            "join": self._cmd_join,
+            "append": self._cmd_append,
+            "appendpipe": self._cmd_appendpipe,
+            "multisearch": self._cmd_multisearch,
+            "lookup": self._cmd_lookup,
+            "outputlookup": self._cmd_outputlookup,
+            "outputnew": self._cmd_outputnew,
+            "coalesce": self._cmd_coalesce,
+            "mvexpand": self._cmd_mvexpand,
+            "mvreverse": self._cmd_mvreverse,
+            "mvcombine": self._cmd_mvcombine,
+            "mvdedup": self._cmd_mvdedup,
+            "mvappend": self._cmd_mvappend,
+            "mvfilter": self._cmd_mvfilter,
+            "mvcount": self._cmd_mvcount,
+            "mvdc": self._cmd_mvdc,
+            "mvfind": self._cmd_mvfind,
+            "mvzip": self._cmd_mvzip,
+            "mvjoin": self._cmd_mvjoin,
+            "mvindex": self._cmd_mvindex,
+            "spath": self._cmd_spath,
+        }
+
     def enterEveryRule(self, ctx):
         """Capture the root context for later processing."""
         if isinstance(ctx, speakQueryParser.SpeakQueryContext) and self.root_ctx is None:
@@ -264,302 +311,9 @@ class speakQueryListener(ParseTreeListener):
 
     def _apply_command(self, cmd, seg_tokens, seg_str):
         """Dispatch transformation commands parsed manually."""
-        # Handle filtering directives using SearchDirective
-        if cmd in ("search", "where"):
-
-            # Extract the expression portion after the command word
-            expr = seg_str[len(cmd):].strip()
-            token_pattern = r'"[^"]*"|>=|<=|!=|=|>|<|\(|\)|,|\w+|\S'
-            tokens = re.findall(token_pattern, expr)
-            return self.search_cmd_handler.run_search(tokens, self.main_df)
-        if cmd in ("stats", "eventstats", "streamstats"):
-            return self.stats_handler.run_stats(seg_tokens, self.main_df)
-        if cmd == "timechart":
-            from handlers.ChartHandler import ChartHandler
-
-            return ChartHandler().run_timechart(seg_tokens, self.main_df)
-        if cmd == "eval":
-            from handlers.EvalHandler import EvalHandler
-
-            return EvalHandler().run_eval(seg_tokens, self.main_df)
-        if cmd in ("head", "limit"):
-            count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
-            return self.general_handler.head_call(self.main_df, count, "head")
-        if cmd == "sort":
-            cols = [c.lstrip("+-").strip(",") for c in seg_tokens[1:]]
-            direction = "+" if seg_tokens[1].startswith("+") else "-"
-            return self.general_handler.sort_df_by_columns(
-                self.main_df, cols, direction
-            )
-        if cmd == "reverse":
-            return self.general_handler.reverse_df_rows(self.main_df)
-        if cmd == "rex":
-            args = []
-            option_tokens = seg_tokens[1:-1]
-            for tok in option_tokens:
-                if "=" in tok:
-                    key, val = tok.split("=", 1)
-                    args.extend([key, "=", val])
-                else:
-                    args.append(tok)
-            if len(seg_tokens) > 1:
-                args.append(seg_tokens[-1])
-            return self.general_handler.execute_rex(self.main_df, args)
-        if cmd == "regex":
-            arg = seg_tokens[1]
-            field, regex = arg.split("=", 1)
-            return self.general_handler.filter_df_by_regex(self.main_df, field, regex)
-        if cmd == "fields":
-            mode = "+"
-            cols = []
-            for tok in seg_tokens[1:]:
-                if tok.startswith("-"):
-                    mode = "-"
-                    cols.append(tok[1:].strip(","))
-                else:
-                    cols.append(tok.strip(","))
-            return self.general_handler.filter_df_columns(self.main_df, cols, mode)
-        if cmd == "rename":
-            pairs = [p.strip() for p in " ".join(seg_tokens[1:]).split(",")]
-            for pair in pairs:
-                if "as" in pair:
-                    old, new = [s.strip() for s in pair.split("as")]
-                    self.main_df = self.general_handler.rename_column(
-                        self.main_df, old, new
-                    )
-            return self.main_df
-        if cmd == "fieldsummary":
-            return self.general_handler.execute_fieldsummary(self.main_df)
-        if cmd == "fillnull":
-            return self.general_handler.execute_fillnull(self.main_df, seg_tokens[1:])
-        if cmd == "table":
-            cols = [c.strip(",") for c in seg_tokens[1:]]
-            return self.general_handler.filter_df_columns(self.main_df, cols, "+")
-        if cmd == "maketable":
-            cols = [c.strip(",") for c in seg_tokens[1:]]
-            return self.general_handler.create_empty_dataframe(cols)
-        if cmd == "base64":
-            return self.general_handler.handle_base64(self.main_df, seg_tokens)
-        if cmd == "bin":
-            field = seg_tokens[1]
-            span = (
-                seg_tokens[seg_tokens.index("span") + 2]
-                if "span" in seg_tokens
-                else "1h"
-            )
-            return self.general_handler.execute_bin(self.main_df, field, span)
-        if cmd == "dedup":
-            args = []
-            tokens = seg_tokens[1:]
-            # Optional leading number specifying keep count
-            if tokens and re.fullmatch(r"\d+", tokens[0]):
-                args.append(int(tokens[0]))
-                tokens = tokens[1:]
-
-            # Search for consecutive flag anywhere in remaining tokens
-            consec_val = None
-            consec_idx = None
-            for i, t in enumerate(tokens):
-                if t == "consecutive":
-                    if i + 2 < len(tokens) and tokens[i + 1] == "=":
-                        consec_val = tokens[i + 2]
-                        consec_idx = i
-                        break
-                    if i + 1 < len(tokens):
-                        val_tok = tokens[i + 1]
-                        consec_val = val_tok.split("=", 1)[1] if "=" in val_tok else val_tok
-                        consec_idx = i
-                        break
-                elif t.startswith("consecutive="):
-                    consec_val = t.split("=", 1)[1]
-                    consec_idx = i
-                    break
-            if consec_idx is not None:
-                # remove consecutive tokens from list
-                if tokens[consec_idx] == "consecutive":
-                    if consec_idx + 2 < len(tokens) and tokens[consec_idx + 1] == "=":
-                        del tokens[consec_idx : consec_idx + 3]
-                    else:
-                        del tokens[consec_idx : consec_idx + 2]
-                else:
-                    tokens.pop(consec_idx)
-                args.extend(["consecutive", "=", consec_val])
-
-            # Remaining tokens should be field list separated by commas
-            fields = []
-            for tok in tokens:
-                parts = [p for p in tok.split(",") if p]
-                fields.extend(parts)
-            for i, f in enumerate(fields):
-                args.append(f)
-                if i < len(fields) - 1:
-                    args.append(",")
-
-            return self.general_handler.execute_dedup(self.main_df, args)
-        if cmd == "join":
-            join_type = "inner"
-            fields = []
-            idx = 1
-            while idx < len(seg_tokens) and seg_tokens[idx] != "[":
-                tok = seg_tokens[idx]
-                if tok.startswith("type="):
-                    join_type = tok.split("=", 1)[1]
-                else:
-                    fields.extend([x.strip(",") for x in tok.split(",") if x])
-                idx += 1
-            sub_df = None
-            if "[" in seg_tokens:
-                start = seg_tokens.index("[") + 1
-                end = seg_tokens.index("]")
-                sub_df = process_index_calls(seg_tokens[start:end])
-            if sub_df is not None:
-                return self.general_handler.execute_join(
-                    self.main_df, sub_df, fields, join_type
-                )
-            return self.main_df
-        if cmd == "append":
-            if "[" in seg_tokens:
-                start = seg_tokens.index("[") + 1
-                end = seg_tokens.index("]")
-                add_df = process_index_calls(seg_tokens[start:end])
-                return self.general_handler.execute_append(self.main_df, add_df)
-            return self.main_df
-        if cmd == "appendpipe":
-            if "[" in seg_tokens:
-                start = seg_tokens.index("[") + 1
-                end = seg_tokens.index("]")
-                sub_tokens = seg_tokens[start:end]
-                sub_df = self.run_subsearch(sub_tokens, self.main_df)
-                return self.general_handler.execute_append(self.main_df, sub_df)
-            return self.main_df
-        if cmd == "multisearch":
-            subs = []
-            idx = 1
-            while idx < len(seg_tokens):
-                if seg_tokens[idx] == "[":
-                    end = seg_tokens.index("]", idx)
-                    subs.append(seg_tokens[idx + 1 : end])
-                    idx = end + 1
-                else:
-                    idx += 1
-            return self.multisearch_handler.run_multisearch(subs, process_index_calls)
-        if cmd == "lookup":
-            filename = seg_tokens[1]
-            key = seg_tokens[2]
-            output_fields = (
-                [t.strip(",") for t in seg_tokens[4:]] if "OUTPUT" in seg_tokens else []
-            )
-            lookup_df = self.lookup_handler.load_data(
-                os.path.join(self.lookup_root, filename)
-            )
-            if lookup_df is not None:
-                self.main_df = self.general_handler.execute_join(
-                    self.main_df, lookup_df, [key], "left"
-                )
-                if output_fields:
-                    self.main_df = self.general_handler.filter_df_columns(
-                        self.main_df, self.main_df.columns.tolist(), "+"
-                    )
-            return self.main_df
-        if cmd == "outputlookup":
-            args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
-            if isinstance(args, str):
-                kwargs = {"filename": os.path.join(self.lookup_root, args)}
-            else:
-                args["filename"] = os.path.join(
-                    self.lookup_root, args.get("filename", "output.csv")
-                )
-                kwargs = args
-            self.general_handler.execute_outputlookup(self.main_df, **kwargs)
-            return self.main_df
-        if cmd == "outputnew":
-            filename = seg_tokens[1].strip('"').strip("'")
-            path = os.path.join(self.lookup_root, filename)
-            self.general_handler.execute_outputnew(self.main_df, path)
-            return self.main_df
-        if cmd == "coalesce":
-            if "(" in seg_str and ")" in seg_str:
-                inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
-                fields = [f.strip().strip(",") for f in inside.split(",")]
-            else:
-                fields = [t.strip(",") for t in seg_tokens[1:]]
-            return self.general_handler.execute_coalesce(self.main_df, fields)
-        if cmd == "mvexpand":
-            field = seg_tokens[1]
-            return self.general_handler.execute_mvexpand(self.main_df, field)
-        if cmd == "mvreverse":
-            field = seg_tokens[1]
-            return self.general_handler.execute_mvreverse(self.main_df, field)
-        if cmd == "mvcombine":
-            field = None
-            delim = " "
-            for t in seg_tokens[1:]:
-                if t.startswith("delim="):
-                    delim = t.split("=", 1)[1].strip('"')
-                else:
-                    field = t.strip(",")
-            if field:
-                return self.general_handler.execute_mvcombine(
-                    self.main_df, field, delim
-                )
-            return self.main_df
-        if cmd == "mvdedup":
-            field = seg_tokens[1]
-            return self.general_handler.execute_mvdedup(self.main_df, field)
-        if cmd == "mvappend":
-            fields = [t.strip(",") for t in seg_tokens[1:]]
-            return self.general_handler.execute_mvappend(
-                self.main_df, fields, fields[0]
-            )
-        if cmd == "mvfilter":
-            field = seg_tokens[1]
-            value = (
-                seg_tokens[2].split("=")[1] if "=" in seg_tokens[2] else seg_tokens[2]
-            )
-            return self.general_handler.execute_mvfilter(self.main_df, field, value)
-        if cmd == "mvcount":
-            field = seg_tokens[1]
-            return self.general_handler.execute_mvcount(
-                self.main_df, field, f"{field}_count"
-            )
-        if cmd == "mvdc":
-            field = seg_tokens[1]
-            return self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
-        if cmd == "mvfind":
-            field = seg_tokens[1]
-            pattern = seg_tokens[2] if len(seg_tokens) > 2 else ""
-            return self.general_handler.execute_mvfind(self.main_df, field, pattern)
-        if cmd == "mvzip":
-            field1 = seg_tokens[1].rstrip(",")
-            field2 = seg_tokens[2].rstrip(",")
-            delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else "_"
-            return self.general_handler.execute_mvzip(
-                self.main_df, field1, field2, delim, "mvzip"
-            )
-        if cmd == "mvjoin":
-            field = seg_tokens[1]
-            delim = seg_tokens[2].split("=")[1] if len(seg_tokens) > 2 else " "
-            return self.general_handler.execute_mvjoin(self.main_df, field, delim)
-        if cmd == "mvindex":
-            field = seg_tokens[1]
-            idxs = [int(i.strip(",")) for i in seg_tokens[2:]]
-            return self.general_handler.execute_mvindex(
-                self.main_df, field, idxs, "mvindex"
-            )
-        if cmd == "spath":
-            params = {}
-            for tok in seg_tokens[1:]:
-                if "=" in tok:
-                    key, val = tok.split("=", 1)
-                    params[key.lower()] = val
-            input_col = params.get("input")
-            output_col = params.get("output")
-            json_path = params.get("path")
-            if input_col and output_col and json_path:
-                return self.general_handler.execute_spath(
-                    self.main_df, input_col, output_col, json_path
-                )
-            return self.main_df
+        handler = self._command_map.get(cmd)
+        if handler:
+            return handler(seg_tokens, seg_str)
         if cmd in ("if_", "case", "tonumber"):
             from handlers.EvalHandler import EvalHandler
 
@@ -576,6 +330,293 @@ class speakQueryListener(ParseTreeListener):
         logging.warning(f"[!] Unhandled transformation '{cmd}', ignoring")
         return self.main_df
 
+    # Individual command handlers
+    def _cmd_search(self, seg_tokens, seg_str):
+        expr = seg_str[len(seg_tokens[0].split("(")[0]):].strip()
+        pattern = r'"[^\"]*"|>=|<=|!=|=|>|<|\(|\)|,|\w+|\S'
+        tokens = re.findall(pattern, expr)
+        return self.search_cmd_handler.run_search(tokens, self.main_df)
+
+    def _cmd_stats(self, seg_tokens, _):
+        return self.stats_handler.run_stats(seg_tokens, self.main_df)
+
+    def _cmd_timechart(self, seg_tokens, _):
+        from handlers.ChartHandler import ChartHandler
+        return ChartHandler().run_timechart(seg_tokens, self.main_df)
+
+    def _cmd_eval(self, seg_tokens, _):
+        from handlers.EvalHandler import EvalHandler
+        return EvalHandler().run_eval(seg_tokens, self.main_df)
+
+    def _cmd_head(self, seg_tokens, _):
+        count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
+        return self.general_handler.head_call(self.main_df, count, "head")
+
+    def _cmd_sort(self, seg_tokens, _):
+        cols = [c.lstrip("+-").strip(",") for c in seg_tokens[1:]]
+        direction = "+" if seg_tokens[1].startswith("+") else "-"
+        return self.general_handler.sort_df_by_columns(self.main_df, cols, direction)
+
+    def _cmd_reverse(self, seg_tokens, _):
+        return self.general_handler.reverse_df_rows(self.main_df)
+
+    def _cmd_rex(self, seg_tokens, _):
+        args = []
+        for tok in seg_tokens[1:-1]:
+            if "=" in tok:
+                key, val = tok.split("=", 1)
+                args.extend([key, "=", val])
+            else:
+                args.append(tok)
+        if len(seg_tokens) > 1:
+            args.append(seg_tokens[-1])
+        return self.general_handler.execute_rex(self.main_df, args)
+
+    def _cmd_regex(self, seg_tokens, _):
+        field, regex = seg_tokens[1].split("=", 1)
+        return self.general_handler.filter_df_by_regex(self.main_df, field, regex)
+
+    def _cmd_fields(self, seg_tokens, _):
+        mode = "+"
+        cols = []
+        for tok in seg_tokens[1:]:
+            if tok.startswith("-"):
+                mode = "-"
+                cols.append(tok[1:].strip(","))
+            else:
+                cols.append(tok.strip(","))
+        return self.general_handler.filter_df_columns(self.main_df, cols, mode)
+
+    def _cmd_rename(self, seg_tokens, _):
+        pairs = [p.strip() for p in " ".join(seg_tokens[1:]).split(",")]
+        for pair in pairs:
+            if "as" in pair:
+                old, new = [s.strip() for s in pair.split("as")]
+                self.main_df = self.general_handler.rename_column(self.main_df, old, new)
+        return self.main_df
+
+    def _cmd_fieldsummary(self, seg_tokens, _):
+        return self.general_handler.execute_fieldsummary(self.main_df)
+
+    def _cmd_fillnull(self, seg_tokens, _):
+        return self.general_handler.execute_fillnull(self.main_df, seg_tokens[1:])
+
+    def _cmd_table(self, seg_tokens, _):
+        cols = [c.strip(",") for c in seg_tokens[1:]]
+        return self.general_handler.filter_df_columns(self.main_df, cols, "+")
+
+    def _cmd_maketable(self, seg_tokens, _):
+        cols = [c.strip(",") for c in seg_tokens[1:]]
+        return self.general_handler.create_empty_dataframe(cols)
+
+    def _cmd_base64(self, seg_tokens, _):
+        return self.general_handler.handle_base64(self.main_df, seg_tokens)
+
+    def _cmd_bin(self, seg_tokens, _):
+        field = seg_tokens[1]
+        span = seg_tokens[seg_tokens.index("span") + 2] if "span" in seg_tokens else "1h"
+        return self.general_handler.execute_bin(self.main_df, field, span)
+
+    def _cmd_dedup(self, seg_tokens, _):
+        args = []
+        tokens = seg_tokens[1:]
+        if tokens and re.fullmatch(r"\d+", tokens[0]):
+            args.append(int(tokens[0]))
+            tokens = tokens[1:]
+        consec_val = None
+        consec_idx = None
+        for i, t in enumerate(tokens):
+            if t == "consecutive":
+                if i + 2 < len(tokens) and tokens[i + 1] == "=":
+                    consec_val = tokens[i + 2]
+                    consec_idx = i
+                    break
+                if i + 1 < len(tokens):
+                    val_tok = tokens[i + 1]
+                    consec_val = val_tok.split("=", 1)[1] if "=" in val_tok else val_tok
+                    consec_idx = i
+                    break
+            elif t.startswith("consecutive="):
+                consec_val = t.split("=", 1)[1]
+                consec_idx = i
+                break
+        if consec_idx is not None:
+            if tokens[consec_idx] == "consecutive":
+                if consec_idx + 2 < len(tokens) and tokens[consec_idx + 1] == "=":
+                    del tokens[consec_idx : consec_idx + 3]
+                else:
+                    del tokens[consec_idx : consec_idx + 2]
+            else:
+                tokens.pop(consec_idx)
+            args.extend(["consecutive", "=", consec_val])
+        fields = []
+        for tok in tokens:
+            parts = [p for p in tok.split(",") if p]
+            fields.extend(parts)
+        for i, f in enumerate(fields):
+            args.append(f)
+            if i < len(fields) - 1:
+                args.append(",")
+        return self.general_handler.execute_dedup(self.main_df, args)
+
+    def _cmd_join(self, seg_tokens, _):
+        join_type = "inner"
+        fields = []
+        idx = 1
+        while idx < len(seg_tokens) and seg_tokens[idx] != "[":
+            tok = seg_tokens[idx]
+            if tok.startswith("type="):
+                join_type = tok.split("=", 1)[1]
+            else:
+                fields.extend([x.strip(",") for x in tok.split(",") if x])
+            idx += 1
+        sub_df = None
+        if "[" in seg_tokens:
+            start = seg_tokens.index("[") + 1
+            end = seg_tokens.index("]")
+            sub_df = process_index_calls(seg_tokens[start:end])
+        if sub_df is not None:
+            return self.general_handler.execute_join(self.main_df, sub_df, fields, join_type)
+        return self.main_df
+
+    def _cmd_append(self, seg_tokens, _):
+        if "[" in seg_tokens:
+            start = seg_tokens.index("[") + 1
+            end = seg_tokens.index("]")
+            add_df = process_index_calls(seg_tokens[start:end])
+            return self.general_handler.execute_append(self.main_df, add_df)
+        return self.main_df
+
+    def _cmd_appendpipe(self, seg_tokens, _):
+        if "[" in seg_tokens:
+            start = seg_tokens.index("[") + 1
+            end = seg_tokens.index("]")
+            sub_tokens = seg_tokens[start:end]
+            sub_df = self.run_subsearch(sub_tokens, self.main_df)
+            return self.general_handler.execute_append(self.main_df, sub_df)
+        return self.main_df
+
+    def _cmd_multisearch(self, seg_tokens, _):
+        subs = []
+        idx = 1
+        while idx < len(seg_tokens):
+            if seg_tokens[idx] == "[":
+                end = seg_tokens.index("]", idx)
+                subs.append(seg_tokens[idx + 1 : end])
+                idx = end + 1
+            else:
+                idx += 1
+        return self.multisearch_handler.run_multisearch(subs, process_index_calls)
+
+    def _cmd_lookup(self, seg_tokens, _):
+        filename = seg_tokens[1]
+        key = seg_tokens[2]
+        output_fields = [t.strip(",") for t in seg_tokens[4:]] if "OUTPUT" in seg_tokens else []
+        lookup_df = self.lookup_handler.load_data(os.path.join(self.lookup_root, filename))
+        if lookup_df is not None:
+            self.main_df = self.general_handler.execute_join(self.main_df, lookup_df, [key], "left")
+            if output_fields:
+                self.main_df = self.general_handler.filter_df_columns(self.main_df, self.main_df.columns.tolist(), "+")
+        return self.main_df
+
+    def _cmd_outputlookup(self, seg_tokens, _):
+        args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
+        if isinstance(args, str):
+            kwargs = {"filename": os.path.join(self.lookup_root, args)}
+        else:
+            args["filename"] = os.path.join(self.lookup_root, args.get("filename", "output.csv"))
+            kwargs = args
+        self.general_handler.execute_outputlookup(self.main_df, **kwargs)
+        return self.main_df
+
+    def _cmd_outputnew(self, seg_tokens, _):
+        filename = seg_tokens[1].strip('"').strip("'")
+        path = os.path.join(self.lookup_root, filename)
+        self.general_handler.execute_outputnew(self.main_df, path)
+        return self.main_df
+
+    def _cmd_coalesce(self, seg_tokens, seg_str):
+        if "(" in seg_str and ")" in seg_str:
+            inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
+            fields = [f.strip().strip(",") for f in inside.split(",")]
+        else:
+            fields = [t.strip(",") for t in seg_tokens[1:]]
+        return self.general_handler.execute_coalesce(self.main_df, fields)
+
+    def _cmd_mvexpand(self, seg_tokens, _):
+        field = seg_tokens[1]
+        return self.general_handler.execute_mvexpand(self.main_df, field)
+
+    def _cmd_mvreverse(self, seg_tokens, _):
+        field = seg_tokens[1]
+        return self.general_handler.execute_mvreverse(self.main_df, field)
+
+    def _cmd_mvcombine(self, seg_tokens, _):
+        field = None
+        delim = " "
+        for t in seg_tokens[1:]:
+            if t.startswith("delim="):
+                delim = t.split("=", 1)[1].strip('"')
+            else:
+                field = t.strip(",")
+        if field:
+            return self.general_handler.execute_mvcombine(self.main_df, field, delim)
+        return self.main_df
+
+    def _cmd_mvdedup(self, seg_tokens, _):
+        field = seg_tokens[1]
+        return self.general_handler.execute_mvdedup(self.main_df, field)
+
+    def _cmd_mvappend(self, seg_tokens, _):
+        fields = [t.strip(",") for t in seg_tokens[1:]]
+        return self.general_handler.execute_mvappend(self.main_df, fields, fields[0])
+
+    def _cmd_mvfilter(self, seg_tokens, _):
+        field = seg_tokens[1]
+        value = seg_tokens[2].split("=")[1] if "=" in seg_tokens[2] else seg_tokens[2]
+        return self.general_handler.execute_mvfilter(self.main_df, field, value)
+
+    def _cmd_mvcount(self, seg_tokens, _):
+        field = seg_tokens[1]
+        return self.general_handler.execute_mvcount(self.main_df, field, f"{field}_count")
+
+    def _cmd_mvdc(self, seg_tokens, _):
+        field = seg_tokens[1]
+        return self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
+
+    def _cmd_mvfind(self, seg_tokens, _):
+        field = seg_tokens[1]
+        pattern = seg_tokens[2] if len(seg_tokens) > 2 else ""
+        return self.general_handler.execute_mvfind(self.main_df, field, pattern)
+
+    def _cmd_mvzip(self, seg_tokens, _):
+        field1 = seg_tokens[1].rstrip(",")
+        field2 = seg_tokens[2].rstrip(",")
+        delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else "_"
+        return self.general_handler.execute_mvzip(self.main_df, field1, field2, delim, "mvzip")
+
+    def _cmd_mvjoin(self, seg_tokens, _):
+        field = seg_tokens[1]
+        delim = seg_tokens[2].split("=")[1] if len(seg_tokens) > 2 else " "
+        return self.general_handler.execute_mvjoin(self.main_df, field, delim)
+
+    def _cmd_mvindex(self, seg_tokens, _):
+        field = seg_tokens[1]
+        idxs = [int(i.strip(",")) for i in seg_tokens[2:]]
+        return self.general_handler.execute_mvindex(self.main_df, field, idxs, "mvindex")
+
+    def _cmd_spath(self, seg_tokens, _):
+        params = {}
+        for tok in seg_tokens[1:]:
+            if "=" in tok:
+                key, val = tok.split("=", 1)
+                params[key.lower()] = val
+        input_col = params.get("input")
+        output_col = params.get("output")
+        json_path = params.get("path")
+        if input_col and output_col and json_path:
+            return self.general_handler.execute_spath(self.main_df, input_col, output_col, json_path)
+        return self.main_df
     # Enter a parse tree produced by speakQueryParser#initialSequence.
     def enterInitialSequence(self, ctx: speakQueryParser.InitialSequenceContext):
         self.initial_sequence_enabled = True
