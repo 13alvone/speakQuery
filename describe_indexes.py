@@ -5,7 +5,7 @@ from subprocess import check_output
 from typing import Generator
 import logging
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def explore_directory() -> str:

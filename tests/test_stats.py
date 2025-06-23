@@ -18,8 +18,6 @@ import yaml
 import pandas as pd
 import time
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 logger = logging.getLogger("test_stats")
 
 

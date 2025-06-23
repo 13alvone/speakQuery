@@ -9,7 +9,7 @@ from typing import Callable, Dict, Any
 import pandas as pd
 import shlex
 
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+logger = logging.getLogger(__name__)
 
 
 class MacroHandler:

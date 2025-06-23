@@ -40,8 +40,7 @@ if "." in __name__:
 else:
     from antlr4_active.speakQueryParser import speakQueryParser
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------------------------------------

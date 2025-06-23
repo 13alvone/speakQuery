@@ -3,8 +3,8 @@
 import jpype
 import logging
 
-# Initialize logging
-logging.basicConfig(level=logging.INFO)
+# Module-specific logger
+logger = logging.getLogger(__name__)
 
 # Module-level variables
 _java_classes_cache = {}

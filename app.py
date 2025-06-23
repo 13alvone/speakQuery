@@ -73,8 +73,6 @@ UUID_REGEX = re.compile(
     r'^[0-9]{10}\.[0-9]{6,7}_[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
 )
 
-# Configure logging
-logging.basicConfig(level=app.config['LOG_LEVEL'], format='[%(levelname)s] %(message)s')
 
 # Ensure temp directory exists
 os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
@@ -1153,6 +1151,11 @@ if __name__ == '__main__':
     delete_old_files()
     initialize_database()
     load_settings_into_config()  # Load settings into app.config
+    # Configure logging now that app config is available
+    logging.basicConfig(
+        level=app.config['LOG_LEVEL'],
+        format='[%(levelname)s] %(message)s',
+    )
     # start_background_engines()  # Initialize Background Engines as Services
     # Allow FLASK_DEBUG environment variable to override default debug mode
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in {'1', 'true', 't'}

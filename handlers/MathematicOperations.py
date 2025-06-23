@@ -13,9 +13,8 @@ import ast
 from typing import Union, List
 import numpy as np
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logger = logging.getLogger()
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class MathHandler:
     def __init__(self):

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import logging
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def generate_parquet_files():

@@ -16,7 +16,6 @@ class LookupHandler:
         logger (logging.Logger): Optional logger instance. If None, a default logger will be configured.
         """
         if logger is None:
-            logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
             self.logger = logging.getLogger('DataLoader')
         else:
             self.logger = logger

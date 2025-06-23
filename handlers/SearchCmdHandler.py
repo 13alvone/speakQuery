@@ -25,7 +25,7 @@ import re
 import pandas as pd
 from typing import List, Optional
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class SearchDirective:

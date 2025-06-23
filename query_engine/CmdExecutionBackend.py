@@ -24,8 +24,7 @@ uuid_regex = re.compile(r'^[0-9]{10}\.[0-9a-fA-F]{6,7}_[0-9a-fA-F]{8}(-[0-9a-fA-
 target_db = 'saved_searches.db'
 conn = ''
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def run_query_and_return_results_df(query):
