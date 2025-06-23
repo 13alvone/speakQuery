@@ -134,6 +134,16 @@ class speakQueryListener(ParseTreeListener):
         self.macro_handler = MacroHandler()
         self.multisearch_handler = MultiSearchHandler()
 
+    def enterEveryRule(self, ctx):
+        """Capture the root context for later processing."""
+        if isinstance(ctx, speakQueryParser.SpeakQueryContext) and self.root_ctx is None:
+            self.root_ctx = ctx
+
+    def exitEveryRule(self, ctx):
+        """Manually invoke exitSpeakQuery since generated listeners are absent."""
+        if isinstance(ctx, speakQueryParser.SpeakQueryContext):
+            self.exitSpeakQuery(ctx)
+
     # Exit a parse tree produced by speakQueryParser#speakQuery.
     def exitSpeakQuery(self, ctx: speakQueryParser.SpeakQueryContext):
         """Top level exit hook used by the parser.
@@ -476,10 +486,8 @@ class speakQueryListener(ParseTreeListener):
                 name, arg_str = macro_body, ""
             args = self.macro_handler.parse_arguments(arg_str)
             return self.macro_handler.execute_macro(name, args, self.main_df)
-        logging.warning(f"[!] Unhandled transformation '{cmd}', defaulting to eval")
-        from handlers.EvalHandler import EvalHandler
-
-        return EvalHandler().run_eval(seg_tokens, self.main_df)
+        logging.warning(f"[!] Unhandled transformation '{cmd}', ignoring")
+        return self.main_df
 
     # Enter a parse tree produced by speakQueryParser#initialSequence.
     def enterInitialSequence(self, ctx: speakQueryParser.InitialSequenceContext):
@@ -859,5 +867,4 @@ class speakQueryListener(ParseTreeListener):
         return normalized
 
 
-# Clean up parser import to prevent circular imports
-del speakQueryParser
+# Retain parser reference for isinstance checks

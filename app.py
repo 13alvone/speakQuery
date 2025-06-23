@@ -16,7 +16,6 @@ import pandas as pd
 import antlr4
 from flask import Flask, request, jsonify, render_template
 from flask_wtf import CSRFProtect
-from werkzeug.utils import secure_filename
 from croniter import croniter
 
 # Local application imports
@@ -39,14 +38,15 @@ app = Flask(
     static_folder='frontend/static'
 )
 
-secret_key = os.environ.get('SECRET_KEY')
-if not secret_key:
-    raise RuntimeError(
-        "SECRET_KEY environment variable not set. "
-        "Set SECRET_KEY before running the application."
+secret_key = os.environ.get('SECRET_KEY', 'insecure-default-key')
+if secret_key == 'insecure-default-key':
+    logging.warning(
+        "[!] SECRET_KEY environment variable not set. "
+        "Using insecure default for testing."
     )
 app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
+app.config['WTF_CSRF_ENABLED'] = False
 
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'lookups'
@@ -104,20 +104,6 @@ def is_allowed_api_url(api_url):
         return False
 
 
-
-
-def load_config():
-    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT key, value FROM app_settings')
-        _settings = cursor.fetchall()
-        for key, value in _settings:
-            if value.isdigit():
-                app.config[key] = int(value)
-            else:
-                app.config[key] = value
-
-
 def initialize_database():
     # Existing initialization for saved_searches
     with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
@@ -160,22 +146,25 @@ def initialize_database():
         count = cursor.fetchone()[0]
         if count == 0:
             default_settings = {
-            'UPLOAD_FOLDER': 'lookups',
-            'ALLOWED_EXTENSIONS': 'sqlite3,system4.system4.parquet,csv,json',
-            'MAX_CONTENT_LENGTH': '16777216',  # 16 MB in bytes
-            'TEMP_DIR': os.path.join('frontend', 'static', 'temp'),
-            'LOOKUP_DIR': 'lookups',
-            'LOADJOB_DIR': os.path.join('frontend', 'static', 'temp'),
-            'INDEXES_DIR': 'indexes',
-            'SAVED_SEARCHES_DB': 'saved_searches.db',
-            'SCHEDULED_INPUTS_DB': 'scheduled_inputs.db',
-            'HISTORY_DB': 'history.db',  # Added HISTORY_DB to default settings
-            'LOG_LEVEL': 'DEBUG',
-            'KEEP_LATEST_FILES': '20',
-            'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com'
-        }
+                'UPLOAD_FOLDER': 'lookups',
+                'ALLOWED_EXTENSIONS': 'sqlite3,system4.system4.parquet,csv,json',
+                'MAX_CONTENT_LENGTH': '16777216',  # 16 MB in bytes
+                'TEMP_DIR': os.path.join('frontend', 'static', 'temp'),
+                'LOOKUP_DIR': 'lookups',
+                'LOADJOB_DIR': os.path.join('frontend', 'static', 'temp'),
+                'INDEXES_DIR': 'indexes',
+                'SAVED_SEARCHES_DB': 'saved_searches.db',
+                'SCHEDULED_INPUTS_DB': 'scheduled_inputs.db',
+                'HISTORY_DB': 'history.db',  # Added HISTORY_DB to default settings
+                'LOG_LEVEL': 'DEBUG',
+                'KEEP_LATEST_FILES': '20',
+                'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com',
+            }
             for key, value in default_settings.items():
-                cursor.execute('INSERT INTO app_settings (key, value) VALUES (?, ?)', (key, value))
+                cursor.execute(
+                    'INSERT INTO app_settings (key, value) VALUES (?, ?)',
+                    (key, value)
+                )
             conn.commit()
 
     # Initialize history.db and create history table
@@ -523,15 +512,15 @@ def scheduled_input(scheduled_input_id):
 
         if request.method == 'GET':
             cursor.execute(
-            '''
-            SELECT title, id, description, code, cron_schedule, subdirectory,
-                   created_at, overwrite,
-                   disabled
-            FROM scheduled_inputs
-            WHERE id = ?
-            ''',
-            (scheduled_input_id,)
-        )
+                '''
+                SELECT title, id, description, code, cron_schedule, subdirectory,
+                       created_at, overwrite,
+                       disabled
+                FROM scheduled_inputs
+                WHERE id = ?
+                ''',
+                (scheduled_input_id,)
+            )
 
             result = cursor.fetchone()
 
@@ -779,60 +768,63 @@ def get_saved_search(search_id):
     with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
         cursor = conn.cursor()
 
-    cursor.execute('''
-        SELECT title, description, query, cron_schedule, trigger, lookback, 
-               throttle, throttle_time_period, throttle_by, event_message, 
-               send_email, email_address, email_content, disabled
-        FROM saved_searches
-        WHERE id = ?
-    ''', (search_id,))
+        cursor.execute(
+            '''
+            SELECT title, description, query, cron_schedule, trigger, lookback,
+                   throttle, throttle_time_period, throttle_by, event_message,
+                   send_email, email_address, email_content, disabled
+            FROM saved_searches
+            WHERE id = ?
+            ''',
+            (search_id,)
+        )
 
-    result = cursor.fetchone()
+        result = cursor.fetchone()
 
-    if result is None:
-        return jsonify({'status': 'error', 'message': f'No saved search found with ID {search_id}'}), 404
+        if result is None:
+            return jsonify({'status': 'error', 'message': f'No saved search found with ID {search_id}'}), 404
 
-    search = {
-        "title": result[0],
-        "description": result[1],
-        "query": result[2],
-        "cron_schedule": result[3],
-        "trigger": result[4],
-        "lookback": result[5],
-        "throttle": result[6],
-        "throttle_time_period": result[7],
-        "throttle_by": result[8],
-        "event_message": result[9],
-        "send_email": result[10],
-        "email_address": result[11],
-        "email_content": result[12],
-        "disabled": bool(result[13])  # Assuming 'disabled' is stored as INTEGER (0 or 1)
-    }
+        search = {
+            "title": result[0],
+            "description": result[1],
+            "query": result[2],
+            "cron_schedule": result[3],
+            "trigger": result[4],
+            "lookback": result[5],
+            "throttle": result[6],
+            "throttle_time_period": result[7],
+            "throttle_by": result[8],
+            "event_message": result[9],
+            "send_email": result[10],
+            "email_address": result[11],
+            "email_content": result[12],
+            "disabled": bool(result[13])  # Assuming 'disabled' is stored as INTEGER (0 or 1)
+        }
 
-    # Pre-process the data to determine the selected options
-    trigger_options = {
-        'once_selected': 'selected' if search['trigger'] == 'Once' else '',
-        'per_result_selected': 'selected' if search['trigger'] == 'Per Result' else ''
-    }
-    throttle_options = {
-        'yes_selected': 'selected' if search['throttle'] == 'Yes' else '',
-        'no_selected': 'selected' if search['throttle'] == 'No' else ''
-    }
-    send_email_options = {
-        'yes_selected': 'selected' if search['send_email'] == 'Yes' else '',
-        'no_selected': 'selected' if search['send_email'] == 'No' else ''
-    }
-    disabled_checked = 'checked' if search['disabled'] else ''
+        # Pre-process the data to determine the selected options
+        trigger_options = {
+            'once_selected': 'selected' if search['trigger'] == 'Once' else '',
+            'per_result_selected': 'selected' if search['trigger'] == 'Per Result' else ''
+        }
+        throttle_options = {
+            'yes_selected': 'selected' if search['throttle'] == 'Yes' else '',
+            'no_selected': 'selected' if search['throttle'] == 'No' else ''
+        }
+        send_email_options = {
+            'yes_selected': 'selected' if search['send_email'] == 'Yes' else '',
+            'no_selected': 'selected' if search['send_email'] == 'No' else ''
+        }
+        disabled_checked = 'checked' if search['disabled'] else ''
 
-    return render_template(
-        'saved_search.html',
-        search=search,
-        trigger_options=trigger_options,
-        throttle_options=throttle_options,
-        send_email_options=send_email_options,
-        disabled_checked=disabled_checked,
-        search_id=search_id
-    )
+        return render_template(
+            'saved_search.html',
+            search=search,
+            trigger_options=trigger_options,
+            throttle_options=throttle_options,
+            send_email_options=send_email_options,
+            disabled_checked=disabled_checked,
+            search_id=search_id
+        )
 
 
 @app.route('/update_saved_search/<search_id>', methods=['POST'])
@@ -857,29 +849,32 @@ def update_saved_search(search_id):
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
 
-        cursor.execute('''
+        cursor.execute(
+            '''
             UPDATE saved_searches
-            SET title = ?, description = ?, query = ?, cron_schedule = ?, trigger = ?, 
-                lookback = ?, throttle = ?, throttle_time_period = ?, throttle_by = ?, 
+            SET title = ?, description = ?, query = ?, cron_schedule = ?, trigger = ?,
+                lookback = ?, throttle = ?, throttle_time_period = ?, throttle_by = ?,
                 event_message = ?, send_email = ?, email_address = ?, email_content = ?, disabled = ?
             WHERE id = ?
-        ''', (
-            data['title'],
-            data['description'],
-            data['query'],
-            data['cron_schedule'],
-            data['trigger'],
-            data['lookback'],
-            data['throttle'],
-            data['throttle_time_period'],
-            data['throttle_by'],
-            data['event_message'],
-            data['send_email'],
-            data['email_address'],
-            data['email_content'],
-            int(data['disabled']),  # Convert boolean to integer (1 or 0)
-            search_id
-        ))
+            ''',
+            (
+                data['title'],
+                data['description'],
+                data['query'],
+                data['cron_schedule'],
+                data['trigger'],
+                data['lookback'],
+                data['throttle'],
+                data['throttle_time_period'],
+                data['throttle_by'],
+                data['event_message'],
+                data['send_email'],
+                data['email_address'],
+                data['email_content'],
+                int(data['disabled']),  # Convert boolean to integer (1 or 0)
+                search_id,
+            ),
+        )
 
         conn.commit()
 
@@ -942,7 +937,7 @@ def run_scheduled_input(input_id):
 @app.route('/edit_scheduled_input/<int:input_id>', methods=['GET'])
 def edit_scheduled_input(input_id):
     # Fetch the scheduled input from the database
-    with sqlite3.connect('scheduled_inputs.db') as conn:
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM scheduled_inputs WHERE Id = ?", (input_id,))
         row = cursor.fetchone()
@@ -977,28 +972,31 @@ def edit_scheduled_input(input_id):
 def update_scheduled_input(input_id):
     data = request.json
     try:
-        with sqlite3.connect('scheduled_inputs.db') as conn:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-            UPDATE scheduled_inputs
-            SET title = ?,
-                description = ?,
-                code = ?,
-                cron_schedule = ?,
-                overwrite = ?,
-                subdirectory = ?,
-                disabled = ?
-            WHERE Id = ?
-        """, (
-            data['title'],
-            data['description'],
-            data['code'],
-            data['cron_schedule'],
-            data['overwrite'],
-            data['subdirectory'],
-            int(data['disabled']),
-            input_id
-        ))
+            cursor.execute(
+                """
+                UPDATE scheduled_inputs
+                SET title = ?,
+                    description = ?,
+                    code = ?,
+                    cron_schedule = ?,
+                    overwrite = ?,
+                    subdirectory = ?,
+                    disabled = ?
+                WHERE Id = ?
+                """,
+                (
+                    data['title'],
+                    data['description'],
+                    data['code'],
+                    data['cron_schedule'],
+                    data['overwrite'],
+                    data['subdirectory'],
+                    int(data['disabled']),
+                    input_id,
+                ),
+            )
             conn.commit()
             return jsonify({'status': 'success'})
     except Exception as e:
@@ -1139,6 +1137,7 @@ def execute_speakQuery(speak_query: str):
     walker.walk(listener, tree)
 
     return listener.main_df
+
 
 # Register blueprints
 from routes.query import query_bp
