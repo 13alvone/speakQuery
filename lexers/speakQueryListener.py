@@ -28,6 +28,11 @@ from handlers.SearchCmdHandler import SearchDirective
 from handlers.StatsHandler import StatsHandler
 from handlers.MacroHandler import MacroHandler
 from handlers.MultiSearchHandler import MultiSearchHandler
+from utils.tree_helpers import (
+    ctx_flatten,
+    flatten_list,
+    flatten_with_parens,
+)
 
 # Import speakQueryParser (support for relative or absolute import)
 if "." in __name__:
@@ -214,7 +219,7 @@ class speakQueryListener(ParseTreeListener):
         self.validate_exceptions(ctx)
 
         # Flatten to get tokens for index vs. transformations
-        flattened = self.ctx_flatten(self.root_ctx)
+        flattened = ctx_flatten(self.root_ctx, self.extract_screenshot_of_ctx)
         tokens = [t for t in flattened if t != "<EOF>"]
 
         # Skip a leading pipe if present
@@ -629,7 +634,9 @@ class speakQueryListener(ParseTreeListener):
 
     # Exit a parse tree produced by speakQueryParser#expression.
     def exitExpression(self, ctx: speakQueryParser.ExpressionContext):
-        current_parsed_index_call = self.ctx_flatten(ctx)
+        current_parsed_index_call = ctx_flatten(
+            ctx, self.extract_screenshot_of_ctx
+        )
         current_index_call = "".join(current_parsed_index_call).replace(" ", "")
         if current_index_call == self.original_index_call:
             # Use the dynamically loaded process_index_calls function
@@ -686,7 +693,9 @@ class speakQueryListener(ParseTreeListener):
 
     # Exit a parse tree produced by speakQueryParser#inputlookupInit.
     def exitInputlookupInit(self, ctx: speakQueryParser.InputlookupInitContext):
-        self.current_inputlookup_call = self.ctx_flatten(ctx)
+        self.current_inputlookup_call = ctx_flatten(
+            ctx, self.extract_screenshot_of_ctx
+        )
         self.current_inputlookup_filename = (
             self.current_inputlookup_call[-1].strip().strip('"')
         )
@@ -698,7 +707,9 @@ class speakQueryListener(ParseTreeListener):
 
     # Exit a parse tree produced by speakQueryParser#loadjobInit.
     def exitLoadjobInit(self, ctx: speakQueryParser.LoadjobInitContext):
-        self.current_loadjob_call = self.ctx_flatten(ctx)
+        self.current_loadjob_call = ctx_flatten(
+            ctx, self.extract_screenshot_of_ctx
+        )
         self.current_loadjob_filename = self.current_loadjob_call[-1].strip("'").strip()
         self.current_loadjob_path = (
             f"{self.loadjob_root}/{self.current_loadjob_filename}"
@@ -805,31 +816,6 @@ class speakQueryListener(ParseTreeListener):
         logging.error(f'[x] Failure at "{obj_failure}". {err_msg}')
         raise RuntimeError(f'Failure at "{obj_failure}". {err_msg}')
 
-    # CRITICAL COMPONENT
-    def ctx_flatten(self, ctx):
-        """
-        Flattens the parse tree context and returns a normalized list of tokens.
-        It uses extract_screenshot_of_ctx() and flatten_with_parens() to produce a token list,
-        then normalizes the tokens by:
-          - Stripping extra whitespace from each token.
-          - Collapsing spaces between function names and the opening parenthesis.
-
-        This ensures that tokens like "lower ( userRole )" become "lower(userRole)"
-        for consistent downstream processing.
-        """
-        # Flatten the context while preserving parentheses
-        flattened = self.flatten_with_parens(self.extract_screenshot_of_ctx(ctx))
-
-        # Normalize tokens: strip whitespace and collapse identifier-parenthesis spaces.
-        import re
-
-        normalized = []
-        for token in flattened:
-            token = token.strip()
-            token = re.sub(r"([a-zA-Z_][a-zA-Z_0-9]*)\s*\(", r"\1(", token)
-            normalized.append(token)
-
-        return normalized
 
     def run_subsearch(self, tokens, df):
         """Execute a list of tokens as a pipeline against df."""
@@ -910,55 +896,9 @@ class speakQueryListener(ParseTreeListener):
             children_results = [
                 child for child in children_results if child is not None
             ]
-            return self.flatten_list(children_results)
+            return flatten_list(children_results)
         else:
             return None
-
-    # CRITICAL COMPONENT
-    @staticmethod
-    def flatten_list(result):
-        """
-        Flattens lists that have only one element to avoid unnecessary nesting.
-        """
-        if isinstance(result, list):
-            flat_result = []
-            for item in result:
-                if isinstance(item, list):
-                    flat_result.extend(item)
-                else:
-                    flat_result.append(item)
-            if len(flat_result) == 1:
-                return flat_result[0]
-            return flat_result
-        else:
-            return result
-
-    # CRITICAL COMPONENT
-    @staticmethod
-    def flatten_with_parens(input_list):
-        """
-        Flattens a nested list while preserving parentheses as individual items.
-        """
-
-        def flatten_recursive(element):
-            if isinstance(element, list):
-                if not element:
-                    return []
-                result = []
-                for item in element:
-                    if item == "(":
-                        result.append("(")
-                    elif item == ")":
-                        result.append(")")
-                    else:
-                        result.extend(flatten_recursive(item))
-                return result
-            elif isinstance(element, str):
-                return [element]
-            else:
-                return []
-
-        return flatten_recursive(input_list)
 
     # CRITICAL COMPONENT
     def validate_exceptions(self, ctx_obj):
@@ -974,7 +914,9 @@ class speakQueryListener(ParseTreeListener):
         if obj_identifier == "exitDirective":
             directive = str(ctx_obj.children[0]).lower()
             if directive in ("search", "where"):
-                self.current_search_cmd_tokens = self.ctx_flatten(ctx_obj)[1:]
+                self.current_search_cmd_tokens = ctx_flatten(
+                    ctx_obj, self.extract_screenshot_of_ctx
+                )[1:]
                 self.main_df = self.search_cmd_handler.run_search(
                     self.current_search_cmd_tokens, self.main_df
                 )
