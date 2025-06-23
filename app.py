@@ -658,25 +658,25 @@ def commit_saved_search():
             email_content = "N/A"
         dest_file = app.config['TEMP_DIR']
 
-    # Save to SQLite3
-    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
-        cursor = conn.cursor()
+        # Save to SQLite3
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
 
-        cursor.execute('''
-            INSERT INTO saved_searches (
-                id, title, description, query, cron_schedule, trigger, lookback, 
+            cursor.execute('''
+                INSERT INTO saved_searches (
+                    id, title, description, query, cron_schedule, trigger, lookback,
+                    throttle, throttle_time_period, throttle_by, event_message,
+                    send_email, email_address, email_content, file_location
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                request_id, title, description, query, cron_schedule, trigger, lookback,
                 throttle, throttle_time_period, throttle_by, event_message,
-                send_email, email_address, email_content, file_location
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            request_id, title, description, query, cron_schedule, trigger, lookback,
-            throttle, throttle_time_period, throttle_by, event_message,
-            send_email, email_address, email_content, dest_file
-        ))
+                send_email, email_address, email_content, dest_file
+            ))
 
-        conn.commit()
+            conn.commit()
 
-    return jsonify({'status': 'success', 'message': f"Successfully saved search: '{title}'"}), 200
+        return jsonify({'status': 'success', 'message': f"Successfully saved search: '{title}'"}), 200
 
     except Exception as e:
         logging.error(f"Error committing saved search: {str(e)}")
@@ -824,15 +824,15 @@ def get_saved_search(search_id):
     }
     disabled_checked = 'checked' if search['disabled'] else ''
 
-        return render_template(
-            'saved_search.html',
-            search=search,
-            trigger_options=trigger_options,
-            throttle_options=throttle_options,
-            send_email_options=send_email_options,
-            disabled_checked=disabled_checked,
-            search_id=search_id
-        )
+    return render_template(
+        'saved_search.html',
+        search=search,
+        trigger_options=trigger_options,
+        throttle_options=throttle_options,
+        send_email_options=send_email_options,
+        disabled_checked=disabled_checked,
+        search_id=search_id
+    )
 
 
 @app.route('/update_saved_search/<search_id>', methods=['POST'])
@@ -881,9 +881,9 @@ def update_saved_search(search_id):
             search_id
         ))
 
-            conn.commit()
+        conn.commit()
 
-            return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
+        return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
 
     except Exception as e:
         logging.error(f"Error updating saved search: {e}")
