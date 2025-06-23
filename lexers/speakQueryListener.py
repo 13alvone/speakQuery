@@ -533,6 +533,20 @@ class speakQueryListener(ParseTreeListener):
             return self.general_handler.execute_mvindex(
                 self.main_df, field, idxs, "mvindex"
             )
+        if cmd == "spath":
+            params = {}
+            for tok in seg_tokens[1:]:
+                if "=" in tok:
+                    key, val = tok.split("=", 1)
+                    params[key.lower()] = val
+            input_col = params.get("input")
+            output_col = params.get("output")
+            json_path = params.get("path")
+            if input_col and output_col and json_path:
+                return self.general_handler.execute_spath(
+                    self.main_df, input_col, output_col, json_path
+                )
+            return self.main_df
         if cmd in ("if_", "case", "tonumber"):
             from handlers.EvalHandler import EvalHandler
 
