@@ -285,6 +285,18 @@ class speakQueryListener(ParseTreeListener):
             )
         if cmd == "reverse":
             return self.general_handler.reverse_df_rows(self.main_df)
+        if cmd == "rex":
+            args = []
+            option_tokens = seg_tokens[1:-1]
+            for tok in option_tokens:
+                if "=" in tok:
+                    key, val = tok.split("=", 1)
+                    args.extend([key, "=", val])
+                else:
+                    args.append(tok)
+            if len(seg_tokens) > 1:
+                args.append(seg_tokens[-1])
+            return self.general_handler.execute_rex(self.main_df, args)
         if cmd == "regex":
             arg = seg_tokens[1]
             field, regex = arg.split("=", 1)

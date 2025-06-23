@@ -66,7 +66,7 @@ export SMTP_PASSWORD="your_app_password"
 
 ## Testing
 
-Install the Python requirements first, then run the security and unit tests located in `tests/`:
+Install the Python requirements first, then run the security and unit tests located in `tests/`. The compiled extensions required by some tests are built using `build_custom_components.py`:
 ```bash
 pip install -r requirements.txt
 python build_custom_components.py --rebuild
