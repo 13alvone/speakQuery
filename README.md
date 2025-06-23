@@ -105,3 +105,7 @@ To regenerate them, place `antlr-4.13.1-complete.jar` in the `utils/` directory 
 java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor \
   -o lexers/antlr4_active lexers/speakQuery.g4
 ```
+
+The grammar intentionally omits tokens for increment/decrement operators
+(`++`, `--`), bitwise negation (`~`), semicolons and the `else` keyword.
+These constructs are not part of the supported query language.
