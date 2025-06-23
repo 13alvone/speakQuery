@@ -16,6 +16,7 @@ from lexers.antlr4_active.speakQueryParser import speakQueryParser
         'index="logs/main.log" | head 5',
         'index="logs/main.log" | fields field1 field2',
         'index="logs/main.log" | streamstats count as seq by level',
+        'index="logs/main.log" | rex field=_raw "user=(?P<id>\\d+)"',
     ],
 )
 def test_pipeline_parses(query):
