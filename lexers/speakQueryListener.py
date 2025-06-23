@@ -328,6 +328,54 @@ class speakQueryListener(ParseTreeListener):
                 else "1h"
             )
             return self.general_handler.execute_bin(self.main_df, field, span)
+        if cmd == "dedup":
+            args = []
+            tokens = seg_tokens[1:]
+            # Optional leading number specifying keep count
+            if tokens and re.fullmatch(r"\d+", tokens[0]):
+                args.append(int(tokens[0]))
+                tokens = tokens[1:]
+
+            # Search for consecutive flag anywhere in remaining tokens
+            consec_val = None
+            consec_idx = None
+            for i, t in enumerate(tokens):
+                if t == "consecutive":
+                    if i + 2 < len(tokens) and tokens[i + 1] == "=":
+                        consec_val = tokens[i + 2]
+                        consec_idx = i
+                        break
+                    if i + 1 < len(tokens):
+                        val_tok = tokens[i + 1]
+                        consec_val = val_tok.split("=", 1)[1] if "=" in val_tok else val_tok
+                        consec_idx = i
+                        break
+                elif t.startswith("consecutive="):
+                    consec_val = t.split("=", 1)[1]
+                    consec_idx = i
+                    break
+            if consec_idx is not None:
+                # remove consecutive tokens from list
+                if tokens[consec_idx] == "consecutive":
+                    if consec_idx + 2 < len(tokens) and tokens[consec_idx + 1] == "=":
+                        del tokens[consec_idx : consec_idx + 3]
+                    else:
+                        del tokens[consec_idx : consec_idx + 2]
+                else:
+                    tokens.pop(consec_idx)
+                args.extend(["consecutive", "=", consec_val])
+
+            # Remaining tokens should be field list separated by commas
+            fields = []
+            for tok in tokens:
+                parts = [p for p in tok.split(",") if p]
+                fields.extend(parts)
+            for i, f in enumerate(fields):
+                args.append(f)
+                if i < len(fields) - 1:
+                    args.append(",")
+
+            return self.general_handler.execute_dedup(self.main_df, args)
         if cmd == "join":
             join_type = "inner"
             fields = []
