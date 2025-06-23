@@ -464,6 +464,11 @@ class speakQueryListener(ParseTreeListener):
                 kwargs = args
             self.general_handler.execute_outputlookup(self.main_df, **kwargs)
             return self.main_df
+        if cmd == "outputnew":
+            filename = seg_tokens[1].strip('"').strip("'")
+            path = os.path.join(self.lookup_root, filename)
+            self.general_handler.execute_outputnew(self.main_df, path)
+            return self.main_df
         if cmd == "coalesce":
             if "(" in seg_str and ")" in seg_str:
                 inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
