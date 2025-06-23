@@ -264,6 +264,14 @@ class speakQueryListener(ParseTreeListener):
 
     def _apply_command(self, cmd, seg_tokens, seg_str):
         """Dispatch transformation commands parsed manually."""
+        # Handle filtering directives using SearchDirective
+        if cmd in ("search", "where"):
+
+            # Extract the expression portion after the command word
+            expr = seg_str[len(cmd):].strip()
+            token_pattern = r'"[^"]*"|>=|<=|!=|=|>|<|\(|\)|,|\w+|\S'
+            tokens = re.findall(token_pattern, expr)
+            return self.search_cmd_handler.run_search(tokens, self.main_df)
         if cmd in ("stats", "eventstats", "streamstats"):
             return self.stats_handler.run_stats(seg_tokens, self.main_df)
         if cmd == "timechart":
@@ -923,7 +931,8 @@ class speakQueryListener(ParseTreeListener):
             )
 
         if obj_identifier == "exitDirective":
-            if str(ctx_obj.children[0]) == "search":
+            directive = str(ctx_obj.children[0]).lower()
+            if directive in ("search", "where"):
                 self.current_search_cmd_tokens = self.ctx_flatten(ctx_obj)[1:]
                 self.main_df = self.search_cmd_handler.run_search(
                     self.current_search_cmd_tokens, self.main_df
