@@ -71,5 +71,9 @@ def test_outputnew_directive(monkeypatch):
     monkeypatch.setattr(
         "lexers.speakQueryListener.process_index_calls", lambda tokens: df.copy()
     )
+    monkeypatch.setattr(
+        "handlers.GeneralHandler.GeneralHandler.execute_outputnew",
+        lambda self, df, filename: None,
+    )
     errors, _ = run_query('index="dummy" | outputnew new.csv')
     assert errors == 0

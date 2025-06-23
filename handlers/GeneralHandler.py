@@ -1598,6 +1598,58 @@ class GeneralHandler:
             )
 
     @staticmethod
+    def execute_outputnew(df: pd.DataFrame, filename: str) -> None:
+        """Write a DataFrame to a new file.
+
+        This method fails if the target file already exists. The output format
+        is determined by the file extension and supports CSV, TSV, JSON, YAML
+        and SQLite.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Data to write.
+        filename : str
+            Destination file path including extension.
+
+        Raises
+        ------
+        FileExistsError
+            If ``filename`` already exists.
+        ValueError
+            If ``filename`` has an unsupported extension.
+        """
+
+        if os.path.exists(filename):
+            logging.error(f"[x] File '{filename}' already exists.")
+            raise FileExistsError(f"File '{filename}' already exists")
+
+        if "." not in filename:
+            raise ValueError(
+                "Filename must include a valid extension (.csv, .tsv, .json, .yaml, .sqlite)"
+            )
+
+        ext = filename.split(".")[-1].lower()
+
+        if ext in {"csv", "tsv"}:
+            sep = "," if ext == "csv" else "\t"
+            df.to_csv(filename, sep=sep, index=False)
+        elif ext == "json":
+            df.to_json(filename, orient="records", lines=True)
+        elif ext == "yaml":
+            with open(filename, "w") as fh:
+                yaml.dump(df.to_dict(orient="records"), fh)
+        elif ext == "sqlite":
+            with sqlite3.connect(filename) as conn:
+                df.to_sql(name="data", con=conn, if_exists="fail", index=False)
+        else:
+            raise ValueError(
+                "Unsupported file format. Supported formats: csv, tsv, json, yaml, sqlite"
+            )
+
+        logging.info(f"[i] Data written to new file {filename}.")
+
+    @staticmethod
     def replace_variable_in_self_dot_values(
         stack: OrderedDict, var_name: str, replacement: List[Any]
     ) -> None:
