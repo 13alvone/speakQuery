@@ -17,7 +17,6 @@ all_funcs = [
 
 class StringHandler:
     def __init__(self):
-        self.test = 'test'
         self.java_handler = JavaHandler()
         self.all_functions = [
             'round (', 'min (', 'max (', 'avg (', 'sum (', 'range (', 'median (', 'sqrt (', 'random (', 'tonumb (',
