@@ -304,8 +304,6 @@ MVDC                    : 'mvdc' ;
 MVZIP                   : 'mvzip' ;
 FIRST                   : 'first' ;
 LAST                    : 'last' ;
-DELIM                   : ('delim' | 'DELIM') ;
-FILE                    : ('file' | 'FILE') ;
 SORT                    : 'sort' ;
 NULL                    : 'null' ;
 EVAL                    : 'eval' ;
