@@ -91,6 +91,7 @@ directive
     | MAKETABLE variableName (COMMA variableName)*
     | EVENTSTATS (NEWLINE | WS)* (statsAgg (COMMA? NEWLINE? statsAgg)*)? ((NEWLINE | WS)* COUNT (AS variableName)?)? (BY variableList)?
     | STATS (NEWLINE | WS)* statsAgg (COMMA? (NEWLINE | WS)* statsAgg)* ((NEWLINE | WS)* BY variableList)?
+    | STREAMSTATS (NEWLINE | WS)* statsAgg (COMMA? (NEWLINE | WS)* statsAgg)* ((NEWLINE | WS)* BY variableList)?
     | TIMECHART (NEWLINE | WS)* (SPAN EQUALS timespan)? statsAgg (COMMA? (NEWLINE | WS)* statsAgg)* ((NEWLINE | WS)* BY variableList)?
     | RENAME (NEWLINE | WS)* (variableName AS (variableName | DOUBLE_QUOTED_STRING) COMMA? (NEWLINE | WS)*)+
     | FIELDS (PLUS | MINUS)? variableName (COMMA? variableName)*
@@ -312,6 +313,7 @@ SPAN                    : ('span' | 'SPAN') ;
 BIN                     : 'bin' ;
 STATS                   : 'stats' ;
 EVENTSTATS              : 'eventstats' ;
+STREAMSTATS             : 'streamstats' ;
 TIMECHART               : 'timechart' ;
 VALUE                   : ('value' | 'VALUE') ;
 VALUES                  : 'values' ;
