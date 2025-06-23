@@ -15,6 +15,7 @@ from lexers.antlr4_active.speakQueryParser import speakQueryParser
         'index="logs/main.log" | eval total=price*quantity',
         'index="logs/main.log" | head 5',
         'index="logs/main.log" | fields field1 field2',
+        'index="logs/main.log" | streamstats count as seq by level',
     ],
 )
 def test_pipeline_parses(query):
