@@ -59,9 +59,8 @@ def find_project_root(start_path: str, marker_files=("app.py", ".git")):
     raise RuntimeError("Project root not found")
 
 
-# Compute project root and set working directory
+# Compute project root (do not change cwd)
 project_root = find_project_root(__file__)
-os.chdir(project_root)
 
 # Define module build directories for the compiled shared libraries
 cpp_index_path = os.path.join(project_root, "functionality", "cpp_index_call", "build")
@@ -107,7 +106,8 @@ except ImportError as e:
 class speakQueryListener(ParseTreeListener):
     def __init__(self, cleaned_query):
         self.current_search_cmd_tokens = None
-        self.project_root = f"{os.path.abspath(os.path.curdir)}"
+        # Use the project root discovered at import time
+        self.project_root = project_root
         self.lookup_root = f"{self.project_root}/lookups"
         self.loadjob_root = (
             f'{self.project_root}/{os.path.join("frontend", "static", "temp")}'

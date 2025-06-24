@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+import pytest
+
+pytest.importorskip("antlr4")
+pytest.importorskip("pandas")
+
 import os
 import sys
 import antlr4
 import logging
-import pytest
 
 pytest.skip("cpp modules unavailable", allow_module_level=True)
 

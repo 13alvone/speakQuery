@@ -1,3 +1,8 @@
+import pytest
+
+pytest.importorskip("antlr4")
+pytest.importorskip("pandas")
+
 import os
 import sys
 import types
