@@ -5,9 +5,17 @@ import aiosmtplib
 import logging
 from email.message import EmailMessage
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Reuse the logger configuration
 logger = logging.getLogger(__name__)
+
+dotenv_path = Path(__file__).resolve().parent.parent / '.env'
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
+    logger.info("[i] Loaded environment variables from .env")
+else:
+    logger.debug("[DEBUG] No .env file found for Alert module")
 
 # Gmail SMTP configuration
 SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.gmail.com')
