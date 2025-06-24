@@ -50,7 +50,7 @@ try:
     from functionality.so_loader import resolve_and_import_so
 except ImportError as e:
     logger.error(f"[x] Could not import so_loader: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import so_loader") from e
 
 try:
     cpp_index = resolve_and_import_so(cpp_index_path, "cpp_index_call")
@@ -58,7 +58,7 @@ try:
     logger.info("[i] Loaded 'cpp_index_call'.")
 except ImportError as e:
     logger.error(f"[x] Could not import cpp_index_call: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import cpp_index_call") from e
 
 try:
     cpp_dt = resolve_and_import_so(cpp_datetime_path, "cpp_datetime_parser")
@@ -66,14 +66,14 @@ try:
     logger.info("[i] Loaded 'cpp_datetime_parser'.")
 except ImportError as e:
     logger.error(f"[x] Could not import cpp_datetime_parser: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import cpp_datetime_parser") from e
 
 # Import StatsHandler
 try:
     from handlers.StatsHandler import StatsHandler
 except ImportError as e:
     logger.error(f"[x] Could not import StatsHandler: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import StatsHandler") from e
 
 
 def load_test_cases(yaml_file):
