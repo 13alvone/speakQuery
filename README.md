@@ -42,20 +42,27 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
    # edit .env to provide real credentials
    ```
 6. **Run the application**
-  - Start the Flask server (the `SECRET_KEY` loaded from `.env` is required):
-    ```bash
-    python app.py
-    ```
-   - Run the query engine (in a separate terminal):
+   - The recommended approach is to launch all services together using the helper script:
      ```bash
-     python query_engine/QueryEngine.py
+     ./run_all.sh
      ```
-   - Run the scheduled input engine:
-     ```bash
-     python scheduled_input_engine/ScheduledInputEngine.py
-     ```
+     This loads variables from `.env` and starts the Flask app, query engine and scheduled input engine. Press `Ctrl+C` to stop everything at once.
 
-  These engines run continuously and can also be launched from within `app.py` by uncommenting `start_background_engines()`.
+   - Alternatively you can start each component manually:
+     - Start the Flask server (the `SECRET_KEY` loaded from `.env` is required):
+       ```bash
+       python app.py
+       ```
+     - Run the query engine (in a separate terminal):
+       ```bash
+       python query_engine/QueryEngine.py
+       ```
+     - Run the scheduled input engine:
+       ```bash
+       python scheduled_input_engine/ScheduledInputEngine.py
+       ```
+
+   These engines run continuously and can also be launched from within `app.py` by uncommenting `start_background_engines()`.
 
 ### SMTP configuration
 
