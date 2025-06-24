@@ -17,12 +17,16 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
      ```bash
      python3 -m venv env
      source env/bin/activate
-     pip install -r requirements.txt
+    pip install -r requirements.txt
+    # install dev dependencies needed for the test suite
+    pip install antlr4-python3-runtime pandas pyyaml defusedxml
      ```
    - Using conda:
      ```bash
-     conda env create -f environment.yml
-     conda activate speakQueryEnv
+    conda env create -f environment.yml
+    conda activate speakQueryEnv
+    # install dev dependencies needed for the test suite
+    conda install -y antlr4-python3-runtime pandas pyyaml defusedxml
      ```
 3. **Required build tools**
    - CMake ≥3.5
@@ -66,7 +70,7 @@ export SMTP_PASSWORD="your_app_password"
 
 ## Testing
 
-Install the Python requirements first, then run the security and unit tests located in `tests/`. The compiled extensions required by some tests are built using `build_custom_components.py`:
+Install the Python requirements first, then run the security and unit tests located in `tests/`. The tests rely on `antlr4-python3-runtime`, `pandas`, `pyyaml`, and `defusedxml`, so ensure these packages are installed. The compiled extensions required by some tests are built using `build_custom_components.py`:
 ```bash
 pip install -r requirements.txt
 python build_custom_components.py --rebuild
@@ -97,8 +101,8 @@ to group results. Example:
 
 
 ## Regenerating the parser
-
-`lexers/speakQuery.g4` is the authoritative grammar for the query language. Parser files under `lexers/antlr4_active/` are generated from this grammar.
+`lexers/speakQuery.g4` is the authoritative grammar for the query language. Parser files under `lexers/antlr4_active/` are generated from this grammar. The Python runtime
+for ANTLR (`antlr4-python3-runtime`) is required for both development and the test suite.
 To regenerate them, place `antlr-4.13.1-complete.jar` in the `utils/` directory and run:
 
 ```bash
