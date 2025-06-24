@@ -201,8 +201,8 @@ class GeneralHandler:
     def validate_ast(_obj):
         try:
             return ast.literal_eval(_obj)
-        except Exception as e:
-            # return str(_obj)
+        except Exception as exc:
+            logging.error("[x] AST validation failed: %s", exc)
             return _obj
 
     def ast_args(self, args):
@@ -213,7 +213,7 @@ class GeneralHandler:
                     entry = self.validate_ast(str(entry))
                     if isinstance(entry, list):
                         logging.warning(
-                            f"[!] This depth hasn't been built yet. See GeneralHandler.ast_args()."
+                            "[!] This depth hasn't been built yet. See GeneralHandler.ast_args()."
                         )
             args[index] = arg
         return args
@@ -491,10 +491,10 @@ class GeneralHandler:
                         obj.getText()
                     )  # Attempt to resolve the terminal node's text content
                     resolved_values.append(value)
-                except (ValueError, SyntaxError) as e:
+                except (ValueError, SyntaxError):
                     try:
                         resolved_values.append(float(obj.getText()))
-                    except Exception as e:
+                    except Exception:
                         resolved_values.append(str(obj.getText()))
             else:
                 logging.debug(
@@ -1086,7 +1086,7 @@ class GeneralHandler:
         if n > len(df):  # Check if n is larger than the DataFrame
             logging.warning(
                 f"[!] HEAD CALL: Requested number of rows ({n}) exceeds DataFrame row count ({len(df)}). "
-                f"Returning all rows."
+                "Returning all rows."
             )
 
         if str(_mode).lower() == "head":
@@ -1760,11 +1760,21 @@ class GeneralHandler:
 
     @staticmethod
     def loadjob_pickle_file(request_id_file_path):
-        if os.path.exists(request_id_file_path):
-            return pd.read_pickle(request_id_file_path)
+        """Safely load a pickled DataFrame from a trusted location."""
+
+        trusted_dir = os.path.join(os.getcwd(), "jobs")
+        abs_path = os.path.abspath(request_id_file_path)
+
+        if not abs_path.startswith(trusted_dir):
+            raise ValueError(f"Untrusted pickle path: {abs_path}")
+
+        if os.path.exists(abs_path):
+            # pd.read_pickle uses pickle under the hood which can execute
+            # arbitrary code. We limit loading to the trusted directory above.
+            return pd.read_pickle(abs_path)
         else:
             raise FileNotFoundError(
-                f"No saved DataFrame found for request_id: {request_id_file_path}"
+                f"No saved DataFrame found for request_id: {abs_path}"
             )
 
     # ------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 import yaml
 import sqlite3
 import logging

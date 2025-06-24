@@ -9,6 +9,25 @@ if (csrfMetaTag) {
 }
 
 /**
+ * Escape HTML special characters to prevent injection.
+ * Converts <, >, &, ", ', and ` to their entity equivalents.
+ *
+ * @param {string} str - Raw string that may contain HTML.
+ * @returns {string} The escaped string safe for innerHTML.
+ */
+function escapeHtml(str) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        '`': '&#096;'
+    };
+    return String(str).replace(/[&<>"'`]/g, m => map[m]);
+}
+
+/**
  * Function to show notifications.
  * @param {string} message - The message to display.
  * @param {boolean} isError - Flag indicating if the message is an error.
@@ -30,16 +49,8 @@ function showNotification(message, isError = false, allowHtml = false) {
 
     const messageSpan = document.createElement('span');
     if (allowHtml) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;',
-            '`': '&#096;'
-        };
-        const sanitized = message.replace(/[&<>"'`]/g, m => map[m]);
-        messageSpan.innerHTML = sanitized;
+        // Sanitize HTML before assigning to innerHTML to avoid injection.
+        messageSpan.innerHTML = escapeHtml(message);
     } else {
         messageSpan.textContent = message;
     }

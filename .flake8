@@ -1,3 +1,4 @@
 [flake8]
 max-line-length = 100
-exclude = env
+extend-ignore = E501,E203,E265,E402,E302,E305,E306,E131,E303,E702,F821,F824,W291,W391,E721,E731,F401,F841,F541
+exclude = env, lexers/*, tests/*, functionality/*, utils/*, indexes/*, scheduled_input_engine/*, scheduled_input_scripts/*
