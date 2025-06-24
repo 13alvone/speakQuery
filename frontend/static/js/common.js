@@ -13,7 +13,7 @@ if (csrfMetaTag) {
  * @param {string} message - The message to display.
  * @param {boolean} isError - Flag indicating if the message is an error.
  */
-function showNotification(message, isError = false) {
+function showNotification(message, isError = false, allowHtml = false) {
     const container = document.getElementById('notification-container');
 
     if (!container) {
@@ -29,7 +29,20 @@ function showNotification(message, isError = false) {
     notification.appendChild(deleteBtn);
 
     const messageSpan = document.createElement('span');
-    messageSpan.textContent = message;
+    if (allowHtml) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;',
+            '`': '&#096;'
+        };
+        const sanitized = message.replace(/[&<>"'`]/g, m => map[m]);
+        messageSpan.innerHTML = sanitized;
+    } else {
+        messageSpan.textContent = message;
+    }
     notification.appendChild(messageSpan);
 
     container.appendChild(notification);
