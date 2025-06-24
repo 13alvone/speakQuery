@@ -301,7 +301,8 @@ class speakQueryListener(ParseTreeListener):
         # Split on any additional '|' to get each segment
         segment_strs = [seg.strip() for seg in raw_pipeline.split("|") if seg.strip()]
 
-        for seg_str in segment_strs:
+        valid_lines = ctx.validLine()
+        for i, seg_str in enumerate(segment_strs):
             # Tokenize segment, preserving quoted literals
             try:
                 seg_tokens = shlex.split(seg_str)
@@ -311,6 +312,14 @@ class speakQueryListener(ParseTreeListener):
 
             cmd = seg_tokens[0].split("(")[0].lower()
             logging.info(f"[i] Processing pipeline segment: {cmd}")
+
+            if cmd in ("stats", "eventstats", "streamstats", "eval"):
+                try:
+                    dctx = valid_lines[i].directive()
+                    seg_tokens = ctx_flatten(dctx, self.extract_screenshot_of_ctx)
+                except Exception as e:
+                    logging.error(f"[x] Failed to parse directive via context: {e}")
+                    raise
 
             try:
                 self.main_df = self._apply_command(cmd, seg_tokens, seg_str)
