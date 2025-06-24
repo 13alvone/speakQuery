@@ -12,19 +12,16 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
 ## Setup
 
 1. **Python version** – The project targets Python 3.11 as defined in `environment.yml`.
-2. **Install dependencies**
-   - Using `pip`:
-     ```bash
-     python3 -m venv env
-     source env/bin/activate
-     pip install -r requirements.txt -r requirements-dev.txt
-     ```
-   - Using conda:
-     ```bash
-     conda env create -f environment.yml
-     conda activate speakQueryEnv
-     conda install -y --file requirements.txt --file requirements-dev.txt
-     ```
+2. **Run the setup script**
+   The project ships with `setup.sh` which bootstraps a Python virtual
+   environment, installs the requirements, builds the custom C++ components and
+   initializes the application's databases:
+   ```bash
+   bash ./setup.sh
+   ```
+   If you prefer to manage the environment manually, create your own virtual
+   environment and install the packages from `requirements.txt` and
+   `requirements-dev.txt`.
 3. **Required build tools**
    - CMake ≥3.5
    - A C++17 compiler
@@ -73,10 +70,9 @@ export SMTP_PASSWORD="your_app_password"
 
 ## Testing
 
-Install the Python requirements first, then run the security and unit tests located in `tests/`. The compiled extensions required by some tests are built using `build_custom_components.py`:
+After running `setup.sh` and activating the virtual environment, the security and unit tests can be executed from the project root:
 ```bash
-pip install -r requirements.txt -r requirements-dev.txt
-python build_custom_components.py --rebuild
+source env/bin/activate
 flake8 --exclude=env
 bandit -r .
 pytest -vv
