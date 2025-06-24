@@ -1,17 +1,32 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+"""Utility script for inspecting parquet indexes.
+
+This module avoids shelling out to external commands for security and
+portability reasons. Instead of using ``subprocess`` with ``shell=True``
+to walk directories, the code relies solely on Python's ``os`` module.
+"""
+
 import os
-import pyarrow.parquet as pq
-from subprocess import check_output
-from typing import Generator
 import logging
+from typing import Generator
+
+import pyarrow.parquet as pq
 
 logger = logging.getLogger(__name__)
 
 
 def explore_directory() -> str:
-    """Run ls -lart recursively and return the output."""
-    cmd = 'find . -type d -exec ls -lart {} \\;'
-    return check_output(cmd, shell=True).decode('utf-8')
+    """Return a listing of all directories under the current path."""
+    lines = []
+    for root, dirs, _ in os.walk("."):
+        for directory in sorted(dirs):
+            full_path = os.path.join(root, directory)
+            try:
+                stat = os.stat(full_path)
+                lines.append(f"{stat.st_mode:o} {stat.st_size:8d} {full_path}")
+            except OSError as exc:
+                logger.warning("[!] Unable to stat %s: %s", full_path, exc)
+    return "\n".join(lines)
 
 
 def find_parquet_files() -> Generator[str, None, None]:
@@ -42,12 +57,10 @@ def read_parquet_preview(filepath: str, max_rows: int = 20) -> str:
 
 
 def main():
-    # Step 1: Print directory structure
-    #msg = "[+] Below is the layout of <project_root>/indexes/* containing source parquet files for queries. " \
-    #      "Understanding this structure and content is crucial for validating query results in _test.py.\n" \
-    #      "===DIRECTORY STRUCTURE===\n"
-    #print(msg)
-    #print(explore_directory())
+    """Print information about available parquet indexes."""
+
+    # Step 1: print directory structure if needed
+    # print(explore_directory())
 
     # Step 2: Print parquet file contents
     for parquet_file in find_parquet_files():

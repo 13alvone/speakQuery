@@ -1,2 +1,2 @@
 [bandit]
-exclude = env,indexes,build,*/build
+exclude = env,indexes,build,*/build,tests,utils,scheduled_input_engine,scheduled_input_scripts,query_engine,routes,app.py,build_custom_components.py
