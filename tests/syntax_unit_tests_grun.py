@@ -1,3 +1,9 @@
+import pytest
+
+pytest.importorskip("antlr4")
+pytest.importorskip("pandas")
+pytest.importorskip("yaml")
+
 import os
 import sys
 import shutil

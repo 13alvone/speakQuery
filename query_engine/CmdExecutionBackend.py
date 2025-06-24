@@ -7,6 +7,7 @@ import sys
 import os
 import re
 import pandas as pd
+from pathlib import Path
 
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
@@ -17,6 +18,9 @@ from lexers.speakQueryListener import speakQueryListener
 
 from handlers.JavaHandler import JavaHandler
 from validation.SavedSearchValidation import SavedSearchValidation
+
+CURRENT_SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = CURRENT_SCRIPT_DIR.parent
 
 java_handler = JavaHandler()
 validator = SavedSearchValidation()
@@ -85,9 +89,10 @@ def sanitize_dataframe(df):
 
 
 def save_dataframe(request_id, df):
-    temp_dir = os.path.join('frontend', 'static', 'temp')
-    os.makedirs(temp_dir, exist_ok=True)
-    file_path = os.path.join(temp_dir, f"{request_id}.pkl")
+    """Save the DataFrame to a pickle in the project's temp directory."""
+    temp_dir = PROJECT_ROOT / 'frontend' / 'static' / 'temp'
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    file_path = temp_dir / f"{request_id}.pkl"
     df.to_pickle(file_path)
 
 

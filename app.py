@@ -38,6 +38,9 @@ app = Flask(
     static_folder='frontend/static'
 )
 
+# Determine project root based on this file's location
+PROJECT_ROOT = Path(__file__).resolve().parent
+
 secret_key = os.environ.get('SECRET_KEY', 'insecure-default-key')
 if secret_key == 'insecure-default-key':
     logging.warning(
@@ -49,19 +52,19 @@ csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = False
 
 # Configuration
-app.config['UPLOAD_FOLDER'] = 'lookups'
+app.config['UPLOAD_FOLDER'] = str(PROJECT_ROOT / 'lookups')
 app.config['ALLOWED_EXTENSIONS'] = {'sqlite3', 'system4.system4.parquet', 'csv', 'json'}
 app.config['ALLOWED_API_DOMAINS'] = {'jsonplaceholder.typicode.com'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB upload limit
-app.config['TEMP_DIR'] = os.path.join('frontend', 'static', 'temp')
-app.config['LOOKUP_DIR'] = 'lookups'
-app.config['LOADJOB_DIR'] = os.path.join('frontend', 'static', 'temp')
-app.config['INDEXES_DIR'] = 'indexes'
-app.config['SAVED_SEARCHES_DB'] = 'saved_searches.db'
-app.config['SCHEDULED_INPUTS_DB'] = 'scheduled_inputs.db'
+app.config['TEMP_DIR'] = str(PROJECT_ROOT / 'frontend' / 'static' / 'temp')
+app.config['LOOKUP_DIR'] = str(PROJECT_ROOT / 'lookups')
+app.config['LOADJOB_DIR'] = str(PROJECT_ROOT / 'frontend' / 'static' / 'temp')
+app.config['INDEXES_DIR'] = str(PROJECT_ROOT / 'indexes')
+app.config['SAVED_SEARCHES_DB'] = str(PROJECT_ROOT / 'saved_searches.db')
+app.config['SCHEDULED_INPUTS_DB'] = str(PROJECT_ROOT / 'scheduled_inputs.db')
 app.config['LOG_LEVEL'] = logging.DEBUG
-app.config['HISTORY_DB'] = 'history.db'
-app.config['SCRIPT_DIR'] = os.getcwd()
+app.config['HISTORY_DB'] = str(PROJECT_ROOT / 'history.db')
+app.config['SCRIPT_DIR'] = str(PROJECT_ROOT)
 
 # Initialize necessary components
 scheduled_input_backend = ScheduledInputBackend()
@@ -144,16 +147,16 @@ def initialize_database():
         count = cursor.fetchone()[0]
         if count == 0:
             default_settings = {
-                'UPLOAD_FOLDER': 'lookups',
+                'UPLOAD_FOLDER': str(PROJECT_ROOT / 'lookups'),
                 'ALLOWED_EXTENSIONS': 'sqlite3,system4.system4.parquet,csv,json',
                 'MAX_CONTENT_LENGTH': '16777216',  # 16 MB in bytes
-                'TEMP_DIR': os.path.join('frontend', 'static', 'temp'),
-                'LOOKUP_DIR': 'lookups',
-                'LOADJOB_DIR': os.path.join('frontend', 'static', 'temp'),
-                'INDEXES_DIR': 'indexes',
-                'SAVED_SEARCHES_DB': 'saved_searches.db',
-                'SCHEDULED_INPUTS_DB': 'scheduled_inputs.db',
-                'HISTORY_DB': 'history.db',  # Added HISTORY_DB to default settings
+                'TEMP_DIR': str(PROJECT_ROOT / 'frontend' / 'static' / 'temp'),
+                'LOOKUP_DIR': str(PROJECT_ROOT / 'lookups'),
+                'LOADJOB_DIR': str(PROJECT_ROOT / 'frontend' / 'static' / 'temp'),
+                'INDEXES_DIR': str(PROJECT_ROOT / 'indexes'),
+                'SAVED_SEARCHES_DB': str(PROJECT_ROOT / 'saved_searches.db'),
+                'SCHEDULED_INPUTS_DB': str(PROJECT_ROOT / 'scheduled_inputs.db'),
+                'HISTORY_DB': str(PROJECT_ROOT / 'history.db'),  # Added HISTORY_DB to default settings
                 'LOG_LEVEL': 'DEBUG',
                 'KEEP_LATEST_FILES': '20',
                 'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com',
