@@ -113,3 +113,6 @@ java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visit
 The grammar intentionally omits tokens for increment/decrement operators
 (`++`, `--`), bitwise negation (`~`), semicolons and the `else` keyword.
 These constructs are not part of the supported query language.
+
+## Syntax reference
+See [docs/syntax.md](docs/syntax.md) for a summary of the query grammar and directive usage examples.
