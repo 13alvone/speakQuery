@@ -5,3 +5,4 @@ jobs/*
 functionality/cpp_datetime_parser/build/*
 functionality/cpp_index_call/build/*
 query_engine/frontend/static/temp/*
+.env

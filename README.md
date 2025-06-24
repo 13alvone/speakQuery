@@ -37,12 +37,18 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
    python build_custom_components.py --rebuild
    ```
    You can also build a single component with `--component`.
-5. **Run the application**
-   - Start the Flask server (requires a `SECRET_KEY` environment variable):
-     ```bash
-     export SECRET_KEY="your_secret_value"
-     python app.py
-     ```
+5. **Create an environment file**
+   Copy `.env.example` to `.env` and replace the placeholder values with your own.
+   The application uses `python-dotenv` to load variables from this file:
+   ```bash
+   cp .env.example .env
+   # edit .env to provide real credentials
+   ```
+6. **Run the application**
+  - Start the Flask server (the `SECRET_KEY` loaded from `.env` is required):
+    ```bash
+    python app.py
+    ```
    - Run the query engine (in a separate terminal):
      ```bash
      python query_engine/QueryEngine.py
@@ -56,14 +62,14 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
 
 ### SMTP configuration
 
-To enable email alerts, set your SMTP credentials as environment variables before running the query engine:
+Email alerts require SMTP credentials. Set these values in your `.env` file or export them before running the query engine:
 
 ```bash
 export SMTP_USER="your_email@example.com"
 export SMTP_PASSWORD="your_app_password"
 ```
 
-`SMTP_SERVER` and `SMTP_PORT` can also be specified to override the default Gmail settings.
+`SMTP_SERVER` and `SMTP_PORT` can also be specified in `.env` or via environment variables to override the default Gmail settings.
 
 ## Testing
 
