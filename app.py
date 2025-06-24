@@ -6,6 +6,7 @@ import uuid
 import shutil
 import logging
 import sqlite3
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from concurrent.futures import ProcessPoolExecutor
@@ -21,7 +22,11 @@ from croniter import croniter
 # Local application imports
 from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
 from lexers.antlr4_active.speakQueryParser import speakQueryParser
-from lexers.speakQueryListener import speakQueryListener
+try:
+    from lexers.speakQueryListener import speakQueryListener
+except ImportError as e:
+    logging.error(f"[x] Failed to import speakQueryListener: {e}")
+    sys.exit(1)
 from handlers.JavaHandler import JavaHandler
 from validation.SavedSearchValidation import SavedSearchValidation
 from functionality.FindNextCron import suggest_next_cron_runtime

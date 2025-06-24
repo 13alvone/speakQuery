@@ -77,7 +77,7 @@ try:
     from functionality.so_loader import resolve_and_import_so
 except ImportError as e:
     logging.error(f"[x] Could not import so_loader: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import so_loader") from e
 
 # Dynamically load the cpp_index_call shared object
 try:
@@ -86,7 +86,7 @@ try:
     logging.info("[i] Successfully loaded 'cpp_index_call' module.")
 except ImportError as e:
     logging.error(f"[x] Could not import cpp_index_call: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import cpp_index_call") from e
 
 # Dynamically load the cpp_datetime_parser shared object
 try:
@@ -97,7 +97,7 @@ try:
     logging.info("[i] Successfully loaded 'cpp_datetime_parser' module.")
 except ImportError as e:
     logging.error(f"[x] Could not import cpp_datetime_parser: {e}")
-    sys.exit(1)
+    raise ImportError("Could not import cpp_datetime_parser") from e
 
 
 # ------------------------------------------------------------------------------------------------

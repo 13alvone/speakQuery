@@ -29,6 +29,10 @@ import site
 import platform
 import re
 
+
+class BuildError(Exception):
+    """Raised when building custom components fails."""
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +48,7 @@ def run_command(cmd, cwd):
         str: Standard output from the command.
 
     Raises:
-        SystemExit: Exits with an error message if the command fails.
+        BuildError: if the command fails.
     """
     logging.info(f"[i] Running command: {' '.join(cmd)} in {cwd}")
     try:
@@ -52,8 +56,10 @@ def run_command(cmd, cwd):
             cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
         )
     except subprocess.CalledProcessError as e:
-        logging.error(f"[x] Command {' '.join(cmd)} failed in {cwd} with error:\n{e.stderr}")
-        sys.exit(1)
+        logging.error(
+            f"[x] Command {' '.join(cmd)} failed in {cwd} with error:\n{e.stderr}"
+        )
+        raise BuildError(f"Command failed: {' '.join(cmd)}") from e
     logging.info(f"[i] Command output:\n{result.stdout}")
     return result.stdout
 
@@ -62,11 +68,11 @@ def get_pybind11_cmake_dir():
     """Return the pybind11 CMake directory if available."""
     try:
         import pybind11  # type: ignore
-    except ModuleNotFoundError:
+    except ModuleNotFoundError as e:
         logging.error(
             "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
         )
-        sys.exit(1)
+        raise BuildError("pybind11 not installed") from e
     try:
         cmake_dir = pybind11.get_cmake_dir()  # type: ignore
         logging.debug(f"[DEBUG] Found pybind11 CMake dir: {cmake_dir}")
@@ -124,8 +130,12 @@ def build_component(source_dir, build_dir):
                     logging.info(f"[i] Existing CMake cache source ({cached_source}) does not match current source ({current_source}). Removing build directory.")
                     shutil.rmtree(build_dir)
         except Exception as e:
-            logging.error(f"[x] Failed to check CMake cache in {build_dir}: {e}")
-            sys.exit(1)
+            logging.error(
+                f"[x] Failed to check CMake cache in {build_dir}: {e}"
+            )
+            raise BuildError(
+                f"Failed to check CMake cache in {build_dir}"
+            ) from e
 
     # Create the build directory if it does not exist.
     if not os.path.exists(build_dir):
@@ -214,15 +224,15 @@ def main():
         logging.error(
             "[x] cmake is not installed or not found in PATH. Please install cmake to build the components."
         )
-        sys.exit(1)
+        raise BuildError("cmake not found")
 
     try:
         import pybind11  # type: ignore
-    except ModuleNotFoundError:
+    except ModuleNotFoundError as e:
         logging.error(
             "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
         )
-        sys.exit(1)
+        raise BuildError("pybind11 not installed") from e
 
     # Determine the project root (assuming this script is placed at the project root).
     project_root = os.path.abspath(os.path.dirname(__file__))
@@ -247,22 +257,32 @@ def main():
         comp_info = components.get(comp)
         if comp_info is None:
             logging.error(f"[x] Component '{comp}' is not recognized.")
-            sys.exit(1)
+            raise BuildError(f"Unknown component: {comp}")
         source_dir = comp_info["source"]
         build_dir = comp_info["build"]
 
         # If the rebuild flag is set, remove the existing build directory.
         if args.rebuild and os.path.exists(build_dir):
-            logging.info(f"[i] Removing existing build directory for component '{comp}': {build_dir}")
+            logging.info(
+                f"[i] Removing existing build directory for component '{comp}': {build_dir}"
+            )
             try:
                 shutil.rmtree(build_dir)
             except Exception as e:
-                logging.error(f"[x] Failed to remove build directory {build_dir}: {e}")
-                sys.exit(1)
+                logging.error(
+                    f"[x] Failed to remove build directory {build_dir}: {e}"
+                )
+                raise BuildError(
+                    f"Failed to remove build directory {build_dir}"
+                ) from e
 
         # Build the component.
         build_component(source_dir, build_dir)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BuildError as e:
+        logging.error(f"[x] Build failed: {e}")
+        raise
