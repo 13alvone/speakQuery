@@ -1,12 +1,18 @@
 # SpeakQuery Syntax Reference
 
-The query language is defined by `lexers/speakQuery.g4`. This document summarizes
-its grammar and provides examples for common directives.
+The query language syntax is generated from [`lexers/speakQuery.g4`](../lexers/speakQuery.g4). This reference focuses on how to compose queries and use the main directives.
+
+## Basic Query Structure
+
+A query starts with either an initial expression or a pipeline input command (`| inputlookup` or `| loadjob`). Subsequent directives are separated by the pipe (`|`) character. Example:
+
+```spl
+index="logs/app.log" status="error" | stats count by host
+```
 
 ## Expressions
 
-Expressions form the building blocks of filters and calculations. An expression
-can contain logical operators and arithmetic:
+Expressions provide filtering and calculations. They support logical and arithmetic operators:
 
 ```
 expression       -> conjunction (OR conjunction)*
@@ -20,62 +26,120 @@ primary          -> '(' expression ')' | timeClause | indexClause |
                     DOUBLE_QUOTED_STRING | NUMBER | BOOLEAN
 ```
 
-`timeClause`, `indexClause` and `inExpression` allow specifying time ranges,
-indexes and set membership respectively. Functions and variables may appear
-inside any expression.
+`timeClause`, `indexClause` and `inExpression` specify time ranges, indexes and set membership. Functions and variables may appear anywhere inside an expression.
 
 ## Directives
 
-Queries begin with an initial expression or a pipeline input command
-(`| inputlookup` or `| loadjob`) followed by one or more pipe-delimited
-**directives**. Directives implement filtering, evaluation and aggregation.
-Key directives include:
+### search / where
+Filter events using expressions.
 
-- `search` / `where` – filter events using expressions
-- `eval` – assign new fields using expressions
-- `stats`, `eventstats`, `streamstats` – compute aggregations
-- `timechart` – produce time-series aggregations
-- `table` / `maketable` – select or create tables
-- `rename`, `fields`, `sort`, `head`/`limit`, `dedup`, `lookup`, `join`,
-  `append`, `appendpipe` and many multivalue (`mv*`) commands
-- `rex` / `regex` – extract or filter using regular expressions
-- `fillnull`, `spath`, `bin`, `reverse`, `base64`, `outputlookup` and others
+```spl
+index="metrics" | search status="critical" AND errorCode=500
+```
 
-Directive syntax often accepts expressions, variable lists or subsearches (a
-bracketed `[...]` expression sequence).
+### eval
+Assign or transform fields.
+
+```spl
+index="metrics" | eval total=price*quantity, tag=upper(category)
+```
+
+### stats and related aggregations
+Create summaries with `stats`, `eventstats` or `streamstats`.
+
+```spl
+index="metrics" | stats avg(duration) as avg_dur by endpoint
+```
+
+### timechart
+Produce time-series aggregations.
+
+```spl
+index="traffic" | timechart span=1h count by status
+```
+
+### multivalue operations
+Use `mv*` commands to manipulate multivalue fields.
+
+```spl
+index="items" | mvexpand values | mvjoin(",", values)
+```
+
+### lookups and joins
+Enrich results from external data.
+
+```spl
+index="orders" | lookup product.csv productId OUTPUT productName | join userId [ search index="users" | table userId userName ]
+```
+
+### regex and rex
+Extract or filter with regular expressions.
+
+```spl
+index="logs" | rex field=message "error=(?<code>\d+)" | regex host!="test"
+```
+
+### output commands
+Write search results to files.
+
+```spl
+index="metrics" | stats count by host | outputlookup results.csv
+```
 
 ## Functions
 
-Functions appear within expressions. They are grouped as numeric, string or
-special functions. Examples include:
-
-- Numeric: `round`, `min`, `max`, `avg`, `sum`, `median`, `random`, `sqrt`
-- String: `concat`, `replace`, `repeat`, `upper`, `lower`, `trim`, `substr`,
-  `match`
-- Special: `null()`, `isnull()`, `coalesce()`, `if_()`, `case()`, `tonumber()`,
-  `to_cron()`, `from_cron()`
-- Statistical: `count`, `values`, `latest`, `earliest`, `first`, `last`, `dc`
-
-## Tokens
-
-The grammar defines keywords and operators such as `AND`, `OR`, `NOT`, `BY`,
-`IN`, arithmetic symbols (`+`, `-`, `*`, `/`), comparison operators (`=`,
-`!=`, `>`, `<`, `>=`, `<=`), parentheses, brackets, commas and pipes.
-Literals include numbers, single or double quoted strings, booleans and
-variables (`[a-zA-Z_][a-zA-Z_0-9.]*`).
-
-## Examples
-
-The following examples demonstrate common directives in action:
+### Numeric
+Examples include `round`, `min`, `max`, `avg`, `sum`, `median`, `random`, `sqrt`.
 
 ```spl
-index="logs/main.log" | search status=200
-index="sales/data.parquet" | where revenue > 1000
-index="metrics/parquet" | eval total=price * quantity
-index="metrics/parquet" | stats avg(responseTime) as avg_resp by endpoint
-index="traffic/parquet" | timechart span=1d count by pageURL
-index="users/data.parquet" | join userID [ search index="profiles/data.parquet" | table userID userName ]
-index="transactions/parquet" | lookup user_info.csv userID OUTPUT userName userEmail
+... | eval ratio=round(bytes_sent/bytes_received,2)
 ```
 
-For the full grammar see `lexers/speakQuery.g4`.
+### String
+Common string helpers are `concat`, `replace`, `repeat`, `upper`, `lower`, `trim`, `substr`, `match`.
+
+```spl
+... | eval clean=trim(lower(name))
+```
+
+### Special
+Utilities such as `null()`, `isnull()`, `coalesce()`, `if_()`, `case()`, `tonumber()`, `to_cron()`, `from_cron()`.
+
+```spl
+... | eval safe_num=coalesce(tonumber(size),0)
+```
+
+## Subsearches and Macros
+
+Subsearches are bracketed sequences that run separately and feed their results to the outer query.
+
+```spl
+index="servers" [ earliest="-1d" action="reboot" index="maintenance" | stats count by host | fields host ] | stats count by host
+```
+
+Macros allow reusable logic. They are invoked using backticks.
+
+```spl
+index="logs" | `my_custom_macro(arg1="value")`
+```
+
+## Example Queries
+
+The following concise samples are adapted from `lexers/example_valid_complex_queries.yaml`:
+
+```spl
+(index="system_logs/error_tracking" (status="error" OR status="critical") errorCode IN (403,404)) OR (index="finance_logs/transactions" transactionStatus="pending" amount>1000)
+| eval note="example 1"
+```
+
+```spl
+index="database_logs/operations" (systemStatus="degraded" AND serviceType="database") OR (status="down" AND region="APAC")
+[ earliest="2024-04-01" latest="2024-06-30" action="reboot" index="server_logs/maintenance.parquet" | stats count by hostname | fields hostname ]
+| eval insight="example bracket"
+```
+
+```spl
+earliest="2023-12-01" latest="2023-12-31" action="login" success=false retryCount>=3 index="security/authentication" | eval note="login failures"
+```
+
+For the full grammar see [`lexers/speakQuery.g4`](../lexers/speakQuery.g4).
