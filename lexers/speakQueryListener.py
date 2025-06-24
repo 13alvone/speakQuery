@@ -104,6 +104,13 @@ except ImportError as e:
 # speakQueryListener Class Definition
 # ------------------------------------------------------------------------------------------------
 class speakQueryListener(ParseTreeListener):
+    """Listener used by ``speakQueryParser`` to execute pipeline commands.
+
+    The initial index clause is parsed by ANTLR, but the remainder of the
+    pipeline is tokenised manually.  Each segment is looked up in
+    ``_command_map`` and the corresponding ``_cmd_*`` method is invoked to
+    transform the running ``pandas.DataFrame``.
+    """
     def __init__(self, cleaned_query):
         self.current_search_cmd_tokens = None
         # Use the project root discovered at import time
@@ -336,35 +343,60 @@ class speakQueryListener(ParseTreeListener):
 
     # Individual command handlers
     def _cmd_search(self, seg_tokens, seg_str):
+        """Run a search or where clause.
+        seg_tokens is a list like ['search', 'status', '=', '200']; seg_str is the raw segment. Returns a DataFrame.
+        """
         expr = seg_str[len(seg_tokens[0].split("(")[0]):].strip()
         pattern = r'"[^\"]*"|>=|<=|!=|=|>|<|\(|\)|,|\w+|\S'
         tokens = re.findall(pattern, expr)
         return self.search_cmd_handler.run_search(tokens, self.main_df)
 
     def _cmd_stats(self, seg_tokens, _):
+        """Process stats/eventstats/streamstats.
+        seg_tokens lists the command and its arguments, e.g. ["stats", "count", "by", "host"].
+        Returns the transformed DataFrame.
+        """
         return self.stats_handler.run_stats(seg_tokens, self.main_df)
 
     def _cmd_timechart(self, seg_tokens, _):
+        """Generate a timechart. seg_tokens example: ["timechart", "count", "by", "hour"].
+        Returns a DataFrame ready for charting.
+        """
         from handlers.ChartHandler import ChartHandler
         return ChartHandler().run_timechart(seg_tokens, self.main_df)
 
     def _cmd_eval(self, seg_tokens, _):
+        """Evaluate expressions on the DataFrame.
+        seg_tokens resembles ["eval", "foo=bar"]. Returns the updated DataFrame.
+        """
         from handlers.EvalHandler import EvalHandler
         return EvalHandler().run_eval(seg_tokens, self.main_df)
 
     def _cmd_head(self, seg_tokens, _):
+        """Return the first n rows. seg_tokens example: ["head", "10"]. Default is 5.
+        Returns the truncated DataFrame.
+        """
         count = int(seg_tokens[1]) if len(seg_tokens) > 1 else 5
         return self.general_handler.head_call(self.main_df, count, "head")
 
     def _cmd_sort(self, seg_tokens, _):
+        """Sort the DataFrame by columns. seg_tokens like ["sort", "-field"].
+        Direction determined by sign on first column. Returns sorted DataFrame.
+        """
         cols = [c.lstrip("+-").strip(",") for c in seg_tokens[1:]]
         direction = "+" if seg_tokens[1].startswith("+") else "-"
         return self.general_handler.sort_df_by_columns(self.main_df, cols, direction)
 
     def _cmd_reverse(self, seg_tokens, _):
+        """Reverse row order of the DataFrame. seg_tokens only contains the command name.
+        Returns the reversed DataFrame.
+        """
         return self.general_handler.reverse_df_rows(self.main_df)
 
     def _cmd_rex(self, seg_tokens, _):
+        """Apply a rex extraction. seg_tokens contains command arguments followed by the regex.
+        Returns the DataFrame with extracted fields.
+        """
         args = []
         for tok in seg_tokens[1:-1]:
             if "=" in tok:
@@ -377,10 +409,16 @@ class speakQueryListener(ParseTreeListener):
         return self.general_handler.execute_rex(self.main_df, args)
 
     def _cmd_regex(self, seg_tokens, _):
+        """Filter rows using a regular expression. seg_tokens like ["regex", "field=expr"].
+        Returns the filtered DataFrame.
+        """
         field, regex = seg_tokens[1].split("=", 1)
         return self.general_handler.filter_df_by_regex(self.main_df, field, regex)
 
     def _cmd_fields(self, seg_tokens, _):
+        """Select or drop columns. seg_tokens like ["fields", "-foo", "bar"].
+        Returns DataFrame with columns filtered.
+        """
         mode = "+"
         cols = []
         for tok in seg_tokens[1:]:
@@ -392,6 +430,9 @@ class speakQueryListener(ParseTreeListener):
         return self.general_handler.filter_df_columns(self.main_df, cols, mode)
 
     def _cmd_rename(self, seg_tokens, _):
+        """Rename columns. seg_tokens example: ["rename", "old as new"].
+        Returns the DataFrame with updated column names.
+        """
         pairs = [p.strip() for p in " ".join(seg_tokens[1:]).split(",")]
         for pair in pairs:
             if "as" in pair:
@@ -400,28 +441,49 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_fieldsummary(self, seg_tokens, _):
+        """Summarise field statistics. seg_tokens only includes the command.
+        Returns a DataFrame containing the summary.
+        """
         return self.general_handler.execute_fieldsummary(self.main_df)
 
     def _cmd_fillnull(self, seg_tokens, _):
+        """Replace null values. seg_tokens after the command list default replacements.
+        Returns the DataFrame with nulls filled.
+        """
         return self.general_handler.execute_fillnull(self.main_df, seg_tokens[1:])
 
     def _cmd_table(self, seg_tokens, _):
+        """Keep only specified columns. seg_tokens like ["table", "foo", "bar"].
+        Returns the reduced DataFrame.
+        """
         cols = [c.strip(",") for c in seg_tokens[1:]]
         return self.general_handler.filter_df_columns(self.main_df, cols, "+")
 
     def _cmd_maketable(self, seg_tokens, _):
+        """Create an empty DataFrame with the specified columns.
+        seg_tokens example: ["maketable", "foo", "bar"]. Returns the new DataFrame.
+        """
         cols = [c.strip(",") for c in seg_tokens[1:]]
         return self.general_handler.create_empty_dataframe(cols)
 
     def _cmd_base64(self, seg_tokens, _):
+        """Decode base64 fields. seg_tokens contains the command and arguments.
+        Returns the DataFrame with decoded columns.
+        """
         return self.general_handler.handle_base64(self.main_df, seg_tokens)
 
     def _cmd_bin(self, seg_tokens, _):
+        """Round time values into bins. seg_tokens example: ["bin", "_time", "span", "=", "1h"].
+        Returns the DataFrame with an added binned column.
+        """
         field = seg_tokens[1]
         span = seg_tokens[seg_tokens.index("span") + 2] if "span" in seg_tokens else "1h"
         return self.general_handler.execute_bin(self.main_df, field, span)
 
     def _cmd_dedup(self, seg_tokens, _):
+        """Remove duplicate rows. seg_tokens may include a count and options.
+        Returns the deduplicated DataFrame.
+        """
         args = []
         tokens = seg_tokens[1:]
         if tokens and re.fullmatch(r"\d+", tokens[0]):
@@ -464,6 +526,9 @@ class speakQueryListener(ParseTreeListener):
         return self.general_handler.execute_dedup(self.main_df, args)
 
     def _cmd_join(self, seg_tokens, _):
+        """Join with a subsearch. seg_tokens include join type and fields followed by [subsearch].
+        Returns the joined DataFrame.
+        """
         join_type = "inner"
         fields = []
         idx = 1
@@ -484,6 +549,9 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_append(self, seg_tokens, _):
+        """Append the results of a subsearch to the main DataFrame.
+        seg_tokens contains [subsearch] brackets. Returns the extended DataFrame.
+        """
         if "[" in seg_tokens:
             start = seg_tokens.index("[") + 1
             end = seg_tokens.index("]")
@@ -492,6 +560,11 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_appendpipe(self, seg_tokens, _):
+        """Run a subsearch and append the results to ``self.main_df``.
+
+        ``seg_tokens`` must contain the query in ``[subsearch]`` brackets.
+        Returns the DataFrame with rows from the subsearch appended.
+        """
         if "[" in seg_tokens:
             start = seg_tokens.index("[") + 1
             end = seg_tokens.index("]")
@@ -501,6 +574,9 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_multisearch(self, seg_tokens, _):
+        """Execute multiple subsearches and combine results.
+        seg_tokens contains one or more [subsearch] groups. Returns the combined DataFrame.
+        """
         subs = []
         idx = 1
         while idx < len(seg_tokens):
@@ -513,6 +589,9 @@ class speakQueryListener(ParseTreeListener):
         return self.multisearch_handler.run_multisearch(subs, process_index_calls)
 
     def _cmd_lookup(self, seg_tokens, _):
+        """Perform a lookup against a file. seg_tokens format: ["lookup", "file.csv", "key", "OUTPUT", ...].
+        Returns the joined DataFrame.
+        """
         filename = seg_tokens[1]
         key = seg_tokens[2]
         output_fields = [t.strip(",") for t in seg_tokens[4:]] if "OUTPUT" in seg_tokens else []
@@ -524,6 +603,9 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_outputlookup(self, seg_tokens, _):
+        """Write the DataFrame to a lookup file. seg_tokens hold options and filename.
+        Returns the original DataFrame.
+        """
         args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
         if isinstance(args, str):
             kwargs = {"filename": os.path.join(self.lookup_root, args)}
@@ -534,12 +616,18 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_outputnew(self, seg_tokens, _):
+        """Write output to a new lookup file. seg_tokens example: ["outputnew", "file.csv"].
+        Returns the original DataFrame.
+        """
         filename = seg_tokens[1].strip('"').strip("'")
         path = os.path.join(self.lookup_root, filename)
         self.general_handler.execute_outputnew(self.main_df, path)
         return self.main_df
 
     def _cmd_coalesce(self, seg_tokens, seg_str):
+        """Coalesce multiple fields into the first non-null value.
+        seg_tokens lists the fields or parentheses may hold them in seg_str. Returns the DataFrame with a new column.
+        """
         if "(" in seg_str and ")" in seg_str:
             inside = seg_str[seg_str.find("(") + 1 : seg_str.rfind(")")]
             fields = [f.strip().strip(",") for f in inside.split(",")]
@@ -548,14 +636,24 @@ class speakQueryListener(ParseTreeListener):
         return self.general_handler.execute_coalesce(self.main_df, fields)
 
     def _cmd_mvexpand(self, seg_tokens, _):
+        """Expand a multivalue field into multiple events. seg_tokens example: ["mvexpand", "field"].
+        Returns the expanded DataFrame.
+        """
         field = seg_tokens[1]
         return self.general_handler.execute_mvexpand(self.main_df, field)
 
     def _cmd_mvreverse(self, seg_tokens, _):
+        """Reverse the order of values in a multivalue field. seg_tokens example: ["mvreverse", "field"].
+        Returns the modified DataFrame.
+        """
         field = seg_tokens[1]
         return self.general_handler.execute_mvreverse(self.main_df, field)
 
     def _cmd_mvcombine(self, seg_tokens, _):
+        """Combine multivalue entries into a single delimited string.
+        seg_tokens example: ["mvcombine", "field", "delim=,"]
+        Returns the updated DataFrame.
+        """
         field = None
         delim = " "
         for t in seg_tokens[1:]:
@@ -568,48 +666,78 @@ class speakQueryListener(ParseTreeListener):
         return self.main_df
 
     def _cmd_mvdedup(self, seg_tokens, _):
+        """Remove duplicate values from a multivalue field. seg_tokens example: ["mvdedup", "field"].
+        Returns the DataFrame with unique lists.
+        """
         field = seg_tokens[1]
         return self.general_handler.execute_mvdedup(self.main_df, field)
 
     def _cmd_mvappend(self, seg_tokens, _):
+        """Append multiple fields into a single multivalue field. seg_tokens example: ["mvappend", "foo", "bar"].
+        Returns the DataFrame with appended list.
+        """
         fields = [t.strip(",") for t in seg_tokens[1:]]
         return self.general_handler.execute_mvappend(self.main_df, fields, fields[0])
 
     def _cmd_mvfilter(self, seg_tokens, _):
+        """Filter multivalue field values by expression. seg_tokens like ["mvfilter", "field", "value=foo"].
+        Returns the filtered DataFrame.
+        """
         field = seg_tokens[1]
         value = seg_tokens[2].split("=")[1] if "=" in seg_tokens[2] else seg_tokens[2]
         return self.general_handler.execute_mvfilter(self.main_df, field, value)
 
     def _cmd_mvcount(self, seg_tokens, _):
+        """Count elements in a multivalue field. seg_tokens example: ["mvcount", "field"].
+        Returns DataFrame with an added count column.
+        """
         field = seg_tokens[1]
         return self.general_handler.execute_mvcount(self.main_df, field, f"{field}_count")
 
     def _cmd_mvdc(self, seg_tokens, _):
+        """Count distinct elements in a multivalue field. seg_tokens like ["mvdc", "field"].
+        Returns DataFrame with a distinct count column.
+        """
         field = seg_tokens[1]
         return self.general_handler.execute_mvdc(self.main_df, field, f"{field}_dc")
 
     def _cmd_mvfind(self, seg_tokens, _):
+        """Search within multivalue fields for a pattern. seg_tokens example: ["mvfind", "field", "foo"].
+        Returns the DataFrame with matches extracted.
+        """
         field = seg_tokens[1]
         pattern = seg_tokens[2] if len(seg_tokens) > 2 else ""
         return self.general_handler.execute_mvfind(self.main_df, field, pattern)
 
     def _cmd_mvzip(self, seg_tokens, _):
+        """Zip two multivalue fields element-wise. seg_tokens example: ["mvzip", "f1", "f2", "_"]
+        Returns DataFrame with a new zipped field.
+        """
         field1 = seg_tokens[1].rstrip(",")
         field2 = seg_tokens[2].rstrip(",")
         delim = seg_tokens[3].strip('"') if len(seg_tokens) > 3 else "_"
         return self.general_handler.execute_mvzip(self.main_df, field1, field2, delim, "mvzip")
 
     def _cmd_mvjoin(self, seg_tokens, _):
+        """Join multivalue elements with a delimiter. seg_tokens like ["mvjoin", "field", "delim=;"]
+        Returns the DataFrame with joined values.
+        """
         field = seg_tokens[1]
         delim = seg_tokens[2].split("=")[1] if len(seg_tokens) > 2 else " "
         return self.general_handler.execute_mvjoin(self.main_df, field, delim)
 
     def _cmd_mvindex(self, seg_tokens, _):
+        """Extract specific indices from a multivalue field. seg_tokens example: ["mvindex", "field", "0", "1"].
+        Returns DataFrame with indexed values.
+        """
         field = seg_tokens[1]
         idxs = [int(i.strip(",")) for i in seg_tokens[2:]]
         return self.general_handler.execute_mvindex(self.main_df, field, idxs, "mvindex")
 
     def _cmd_spath(self, seg_tokens, _):
+        """Extract JSON values using a spath expression. seg_tokens include key=value pairs such as input=field.
+        Returns DataFrame with the extracted output column.
+        """
         params = {}
         for tok in seg_tokens[1:]:
             if "=" in tok:
