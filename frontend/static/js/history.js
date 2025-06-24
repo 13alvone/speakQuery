@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     localStorage.setItem('savedQuery', loadJobCommand);
 
                     // Update notification
-                    showNotification(`Load job command saved:<br><code>${loadJobCommand}</code><br>Redirecting to the Search page...`, 'is-success');
+                    showNotification(`Load job command saved:<br><code>${loadJobCommand}</code><br>Redirecting to the Search page...`, 'is-success', true);
 
                     // Redirect after a short delay to allow the user to see the notification
                     setTimeout(() => {
