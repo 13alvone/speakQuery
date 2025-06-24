@@ -36,6 +36,31 @@ class BuildError(Exception):
 logger = logging.getLogger(__name__)
 
 
+def ensure_pybind11_installed():
+    """Ensure the pybind11 package is installed."""
+    try:
+        import pybind11  # type: ignore
+        logging.debug("[DEBUG] pybind11 already installed")
+        return
+    except ModuleNotFoundError:
+        logging.info("[i] pybind11 not found. Attempting installation via pip")
+    pip_exe = shutil.which("pip") or shutil.which("pip3")
+    if not pip_exe:
+        logging.error("[x] pip is required to install pybind11 but was not found")
+        raise BuildError("pip not available")
+    try:
+        run_command([pip_exe, "install", "pybind11"], cwd=os.getcwd())
+    except BuildError:
+        logging.error("[x] Failed to install pybind11 via pip")
+        raise
+    try:
+        __import__("pybind11")  # verify import
+        logging.info("[i] Successfully installed pybind11")
+    except Exception as e:  # pragma: no cover - unexpected failure
+        logging.error("[x] pybind11 installation appeared to succeed but import failed: %s", e)
+        raise BuildError("pybind11 installation failed") from e
+
+
 def run_command(cmd, cwd):
     """
     Executes the given command in the specified working directory.
@@ -65,14 +90,9 @@ def run_command(cmd, cwd):
 
 
 def get_pybind11_cmake_dir():
-    """Return the pybind11 CMake directory if available."""
-    try:
-        import pybind11  # type: ignore
-    except ModuleNotFoundError as e:
-        logging.error(
-            "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
-        )
-        raise BuildError("pybind11 not installed") from e
+    """Return the pybind11 CMake directory after ensuring pybind11 is installed."""
+    ensure_pybind11_installed()
+    import pybind11  # type: ignore
     try:
         cmake_dir = pybind11.get_cmake_dir()  # type: ignore
         logging.debug(f"[DEBUG] Found pybind11 CMake dir: {cmake_dir}")
@@ -226,13 +246,7 @@ def main():
         )
         raise BuildError("cmake not found")
 
-    try:
-        import pybind11  # type: ignore
-    except ModuleNotFoundError as e:
-        logging.error(
-            "[x] pybind11 is required. Install it with 'pip install pybind11' and re-run this script."
-        )
-        raise BuildError("pybind11 not installed") from e
+    ensure_pybind11_installed()
 
     # Determine the project root (assuming this script is placed at the project root).
     project_root = os.path.abspath(os.path.dirname(__file__))
