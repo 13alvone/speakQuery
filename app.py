@@ -159,6 +159,17 @@ def initialize_database():
     ''')
         conn.commit()
 
+        # Table to track invalid deletion attempts and bans
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS api_bans (
+            ip TEXT PRIMARY KEY,
+            count INTEGER DEFAULT 0,
+            last_attempt INTEGER DEFAULT 0,
+            banned_until INTEGER DEFAULT 0
+        )
+    ''')
+        conn.commit()
+
     # Initialization for app_settings
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         # Assuming same DB; adjust if different
@@ -192,6 +203,8 @@ def initialize_database():
                 'QUEUE_SIZE': '20',
                 'PROCESSING_LIMIT': '5',
                 'THROTTLE_ENABLED': 'true',
+                'BAN_DELETIONS_ENABLED': 'false',
+                'BAN_DURATION': '3600',
             }
             for key, value in default_settings.items():
                 cursor.execute(
@@ -234,6 +247,10 @@ def load_settings_into_config():
             app.config[key] = int(value)
         elif key == 'THROTTLE_ENABLED':
             app.config[key] = str(value).lower() in {'true', '1', 'yes'}
+        elif key == 'BAN_DELETIONS_ENABLED':
+            app.config[key] = str(value).lower() in {'true', '1', 'yes'}
+        elif key == 'BAN_DURATION':
+            app.config[key] = int(value)
         else:
             app.config[key] = value
 

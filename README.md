@@ -107,6 +107,7 @@ performance:
 - `QUEUE_SIZE` – maximum number of queued requests (default `20`)
 - `PROCESSING_LIMIT` – number of worker threads (default `5`)
 - `THROTTLE_ENABLED` – set to `true` or `false` to toggle per-IP throttling
+- `BAN_DELETIONS_ENABLED` – enable IP banning after repeated failed DELETE requests
 
 
 ## Testing
