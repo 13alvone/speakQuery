@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
+import os
+from werkzeug.utils import secure_filename
 from app import (
     execute_speakQuery,
     save_dataframe,
@@ -13,6 +15,59 @@ import uuid
 import logging
 
 api_bp = Blueprint('api_bp', __name__)
+
+BAN_THRESHOLD = 5
+BAN_WINDOW = 300  # seconds
+
+
+def _is_ip_banned(ip: str) -> bool:
+    """Return True if the IP is currently banned."""
+    if not app.config.get('BAN_DELETIONS_ENABLED', False):
+        return False
+    now = int(time.time())
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT banned_until FROM api_bans WHERE ip=?', (ip,))
+        row = cursor.fetchone()
+        return bool(row and row[0] and row[0] > now)
+
+
+def _record_failure(ip: str):
+    """Increment failure counter for IP and ban if threshold exceeded."""
+    if not app.config.get('BAN_DELETIONS_ENABLED', False):
+        return
+    now = int(time.time())
+    ban_duration = int(app.config.get('BAN_DURATION', 3600))
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT count, last_attempt, banned_until FROM api_bans WHERE ip=?',
+            (ip,),
+        )
+        row = cursor.fetchone()
+        if row:
+            count, last_attempt, banned_until = row
+            if banned_until and banned_until > now:
+                return
+            if last_attempt and now - last_attempt <= BAN_WINDOW:
+                count += 1
+            else:
+                count = 1
+            last_attempt = now
+        else:
+            count = 1
+            last_attempt = now
+            banned_until = 0
+
+        if count >= BAN_THRESHOLD:
+            banned_until = now + ban_duration
+            count = 0
+
+        cursor.execute(
+            'REPLACE INTO api_bans (ip, count, last_attempt, banned_until) VALUES (?, ?, ?, ?)',
+            (ip, count, last_attempt, banned_until),
+        )
+        conn.commit()
 
 @api_bp.route('/api/query', methods=['POST'])
 def api_query():
@@ -162,14 +217,21 @@ def api_update_saved_search(search_id):
 @api_bp.route('/api/saved_search/<search_id>', methods=['DELETE'])
 def api_delete_saved_search(search_id):
     """Delete a saved search."""
+    ip = request.remote_addr
+    if _is_ip_banned(ip):
+        return jsonify({'status': 'error', 'message': 'IP banned'}), 403
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
             cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
+            if cursor.rowcount == 0:
+                _record_failure(ip)
+                return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
             conn.commit()
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
         logging.error(f"Error deleting saved search: {exc}")
+        _record_failure(ip)
         return jsonify({'status': 'error', 'message': 'Failed to delete saved search'}), 500
 
 
@@ -188,4 +250,32 @@ def api_get_saved_search(search_id):
     search = {key: row[key] for key in row.keys()}
     search['disabled'] = bool(search.get('disabled', 0))
     return jsonify({'status': 'success', 'search': search}), 200
+
+
+@api_bp.route('/api/lookup/<name>', methods=['DELETE'])
+def api_delete_lookup(name):
+    """Delete a lookup file by name."""
+    ip = request.remote_addr
+    if _is_ip_banned(ip):
+        return jsonify({'status': 'error', 'message': 'IP banned'}), 403
+
+    safe_name = secure_filename(name)
+    lookup_dir = app.config['LOOKUP_DIR']
+    file_path = os.path.join(lookup_dir, safe_name)
+
+    if not os.path.abspath(file_path).startswith(os.path.abspath(lookup_dir)):
+        _record_failure(ip)
+        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
+
+    if not os.path.exists(file_path):
+        _record_failure(ip)
+        return jsonify({'status': 'error', 'message': 'File not found.'}), 404
+
+    try:
+        os.remove(file_path)
+        return jsonify({'status': 'success'}), 200
+    except Exception as exc:
+        logging.error(f"Error deleting lookup file: {exc}")
+        _record_failure(ip)
+        return jsonify({'status': 'error', 'message': 'Failed to delete file.'}), 500
 
