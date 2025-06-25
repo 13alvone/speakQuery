@@ -35,6 +35,7 @@
                             <button class="modal-close is-large" aria-label="close"></button>
                             <h2 class="title is-4">Upload File</h2>
                             <form id="uploadForm">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="field">
                                     <div class="file has-name is-fullwidth">
                                         <label class="file-label">

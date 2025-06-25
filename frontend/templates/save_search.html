@@ -13,6 +13,7 @@
 
 
         <form id="saved-search-form" method="POST" action="/commit_saved_search">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <!-- Request ID (readonly) -->
             <div class="field">
                 <label class="label">Request ID</label>

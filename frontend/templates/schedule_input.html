@@ -48,6 +48,7 @@ GENERATE_RESULTS(df)
                 </div>
 
                 <form id="scheduled-input-form" method="POST" action="/commit_scheduled_input">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <!-- Title Field -->
                     <div class="field">
                         <label class="label" for="title">Title</label>
