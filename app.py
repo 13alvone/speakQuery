@@ -1157,10 +1157,12 @@ def execute_speakQuery(speak_query: str):
 from routes.query import query_bp
 from routes.lookups import lookups_bp
 from routes.settings import settings_bp
+from routes.api import api_bp
 
 app.register_blueprint(query_bp)
 app.register_blueprint(lookups_bp)
 app.register_blueprint(settings_bp)
+app.register_blueprint(api_bp)
 
 
 if __name__ == '__main__':
