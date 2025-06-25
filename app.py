@@ -159,6 +159,29 @@ def load_user(user_id):
     return None
 
 
+@login_manager.request_loader
+def load_user_from_request(request):
+    """Authenticate via Authorization bearer token."""
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+    token = auth_header.split(None, 1)[1]
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT id, username, role, api_token FROM users WHERE api_token = ?',
+                (token_hash,),
+            )
+            row = cursor.fetchone()
+            if row:
+                return User(id=row[0], username=row[1], role=row[2], api_token=row[3])
+    except Exception as exc:
+        logging.error(f"[x] Token auth failed: {exc}")
+    return None
+
+
 # Ensure temp directory exists
 os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
 
@@ -271,9 +294,10 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             role = admin_role or os.environ.get('ADMIN_ROLE', 'admin')
             api_token = admin_api_token or os.environ.get('ADMIN_API_TOKEN', str(uuid.uuid4()))
             password_hash = hashlib.sha256(password.encode()).hexdigest()
+            token_hash = hashlib.sha256(api_token.encode()).hexdigest()
             cursor.execute(
                 'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
-                (username, password_hash, role, api_token),
+                (username, password_hash, role, token_hash),
             )
             conn.commit()
             logging.info('[i] Inserted default admin user')
