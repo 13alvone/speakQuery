@@ -2,6 +2,14 @@
 
 SpeakQuery is an experimental search and ingestion engine. The system processes a custom query language and operates over local SQLite and Parquet files. A Flask web interface exposes search features while background engines run scheduled queries and ingestion tasks.
 
+## Quick Start
+
+1. Clone this repository.
+2. Run `bash setup.sh` to install dependencies and initialize databases.
+3. Copy `.env.example` to `.env` and edit the values for your environment.
+4. Start all services with `./run_all.sh`.
+5. Open a browser to the provided URL to use the web interface.
+
 ## Architecture
 
 - **`app.py`** – Flask application providing the web UI, upload handlers and query endpoints. It can optionally spawn the background engines.
