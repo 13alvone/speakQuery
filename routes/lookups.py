@@ -134,7 +134,15 @@ def view_lookup():
         return "<p>Error: File not found.</p>", 404
 
     try:
-        df = pd.read_csv(safe_filepath)
+        # Limit rows read to avoid loading large files entirely into memory
+        row_limit = request.args.get('rows', '100')
+        try:
+            row_limit = int(row_limit)
+        except ValueError:
+            row_limit = 100
+        if row_limit <= 0 or row_limit > 1000:
+            row_limit = 100
+        df = pd.read_csv(safe_filepath, nrows=row_limit)
         return df.to_html()
     except Exception as e:
         logging.error(f"Error reading file: {str(e)}")

@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -136,3 +137,37 @@ def test_lookup_file_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch
     client.post('/login', json={'username': 'user2', 'password': 'pw2'})
     resp = client.post('/delete_lookup_file', json={'filepath': str(tmp_path / 'own.csv')})
     assert resp.status_code == 403
+
+
+def test_view_lookup_large_file_limited_rows(mock_heavy_modules, tmp_path, monkeypatch):
+    from app import app, initialize_database
+    from routes import lookups
+    pd = lookups.pd
+
+    test_dir = Path('test_lookups')
+    test_dir.mkdir(exist_ok=True)
+    app.config['LOOKUP_DIR'] = str(test_dir)
+    initialize_database()
+
+    large_file = test_dir / 'large.csv'
+    with large_file.open('w', encoding='utf-8') as fh:
+        fh.write('a\n')
+        for i in range(5000):
+            fh.write(f"{i}\n")
+
+    client = app.test_client()
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+
+    called = {}
+
+    real_read_csv = pd.read_csv
+
+    def fake_read_csv(path, *args, **kwargs):
+        called['nrows'] = kwargs.get('nrows')
+        return real_read_csv(path, *args, **kwargs)
+
+    monkeypatch.setattr(pd, 'read_csv', fake_read_csv)
+
+    resp = client.get(f'/view_lookup?file={large_file}')
+    assert resp.status_code == 200
+    assert called.get('nrows') is not None and called['nrows'] <= 100
