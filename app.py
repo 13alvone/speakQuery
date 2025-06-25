@@ -477,6 +477,9 @@ def login():
                 login_user(user)
                 return jsonify({'status': 'success'})
     except Exception as exc:
+        if isinstance(exc, sqlite3.Error) and 'no such table' in str(exc):
+            initialize_database()
+            return login()
         logging.error(f"[x] Login failed for {username}: {exc}")
         return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
     return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401

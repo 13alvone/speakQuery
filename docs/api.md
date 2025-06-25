@@ -7,6 +7,23 @@ locally on port `5000`.
 The query syntax accepted by `/api/query` and saved search routes is
 derived from [`lexers/speakQuery.g4`](../lexers/speakQuery.g4).
 
+## Authentication
+
+Most API endpoints require an authenticated user. Supply an API token in the `Authorization` header:
+
+```bash
+curl -H "Authorization: Bearer <api_token>" http://localhost:5000/api/query
+```
+
+Create or update an admin account with:
+
+```bash
+python app.py create-admin <username> <password> --token <api_token>
+```
+
+If no users exist, the application creates one using `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_ROLE` and `ADMIN_API_TOKEN` from `.env`. Tokens are hashed before storage.
+
+
 ## Query
 
 ### `POST /api/query`

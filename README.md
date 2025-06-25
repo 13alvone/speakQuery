@@ -110,6 +110,24 @@ performance:
 - `THROTTLE_ENABLED` – set to `true` or `false` to toggle per-IP throttling
 - `BAN_DELETIONS_ENABLED` – enable IP banning after repeated failed DELETE requests
 
+## Authentication
+
+SpeakQuery uses a hybrid authentication system based on **Flask-Login**. When the application initializes an empty database, a default admin account is created. Credentials can be supplied as environment variables or via the CLI:
+
+```bash
+python app.py create-admin <username> <password> --token <api_token>
+```
+
+If `--token` is omitted a random value is generated. Set `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_ROLE` and `ADMIN_API_TOKEN` in `.env` to control the initial admin user.
+
+Include the API token in the `Authorization` header when calling the API:
+
+```bash
+curl -H "Authorization: Bearer <api_token>" http://localhost:5000/api/saved_search
+```
+
+Tokens are stored hashed. Re-run `create-admin` to rotate credentials or add new administrators.
+
 
 ## Testing
 
