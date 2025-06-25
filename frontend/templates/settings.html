@@ -20,6 +20,7 @@
                 <div class="box">
                     <h2 class="subtitle">Global Configuration</h2>
                     <form id="settings-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <!-- Upload Folder -->
                         <div class="field spaced-field">
                             <label class="label">Upload Folder</label>

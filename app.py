@@ -76,7 +76,7 @@ if secret_key == 'insecure-default-key':
     )
 app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
-app.config['WTF_CSRF_ENABLED'] = False
+app.config['WTF_CSRF_ENABLED'] = True
 
 # Authentication setup
 login_manager = LoginManager()
@@ -457,6 +457,7 @@ def index():
     return render_template('index.html')
 
 
+@csrf.exempt
 @app.route('/login', methods=['POST'])
 def login():
     """Authenticate a user and start a session."""
@@ -1354,6 +1355,11 @@ from routes.query import query_bp
 from routes.lookups import lookups_bp
 from routes.settings import settings_bp
 from routes.api import api_bp
+
+csrf.exempt(query_bp)
+csrf.exempt(lookups_bp)
+csrf.exempt(settings_bp)
+csrf.exempt(api_bp)
 
 app.register_blueprint(query_bp)
 app.register_blueprint(lookups_bp)

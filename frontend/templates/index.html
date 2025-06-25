@@ -31,6 +31,7 @@
 
                     <!-- Hidden form for Save Search -->
                     <form id="save-search-form" action="/save_search.html" method="post" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="request_id" id="form-request-id" value="">
                         <input type="hidden" name="saved_query" id="form-saved-query" value="">
                     </form>
