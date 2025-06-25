@@ -63,7 +63,6 @@ def test_saved_search_crud(mock_heavy_modules, tmp_path, monkeypatch):
 
     app.config['SAVED_SEARCHES_DB'] = orig_db
     app.config['SCHEDULED_INPUTS_DB'] = orig_sched
-    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
 
 
 def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch):
@@ -75,6 +74,10 @@ def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatc
     tmp_db = tmp_path / 'db.sqlite3'
     shutil.copy(orig_db, tmp_db)
     app.config['SAVED_SEARCHES_DB'] = str(tmp_db)
+
+    orig_sched = app.config['SCHEDULED_INPUTS_DB']
+    tmp_sched = tmp_path / 'sched.db'
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_sched)
 
     monkeypatch.setenv('ADMIN_USERNAME', 'admin')
     monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
@@ -128,3 +131,4 @@ def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatc
     assert resp.status_code == 200
 
     app.config['SAVED_SEARCHES_DB'] = orig_db
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
