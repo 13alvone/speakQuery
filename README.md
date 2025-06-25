@@ -138,6 +138,25 @@ python utils/generate_fake_dbs_and_data.py 1000 5
 This creates a Parquet file under `indexes/test_parquets/` and logs the
 full path when writing completes.
 
+## Uploading lookup files
+
+Lookup tables can be uploaded through the web UI. The frontend validates file
+extensions before submitting the request:
+
+```javascript
+const allowedExtensions = ['sqlite3', 'parquet', 'csv', 'json'];
+const fileExt = file.name.split('.').pop().toLowerCase();
+if (!allowedExtensions.includes(fileExt)) {
+    alert('Invalid file type');
+    return;
+}
+```
+
+The server performs an additional check when a `.csv` file is uploaded. The
+`/upload_file` route tries to detect a valid delimiter with `csv.Sniffer` and
+falls back to `pandas.read_csv` if necessary. Files that fail these checks are
+rejected even if they use the `.csv` extension.
+
 ## Timechart command
 
 The query language includes a `timechart` directive for quick time-series

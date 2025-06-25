@@ -50,3 +50,31 @@ def test_clone_lookup_file_empty_filepath(mock_heavy_modules):
     resp = client.post('/clone_lookup_file', json={'filepath': '', 'new_name': 'copy.csv'})
     assert resp.status_code == 400
     assert resp.get_json()['status'] == 'error'
+
+
+def test_upload_file_valid_csv(mock_heavy_modules, tmp_path):
+    from app import app
+    import io
+
+    app.config['LOOKUP_DIR'] = str(tmp_path)
+    client = app.test_client()
+
+    data = {'file': (io.BytesIO(b'a,b\n1,2\n'), 'good.csv')}
+    resp = client.post('/upload_file', data=data, content_type='multipart/form-data')
+    assert resp.status_code == 200
+    assert resp.get_json()['status'] == 'success'
+    assert (tmp_path / 'good.csv').exists()
+
+
+def test_upload_file_invalid_csv(mock_heavy_modules, tmp_path):
+    from app import app
+    import io
+
+    app.config['LOOKUP_DIR'] = str(tmp_path)
+    client = app.test_client()
+
+    data = {'file': (io.BytesIO(b'{"json": true}'), 'bad.csv')}
+    resp = client.post('/upload_file', data=data, content_type='multipart/form-data')
+    assert resp.status_code == 400
+    assert resp.get_json()['status'] == 'error'
+    assert not (tmp_path / 'bad.csv').exists()

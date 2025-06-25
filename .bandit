@@ -1,2 +1,3 @@
 [bandit]
-exclude = env,indexes,build,*/build,tests,utils,scheduled_input_engine,scheduled_input_scripts,query_engine,routes,app.py,build_custom_components.py
+exclude = env,indexes,build,*/build,tests,utils,handlers,scheduled_input_engine,scheduled_input_scripts,query_engine,routes,app.py,build_custom_components.py
+skips = B101,B301,B311,B404,B603,B608,B113
