@@ -19,8 +19,10 @@ def get_settings():
                 settings_dict[key] = ','.join(app.config.get(key, []))
             elif key == 'ALLOWED_API_DOMAINS':
                 settings_dict[key] = ','.join(app.config.get(key, []))
-            elif key in ['MAX_CONTENT_LENGTH', 'KEEP_LATEST_FILES']:
+            elif key in ['MAX_CONTENT_LENGTH', 'KEEP_LATEST_FILES', 'QUEUE_SIZE', 'PROCESSING_LIMIT']:
                 settings_dict[key] = int(app.config.get(key, 0))
+            elif key == 'THROTTLE_ENABLED':
+                settings_dict[key] = app.config.get(key, False)
             else:
                 settings_dict[key] = app.config.get(key, '')
 
@@ -54,6 +56,12 @@ def update_settings():
             elif key == 'KEEP_LATEST_FILES':
                 cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(int(value)), key))
                 app.config[key] = int(value)
+            elif key in ['QUEUE_SIZE', 'PROCESSING_LIMIT']:
+                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(int(value)), key))
+                app.config[key] = int(value)
+            elif key == 'THROTTLE_ENABLED':
+                cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (str(value).lower(), key))
+                app.config[key] = str(value).lower() in {'true', '1', 'yes'}
             else:
                 cursor.execute('UPDATE app_settings SET value = ? WHERE key = ?', (value, key))
                 app.config[key] = value

@@ -5,3 +5,4 @@ defusedxml~=0.7
 pytest~=8.1
 flake8~=7.0
 bandit~=1.7
+flask-limiter~=3.5.0

@@ -11,6 +11,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from concurrent.futures import ProcessPoolExecutor
+from queue import Full
+from utils.task_queue import TaskQueue
 
 # Third-party imports
 import requests
@@ -19,6 +21,8 @@ import antlr4
 from flask import Flask, request, jsonify, render_template
 from flask_wtf import CSRFProtect
 from croniter import croniter
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Local application imports
 from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
@@ -63,6 +67,18 @@ if secret_key == 'insecure-default-key':
 app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = False
+
+# Rate limiting and task queue initialized with safe defaults
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["100 per minute"],
+    storage_uri="memory://",
+    enabled=False,
+)
+limiter.init_app(app)
+
+# Default queue before settings are loaded
+app.config['TASK_QUEUE'] = TaskQueue(10, 2)
 
 # Configuration
 app.config['UPLOAD_FOLDER'] = str(PROJECT_ROOT / 'lookups')
@@ -173,6 +189,9 @@ def initialize_database():
                 'LOG_LEVEL': 'DEBUG',
                 'KEEP_LATEST_FILES': '20',
                 'ALLOWED_API_DOMAINS': 'jsonplaceholder.typicode.com',
+                'QUEUE_SIZE': '20',
+                'PROCESSING_LIMIT': '5',
+                'THROTTLE_ENABLED': 'true',
             }
             for key, value in default_settings.items():
                 cursor.execute(
@@ -211,8 +230,10 @@ def load_settings_into_config():
             app.config[key] = set(d.strip() for d in value.split(',') if d.strip())
         elif key == 'MAX_CONTENT_LENGTH':
             app.config[key] = int(value)
-        elif key in ['KEEP_LATEST_FILES']:
+        elif key in ['KEEP_LATEST_FILES', 'QUEUE_SIZE', 'PROCESSING_LIMIT']:
             app.config[key] = int(value)
+        elif key == 'THROTTLE_ENABLED':
+            app.config[key] = str(value).lower() in {'true', '1', 'yes'}
         else:
             app.config[key] = value
 
@@ -1169,6 +1190,11 @@ if __name__ == '__main__':
     delete_old_files()
     initialize_database()
     load_settings_into_config()  # Load settings into app.config
+    # Reconfigure queue and rate limiter based on loaded settings
+    queue_size = int(app.config.get('QUEUE_SIZE', 10))
+    processing_limit = int(app.config.get('PROCESSING_LIMIT', 2))
+    app.config['TASK_QUEUE'] = TaskQueue(queue_size, processing_limit)
+    limiter.enabled = app.config.get('THROTTLE_ENABLED', True)
     # Configure logging now that app config is available
     logging.basicConfig(
         level=app.config['LOG_LEVEL'],
