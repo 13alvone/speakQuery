@@ -14,10 +14,17 @@ def test_saved_search_crud(mock_heavy_modules, tmp_path, monkeypatch):
     tmp_db = tmp_path / 'db.sqlite3'
     shutil.copy(orig_db, tmp_db)
     app.config['SAVED_SEARCHES_DB'] = str(tmp_db)
+
+    orig_sched = app.config['SCHEDULED_INPUTS_DB']
+    tmp_sched = tmp_path / 'sched.db'
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_sched)
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
     initialize_database()
 
     monkeypatch.setattr('routes.api.is_title_unique', lambda t: True)
     client = app.test_client()
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
 
     search_id = f"{time.time()}_{uuid.uuid4()}"
     payload = {
@@ -51,6 +58,72 @@ def test_saved_search_crud(mock_heavy_modules, tmp_path, monkeypatch):
     resp = client.patch(f'/api/saved_search/{search_id}', json=payload_update)
     assert resp.status_code == 200
 
+    resp = client.delete(f'/api/saved_search/{search_id}')
+    assert resp.status_code == 200
+
+    app.config['SAVED_SEARCHES_DB'] = orig_db
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
+
+
+def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch):
+    import sqlite3
+    import hashlib
+    from app import app, initialize_database
+
+    orig_db = app.config['SAVED_SEARCHES_DB']
+    tmp_db = tmp_path / 'db.sqlite3'
+    shutil.copy(orig_db, tmp_db)
+    app.config['SAVED_SEARCHES_DB'] = str(tmp_db)
+
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
+
+    # add user1 and user2
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
+            ('user1', hashlib.sha256(b'pw1').hexdigest(), 'user')
+        )
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
+            ('user2', hashlib.sha256(b'pw2').hexdigest(), 'user')
+        )
+        conn.commit()
+
+    client = app.test_client()
+    client.post('/login', json={'username': 'user1', 'password': 'pw1'})
+
+    search_id = f"{time.time()}_{uuid.uuid4()}"
+    payload = {
+        'request_id': search_id,
+        'title': f'Test {uuid.uuid4()}',
+        'description': 'desc',
+        'query': 'index="dummy"',
+        'cron_schedule': '* * * * *',
+        'trigger': 'Once',
+        'lookback': '-1h',
+        'throttle': 'no',
+        'throttle_time_period': '-1h',
+        'throttle_by': 'user',
+        'event_message': 'msg',
+        'send_email': 'no',
+        'email_address': 'test@example.com',
+        'email_content': 'body'
+    }
+
+    resp = client.post('/api/saved_search', json=payload)
+    assert resp.status_code == 201
+    client.get('/logout')
+
+    client.post('/login', json={'username': 'user2', 'password': 'pw2'})
+    resp = client.delete(f'/api/saved_search/{search_id}')
+    assert resp.status_code == 403
+    client.get('/logout')
+
+    client.post('/login', json={'username': 'user1', 'password': 'pw1'})
     resp = client.delete(f'/api/saved_search/{search_id}')
     assert resp.status_code == 200
 

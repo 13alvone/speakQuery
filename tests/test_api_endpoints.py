@@ -27,6 +27,7 @@ def test_api_query_metadata(mock_heavy_modules, monkeypatch):
 def test_api_saved_search_crud(mock_heavy_modules):
     from app import app
     client = app.test_client()
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
 
     search_id = f"{time.time()}_{uuid.uuid4()}"
     payload = {
@@ -71,6 +72,7 @@ def test_api_saved_search_settings(mock_heavy_modules, monkeypatch):
     monkeypatch.setattr('routes.api.get_next_runtime', lambda s: fixed_time)
 
     client = app.test_client()
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
 
     search_id = f"{time.time()}_{uuid.uuid4()}"
     payload = {

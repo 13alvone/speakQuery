@@ -1,11 +1,14 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
+from flask_login import login_required, current_user
 from app import get_row_count, allowed_file
 import pandas as pd
 import csv
 import os
 import shutil
 import logging
+import sqlite3
+import time
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
@@ -15,6 +18,11 @@ lookups_bp = Blueprint('lookups_bp', __name__)
 def get_lookup_files():
     lookup_dir = app.config['LOOKUP_DIR']
     files = []
+    owner_map = {}
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT filename, owner_id FROM lookup_files')
+        owner_map = dict(cursor.fetchall())
     for root, _, filenames in os.walk(lookup_dir):
         for filename in filenames:
             filepath = os.path.join(root, filename)
@@ -27,7 +35,8 @@ def get_lookup_files():
                 'updated_at': datetime.fromtimestamp(stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
                 'filesize': stats.st_size,
                 'permissions': oct(stats.st_mode)[-3:],
-                'row_count': row_count
+                'row_count': row_count,
+                'owner_id': owner_map.get(filename)
             })
     return jsonify({'status': 'success', 'files': files})
 
@@ -50,6 +59,7 @@ def get_loadjob_files():
 
 
 @lookups_bp.route('/upload_file', methods=['POST'])
+@login_required
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'status': 'error', 'message': 'No file part in the request.'}), 400
@@ -92,6 +102,13 @@ def upload_file():
 
     try:
         file.save(file_path)
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'INSERT OR REPLACE INTO lookup_files (filename, owner_id, created_at) VALUES (?, ?, ?)',
+                (filename, current_user.get_id(), int(time.time()))
+            )
+            conn.commit()
         return jsonify({'status': 'success', 'message': 'File uploaded successfully.'})
     except Exception as e:
         logging.error(f"Error saving file: {str(e)}")
@@ -125,6 +142,7 @@ def view_lookup():
 
 
 @lookups_bp.route('/delete_lookup_file', methods=['POST'])
+@login_required
 def delete_lookup_file():
     data = request.json
     filepath = data.get('filepath')
@@ -144,6 +162,15 @@ def delete_lookup_file():
         return jsonify({'status': 'error', 'message': 'File not found.'}), 404
 
     try:
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT owner_id FROM lookup_files WHERE filename=?', (filename,))
+            row = cursor.fetchone()
+            owner_id = row[0] if row else None
+            if owner_id is not None and str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
+                return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
+            cursor.execute('DELETE FROM lookup_files WHERE filename=?', (filename,))
+            conn.commit()
         os.remove(safe_filepath)
         return jsonify({'status': 'success'})
     except Exception as e:
@@ -152,6 +179,7 @@ def delete_lookup_file():
 
 
 @lookups_bp.route('/clone_lookup_file', methods=['POST'])
+@login_required
 def clone_lookup_file():
     data = request.json
     filepath = data.get('filepath')
@@ -180,7 +208,21 @@ def clone_lookup_file():
     new_filepath = os.path.join(os.path.dirname(safe_filepath), new_filename)
 
     try:
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT owner_id FROM lookup_files WHERE filename=?', (filename,))
+            row = cursor.fetchone()
+            owner_id = row[0] if row else None
+            if owner_id is not None and str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
+                return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
         shutil.copy(safe_filepath, new_filepath)
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'INSERT OR REPLACE INTO lookup_files (filename, owner_id, created_at) VALUES (?, ?, ?)',
+                (new_filename, current_user.get_id(), int(time.time()))
+            )
+            conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
         logging.error(f"Error cloning file: {str(e)}")

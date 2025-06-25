@@ -207,10 +207,18 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             send_email TEXT,
             email_address TEXT,
             email_content TEXT,
-            file_location TEXT
+            file_location TEXT,
+            owner_id INTEGER REFERENCES users(id)
         )
     ''')
         conn.commit()
+        cursor.execute('PRAGMA table_info(saved_searches)')
+        cols = [c[1] for c in cursor.fetchall()]
+        if 'owner_id' not in cols:
+            cursor.execute(
+                'ALTER TABLE saved_searches ADD COLUMN owner_id INTEGER REFERENCES users(id)'
+            )
+            conn.commit()
 
         # Table to track invalid deletion attempts and bans
         cursor.execute('''
@@ -219,6 +227,15 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             count INTEGER DEFAULT 0,
             last_attempt INTEGER DEFAULT 0,
             banned_until INTEGER DEFAULT 0
+        )
+    ''')
+        conn.commit()
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lookup_files (
+            filename TEXT PRIMARY KEY,
+            owner_id INTEGER REFERENCES users(id),
+            created_at INTEGER
         )
     ''')
         conn.commit()
