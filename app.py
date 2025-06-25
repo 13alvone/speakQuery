@@ -22,6 +22,13 @@ import pandas as pd
 import antlr4
 from flask import Flask, request, jsonify, render_template
 from flask_wtf import CSRFProtect
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
 from croniter import croniter
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -70,6 +77,32 @@ app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = False
 
+# Authentication setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+class User:
+    """Simple user model for authentication."""
+
+    def __init__(self, id, username, role, api_token=None):
+        self.id = str(id)
+        self.username = username
+        self.role = role
+        self.api_token = api_token
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    def get_id(self):
+        return self.id
+
+
 # Rate limiting and task queue initialized with safe defaults
 limiter = Limiter(
     key_func=get_remote_address,
@@ -106,6 +139,24 @@ validator = SavedSearchValidation()
 UUID_REGEX = re.compile(
     r'^[0-9]{10}\.[0-9]{6,7}_[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
 )
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Retrieve a user object from the database."""
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT id, username, role, api_token FROM users WHERE id = ?',
+                (user_id,),
+            )
+            row = cursor.fetchone()
+            if row:
+                return User(id=row[0], username=row[1], role=row[2], api_token=row[3])
+    except Exception as exc:
+        logging.error(f"[x] Failed to load user {user_id}: {exc}")
+    return None
 
 
 # Ensure temp directory exists
@@ -362,6 +413,40 @@ def is_title_unique(title):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    """Authenticate a user and start a session."""
+    data = request.get_json() or request.form
+    username = data.get('username') if data else None
+    password = data.get('password') if data else None
+    if not username or not password:
+        return jsonify({'status': 'error', 'message': 'Missing credentials'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'SELECT id, password_hash, role, api_token FROM users WHERE username = ?',
+                (username,),
+            )
+            row = cursor.fetchone()
+            if row and row[1] == hashlib.sha256(password.encode()).hexdigest():
+                user = User(id=row[0], username=username, role=row[2], api_token=row[3])
+                login_user(user)
+                return jsonify({'status': 'success'})
+    except Exception as exc:
+        logging.error(f"[x] Login failed for {username}: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
+    return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    """Log out the current user."""
+    logout_user()
+    return jsonify({'status': 'success'})
 
 
 @app.route('/lookups.html')

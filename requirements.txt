@@ -9,6 +9,7 @@ croniter~=6.0.0
 numpy~=2.2.1
 # Throttling support
 flask-limiter~=3.5.0
+flask-login~=0.6.3
 # The 'yaml' package does not exist on PyPI; PyYAML provides YAML support.
 pyyaml~=6.0.2
 jpype1~=1.5.1
