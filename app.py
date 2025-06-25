@@ -1277,11 +1277,23 @@ def get_directory_tree():
 
 
 def get_row_count(filepath):
+    """Return the number of rows in *filepath*.
+
+    For CSV files the count is performed line by line to avoid reading the
+    entire file into memory. Other formats fall back to ``pandas.read_csv``.
+    """
+
     try:
+        if str(filepath).lower().endswith(".csv"):
+            with open(filepath, "r", encoding="utf-8", errors="ignore") as fh:
+                # Subtract one for the header line if present.
+                row_count = sum(1 for _ in fh) - 1
+            return max(row_count, 0)
+
         df = pd.read_csv(filepath)
         return len(df)
-    except Exception as e:
-        logging.error(f"Error reading file for row count: {str(e)}")
+    except Exception as exc:
+        logging.error(f"Error reading file for row count: {exc}")
         return 0
 
 
