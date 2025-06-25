@@ -20,4 +20,5 @@ dependencies:
   - aiosmtplib
   - restrictedpython
   - jpype1
+  - faker
 prefix: /home/cspeakes/anaconda3/envs/speakQueryEnv

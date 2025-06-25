@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Generate fake SQLite and Parquet data for testing."""
 
 import argparse
 import logging
@@ -101,7 +102,8 @@ def generate_data(x, y):
 def write_data_to_parquet(df, path):
     os.makedirs(os.path.dirname(path), exist_ok=True)  # Ensure the directory exists
     df.to_parquet(path, index=False, engine='pyarrow')
-    logger.info(f"[i] Data written to {path} successfully.")
+    full_path = os.path.abspath(path)
+    logger.info(f"[i] Data written to {full_path}")
 
 
 def main():
@@ -116,4 +118,5 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
     main()

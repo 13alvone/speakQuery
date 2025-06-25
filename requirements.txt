@@ -17,3 +17,4 @@ apscheduler>=3,<4
 restrictedpython~=7.4
 flask-wtf~=1.2.1
 python-dotenv~=1.1
+faker~=37.4.0

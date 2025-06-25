@@ -95,6 +95,14 @@ Two small utilities help inspect your data and server setup:
 - **`describe_frontend.sh`** – outputs basic environment information helpful when
   debugging the web frontend.
 
+To generate example indexes for testing, run:
+
+```bash
+python utils/generate_fake_dbs_and_data.py 1000 5
+```
+This creates a Parquet file under `indexes/test_parquets/` and logs the
+full path when writing completes.
+
 ## Timechart command
 
 The query language includes a `timechart` directive for quick time-series
