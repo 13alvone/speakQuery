@@ -184,3 +184,6 @@ These constructs are not part of the supported query language.
 
 ## Syntax reference
 See [docs/syntax.md](docs/syntax.md) for a summary of the query grammar and directive usage examples.
+
+## API reference
+See [docs/api.md](docs/api.md) for endpoint details and example commands.
