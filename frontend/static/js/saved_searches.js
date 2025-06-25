@@ -288,13 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    /**
-     * Display a success notification using Bulma's notification component.
-     * @param {string} message - The message to display.
-     */
-    function showSuccess(message) {
-        showNotification(message, 'is-primary');
-    }
 
     /**
      * Display an error notification using Bulma's notification component.

@@ -78,6 +78,14 @@ function showError(message) {
 }
 
 /**
+ * Function to show success notifications.
+ * @param {string} message - The success message to display.
+ */
+function showSuccess(message) {
+    showNotification(message, false);
+}
+
+/**
  * Function to close all active notifications.
  */
 function closeAllNotifications() {
