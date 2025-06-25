@@ -54,7 +54,7 @@ def update_grammar():
         grammar_file
     ]
     try:
-        subprocess.run(" ".join(antlr_command), check=True, shell=True)
+        subprocess.run(antlr_command, check=True)  # nosec - dev-only generation of parser files
         logging.info("Regenerated the target antlr4 files successfully.")
     except subprocess.CalledProcessError as e:
         logging.error(f"Failed to regenerate target files: {e}")

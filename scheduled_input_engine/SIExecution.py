@@ -181,7 +181,7 @@ class SIExecution:
             restricted_globals['pd'] = pd
 
             restricted_locals = {}
-            exec(self.modified_code, restricted_globals, restricted_locals)
+            exec(self.modified_code, restricted_globals, restricted_locals)  # nosec B102 - dynamic code execution required for user jobs
 
             if self.df_variable in restricted_locals:
                 result_df = restricted_locals[self.df_variable]
@@ -287,7 +287,7 @@ class SIExecution:
 
             # Execute the code in a restricted environment
             restricted_locals = {}
-            exec(self.modified_code, restricted_globals, restricted_locals)
+            exec(self.modified_code, restricted_globals, restricted_locals)  # nosec B102 - dynamic code execution required for user jobs
 
             # Generate a summary of the DataFrame
             if hasattr(self, 'result_df') and isinstance(self.result_df, pd.DataFrame):
