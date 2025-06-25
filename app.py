@@ -909,6 +909,7 @@ def commit_saved_search():
 
 
 @app.route('/commit_scheduled_input', methods=['POST'])
+@login_required
 def commit_scheduled_input():
     try:
         title = request.form['title']
