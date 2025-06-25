@@ -7,8 +7,18 @@ from typing import Generator
 
 def explore_directory() -> str:
     """Run ls -lart recursively and return the output."""
-    cmd = 'find . -type d -exec ls -lart {} \\;'
-    return check_output(cmd, shell=True).decode('utf-8')
+    cmd = [
+        "find",
+        ".",
+        "-type",
+        "d",
+        "-exec",
+        "ls",
+        "-lart",
+        "{}",
+        ";",
+    ]
+    return check_output(cmd).decode("utf-8")  # nosec - CLI helper for dev use only
 
 
 def find_parquet_files() -> Generator[str, None, None]:

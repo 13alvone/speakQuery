@@ -22,6 +22,18 @@ SpeakQuery is an experimental search and ingestion engine. The system processes 
    If you prefer to manage the environment manually, create your own virtual
    environment and install the packages from `requirements.txt` and
    `requirements-dev.txt`.
+
+### Platform-specific setup
+
+If you are installing dependencies manually, the repository provides
+platform-specific requirement files. Use these in addition to
+`requirements.txt` and `requirements-dev.txt` and make sure the required build
+tools are available:
+
+| Platform | Python packages | Additional tools |
+| -------- | --------------- | ---------------- |
+| **Ubuntu** | `pip install -r ubuntu_requirements.txt` | `sudo apt install build-essential cmake` |
+| **macOS** | `pip install -r macos_requirements.txt` | `brew install cmake` (Xcode or CLT should provide a C++17 compiler) |
 3. **Required build tools**
    - CMake ≥3.5
    - A C++17 compiler
