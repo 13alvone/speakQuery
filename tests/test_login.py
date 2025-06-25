@@ -44,6 +44,7 @@ def test_login_rate_limit(mock_heavy_modules, tmp_path, monkeypatch):
     monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
     initialize_database()
     load_settings_into_config()
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
     limiter.enabled = True
     limiter.reset()
 

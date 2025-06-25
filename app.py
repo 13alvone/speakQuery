@@ -495,8 +495,18 @@ def login():
                 return jsonify({'status': 'success'})
     except Exception as exc:
         if isinstance(exc, sqlite3.Error) and 'no such table' in str(exc):
-            initialize_database()
-            return login()
+            logging.error(
+                "[x] Users table missing during login. Initialize the database first"
+            )
+            return (
+                jsonify(
+                    {
+                        'status': 'error',
+                        'message': 'Database uninitialized. Run create-admin to set up.'
+                    }
+                ),
+                500,
+            )
         logging.error(f"[x] Login failed for {username}: {exc}")
         return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
     return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401

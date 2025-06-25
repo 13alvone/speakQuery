@@ -25,7 +25,8 @@ def test_api_query_metadata(mock_heavy_modules, monkeypatch):
 
 
 def test_api_saved_search_crud(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
 
@@ -66,7 +67,8 @@ def test_api_saved_search_crud(mock_heavy_modules):
 
 
 def test_api_saved_search_settings(mock_heavy_modules, monkeypatch):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
 
     fixed_time = '2023-01-01T00:00:00Z'
     monkeypatch.setattr('routes.api.get_next_runtime', lambda s: fixed_time)
