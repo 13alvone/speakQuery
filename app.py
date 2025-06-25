@@ -7,6 +7,8 @@ import shutil
 import logging
 import sqlite3
 import sys
+import hashlib
+import argparse
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime, timezone
@@ -134,7 +136,7 @@ def is_allowed_api_url(api_url):
         return False
 
 
-def initialize_database():
+def initialize_database(admin_username=None, admin_password=None, admin_role='admin', admin_api_token=None):
     # Existing initialization for saved_searches
     with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
         cursor = conn.cursor()
@@ -181,6 +183,32 @@ def initialize_database():
         )
     ''')
         conn.commit()
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password_hash TEXT,
+            role TEXT,
+            api_token TEXT
+        )
+    ''')
+        conn.commit()
+
+        cursor.execute('SELECT COUNT(*) FROM users')
+        users_count = cursor.fetchone()[0]
+        if users_count == 0:
+            username = admin_username or os.environ.get('ADMIN_USERNAME', 'admin')
+            password = admin_password or os.environ.get('ADMIN_PASSWORD', 'admin')
+            role = admin_role or os.environ.get('ADMIN_ROLE', 'admin')
+            api_token = admin_api_token or os.environ.get('ADMIN_API_TOKEN', str(uuid.uuid4()))
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            cursor.execute(
+                'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                (username, password_hash, role, api_token),
+            )
+            conn.commit()
+            logging.info('[i] Inserted default admin user')
 
         # Insert default settings if table is empty
         cursor.execute('SELECT COUNT(*) FROM app_settings')
@@ -1204,20 +1232,29 @@ app.register_blueprint(api_bp)
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='SpeakQuery application')
+    sub = parser.add_subparsers(dest='command')
+    admin_parser = sub.add_parser('create-admin', help='Create admin user and exit')
+    admin_parser.add_argument('username', help='Admin username')
+    admin_parser.add_argument('password', help='Admin password')
+    admin_parser.add_argument('--role', default='admin', help='User role')
+    admin_parser.add_argument('--token', help='API token')
+    args = parser.parse_args()
+
+    if args.command == 'create-admin':
+        initialize_database(args.username, args.password, args.role, args.token)
+        sys.exit(0)
+
     delete_old_files()
     initialize_database()
     load_settings_into_config()  # Load settings into app.config
-    # Reconfigure queue and rate limiter based on loaded settings
     queue_size = int(app.config.get('QUEUE_SIZE', 10))
     processing_limit = int(app.config.get('PROCESSING_LIMIT', 2))
     app.config['TASK_QUEUE'] = TaskQueue(queue_size, processing_limit)
     limiter.enabled = app.config.get('THROTTLE_ENABLED', True)
-    # Configure logging now that app config is available
     logging.basicConfig(
         level=app.config['LOG_LEVEL'],
         format='[%(levelname)s] %(message)s',
     )
-    # start_background_engines()  # Initialize Background Engines as Services
-    # Allow FLASK_DEBUG environment variable to override default debug mode
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in {'1', 'true', 't'}
     app.run(host='0.0.0.0', debug=debug_mode)
