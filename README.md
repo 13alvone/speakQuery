@@ -1,6 +1,35 @@
 # SpeakQuery
 
+
 SpeakQuery is an experimental search and ingestion engine. The system processes a custom query language and operates over local SQLite and Parquet files. A Flask web interface exposes search features while background engines run scheduled queries and ingestion tasks.
+
+## Docker (preferred)
+
+The easiest way to run SpeakQuery is inside a Docker container.
+
+1. Build the image:
+   ```bash
+   docker build -t speakquery .
+   ```
+2. Create a `.env` file and set at least the following variables:
+   ```bash
+   SECRET_KEY=change_me
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=admin
+   ADMIN_ROLE=admin
+   ADMIN_API_TOKEN=changeme
+   SMTP_USER=you@example.com
+   SMTP_PASSWORD=your_email_password
+   SMTP_SERVER=smtp.gmail.com
+   SMTP_PORT=587
+   ```
+3. Run the container:
+   ```bash
+   docker run -d --name speakquery --env-file .env -p 5000:5000 --restart unless-stopped speakquery
+   ```
+   The container launches the web interface along with the background engines and will automatically restart unless stopped.
+
+The manual setup steps below remain available for local development.
 
 ## Quick Start
 
