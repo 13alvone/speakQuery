@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
-from app import execute_speakQuery, save_dataframe, load_dataframe, is_allowed_api_url, is_title_unique, requests
+from app import execute_speakQuery, save_dataframe, load_dataframe, is_allowed_api_url, is_title_unique
+import requests
 import sqlite3
 import time
 import uuid
