@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from app import get_row_count, allowed_file
 import pandas as pd
+import csv
 import os
 import shutil
 import logging
@@ -51,14 +52,38 @@ def get_loadjob_files():
 @lookups_bp.route('/upload_file', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({'status': 'error', 'message': 'No file part in the request.'})
+        return jsonify({'status': 'error', 'message': 'No file part in the request.'}), 400
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'status': 'error', 'message': 'No file selected for uploading.'})
+        return jsonify({'status': 'error', 'message': 'No file selected for uploading.'}), 400
 
     if not allowed_file(file.filename):
-        return jsonify({'status': 'error', 'message': 'File type not allowed.'})
+        return jsonify({'status': 'error', 'message': 'File type not allowed.'}), 400
+
+    file_ext = file.filename.rsplit('.', 1)[-1].lower()
+    if file_ext == 'csv':
+        try:
+            file.stream.seek(0)
+            sample = file.stream.read(1024)
+            if isinstance(sample, bytes):
+                sample_decoded = sample.decode('utf-8', errors='ignore')
+            else:
+                sample_decoded = sample
+            dialect = csv.Sniffer().sniff(sample_decoded)
+            if dialect.delimiter not in {',', ';', '\t', '|'}:
+                raise csv.Error('unexpected delimiter')
+            file.stream.seek(0)
+        except csv.Error:
+            file.stream.seek(0)
+            try:
+                df = pd.read_csv(file.stream, nrows=5)
+                file.stream.seek(0)
+                if df.shape[1] <= 1 and ',' not in sample_decoded:
+                    raise ValueError('parsed but single column')
+            except Exception as e:
+                logging.warning("Invalid CSV upload %s: %s", file.filename, e)
+                return jsonify({'status': 'error', 'message': 'Invalid CSV content.'}), 400
 
     filename = secure_filename(file.filename)
     upload_dir = app.config['LOOKUP_DIR']
