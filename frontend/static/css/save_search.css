@@ -40,7 +40,7 @@ textarea {
 
 /* Monospaced Font for Inputs */
 .monospaced-input {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: var(--font-family);
     /* Optional: Adjust font size for better readability */
     font-size: 1rem;
 }
