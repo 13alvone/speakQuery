@@ -5,7 +5,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 
 def test_view_lookup_missing_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.get('/view_lookup')
@@ -14,7 +15,8 @@ def test_view_lookup_missing_filepath(mock_heavy_modules):
 
 
 def test_view_lookup_empty_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.get('/view_lookup?file=')
@@ -23,7 +25,8 @@ def test_view_lookup_empty_filepath(mock_heavy_modules):
 
 
 def test_delete_lookup_file_missing_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.post('/delete_lookup_file', json={})
@@ -32,7 +35,8 @@ def test_delete_lookup_file_missing_filepath(mock_heavy_modules):
 
 
 def test_delete_lookup_file_empty_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.post('/delete_lookup_file', json={'filepath': ''})
@@ -41,7 +45,8 @@ def test_delete_lookup_file_empty_filepath(mock_heavy_modules):
 
 
 def test_clone_lookup_file_missing_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.post('/clone_lookup_file', json={'new_name': 'copy.csv'})
@@ -50,7 +55,8 @@ def test_clone_lookup_file_missing_filepath(mock_heavy_modules):
 
 
 def test_clone_lookup_file_empty_filepath(mock_heavy_modules):
-    from app import app
+    from app import app, initialize_database
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
     resp = client.post('/clone_lookup_file', json={'filepath': '', 'new_name': 'copy.csv'})
@@ -59,10 +65,11 @@ def test_clone_lookup_file_empty_filepath(mock_heavy_modules):
 
 
 def test_upload_file_valid_csv(mock_heavy_modules, tmp_path):
-    from app import app
+    from app import app, initialize_database
     import io
 
     app.config['LOOKUP_DIR'] = str(tmp_path)
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
 
@@ -74,10 +81,11 @@ def test_upload_file_valid_csv(mock_heavy_modules, tmp_path):
 
 
 def test_upload_file_invalid_csv(mock_heavy_modules, tmp_path):
-    from app import app
+    from app import app, initialize_database
     import io
 
     app.config['LOOKUP_DIR'] = str(tmp_path)
+    initialize_database()
     client = app.test_client()
     client.post('/login', json={'username': 'admin', 'password': 'admin'})
 

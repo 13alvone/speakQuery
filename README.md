@@ -129,6 +129,16 @@ curl -H "Authorization: Bearer <api_token>" http://localhost:5000/api/saved_sear
 Tokens are stored hashed. Re-run `create-admin` to rotate credentials or add new administrators.
 Passwords are hashed securely using Werkzeug's `generate_password_hash`.
 
+### Manual database initialization
+
+If `/login` returns an error about a missing `users` table, create an administrator manually:
+
+```bash
+python app.py create-admin <username> <password> --token <api_token>
+```
+
+This command sets up the necessary tables and inserts the specified account so future logins succeed.
+
 
 ## Testing
 
