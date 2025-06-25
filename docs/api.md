@@ -76,8 +76,8 @@ are available for API use as well.
 - `GET /view_lookup?file=<path>` – return HTML view of a lookup.
 - `POST /delete_lookup_file` – body: `{ "filepath": "..." }`.
 - `POST /clone_lookup_file` – body: `{ "filepath": "...", "new_name": "copy.csv" }`.
-- `GET /get_settings` – fetch application settings.
-- `POST /update_settings` – update settings with a `settings` object.
+- `GET /get_settings` – fetch application settings (admin only).
+- `POST /update_settings` – update settings with a `settings` object (admin only).
 
 ## Security Features
 

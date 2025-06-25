@@ -26,9 +26,9 @@ from flask_login import (
     LoginManager,
     login_user,
     logout_user,
-    login_required,
     current_user,
 )
+from utils.auth import login_required
 from croniter import croniter
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address

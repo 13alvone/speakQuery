@@ -101,7 +101,8 @@ The Flask API processes requests through a small worker queue. By default only
 two requests are executed concurrently and additional requests will wait until a
 worker is free. API rate limiting is powered by **Flask-Limiter** and can be
 enabled or disabled through the `THROTTLE_ENABLED` setting. Adjust the following
-values in the settings database or via the `/update_settings` endpoint to tune
+values in the settings database or via the `/update_settings` endpoint (requires
+an admin login) to tune
 performance:
 
 - `QUEUE_SIZE` – maximum number of queued requests (default `20`)
