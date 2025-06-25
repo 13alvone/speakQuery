@@ -92,6 +92,7 @@ def test_lookup_file_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch
     import io
     import sqlite3
     import hashlib
+    from werkzeug.security import generate_password_hash
     import shutil
     from app import app, initialize_database
 
@@ -112,9 +113,9 @@ def test_lookup_file_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         cur = conn.cursor()
         cur.execute('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-                    ('user1', hashlib.sha256(b"pw1").hexdigest(), 'user'))
+                    ('user1', generate_password_hash('pw1'), 'user'))
         cur.execute('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-                    ('user2', hashlib.sha256(b"pw2").hexdigest(), 'user'))
+                    ('user2', generate_password_hash('pw2'), 'user'))
         conn.commit()
 
     client = app.test_client()

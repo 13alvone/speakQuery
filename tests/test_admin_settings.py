@@ -3,6 +3,7 @@ import sys
 import sqlite3
 import shutil
 import hashlib
+from werkzeug.security import generate_password_hash
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -24,7 +25,7 @@ def test_admin_required_for_settings(mock_heavy_modules, tmp_path, monkeypatch):
         cursor = conn.cursor()
         cursor.execute(
             'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-            ('user', hashlib.sha256(b'pw').hexdigest(), 'user'),
+            ('user', generate_password_hash('pw'), 'user'),
         )
         conn.commit()
 

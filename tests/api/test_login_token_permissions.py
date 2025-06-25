@@ -2,6 +2,7 @@ import os
 import sys
 import sqlite3
 import hashlib
+from werkzeug.security import generate_password_hash
 import uuid
 import time
 import shutil
@@ -27,11 +28,11 @@ def _setup_db(app, tmp_path, monkeypatch):
         cursor = conn.cursor()
         cursor.execute(
             'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-            ('user1', hashlib.sha256(b'pw1').hexdigest(), 'user'),
+            ('user1', generate_password_hash('pw1'), 'user'),
         )
         cursor.execute(
             'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-            ('user2', hashlib.sha256(b'pw2').hexdigest(), 'user'),
+            ('user2', generate_password_hash('pw2'), 'user'),
         )
         conn.commit()
     return orig_sched, orig_saved

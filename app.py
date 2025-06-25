@@ -8,6 +8,7 @@ import logging
 import sqlite3
 import sys
 import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 import argparse
 from pathlib import Path
 from dotenv import load_dotenv
@@ -293,7 +294,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             password = admin_password or os.environ.get('ADMIN_PASSWORD', 'admin')
             role = admin_role or os.environ.get('ADMIN_ROLE', 'admin')
             api_token = admin_api_token or os.environ.get('ADMIN_API_TOKEN', str(uuid.uuid4()))
-            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            password_hash = generate_password_hash(password)
             token_hash = hashlib.sha256(api_token.encode()).hexdigest()
             cursor.execute(
                 'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
@@ -472,7 +473,7 @@ def login():
                 (username,),
             )
             row = cursor.fetchone()
-            if row and row[1] == hashlib.sha256(password.encode()).hexdigest():
+            if row and check_password_hash(row[1], password):
                 user = User(id=row[0], username=username, role=row[2], api_token=row[3])
                 login_user(user)
                 return jsonify({'status': 'success'})

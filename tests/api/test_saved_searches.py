@@ -68,6 +68,7 @@ def test_saved_search_crud(mock_heavy_modules, tmp_path, monkeypatch):
 def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch):
     import sqlite3
     import hashlib
+    from werkzeug.security import generate_password_hash
     from app import app, initialize_database
 
     orig_db = app.config['SAVED_SEARCHES_DB']
@@ -88,11 +89,11 @@ def test_saved_search_owner_restriction(mock_heavy_modules, tmp_path, monkeypatc
         cursor = conn.cursor()
         cursor.execute(
             'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-            ('user1', hashlib.sha256(b'pw1').hexdigest(), 'user')
+            ('user1', generate_password_hash('pw1'), 'user')
         )
         cursor.execute(
             'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
-            ('user2', hashlib.sha256(b'pw2').hexdigest(), 'user')
+            ('user2', generate_password_hash('pw2'), 'user')
         )
         conn.commit()
 

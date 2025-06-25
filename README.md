@@ -127,6 +127,7 @@ curl -H "Authorization: Bearer <api_token>" http://localhost:5000/api/saved_sear
 ```
 
 Tokens are stored hashed. Re-run `create-admin` to rotate credentials or add new administrators.
+Passwords are hashed securely using Werkzeug's `generate_password_hash`.
 
 
 ## Testing
