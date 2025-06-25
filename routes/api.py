@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
+from flask_login import login_required, current_user
 import os
 from werkzeug.utils import secure_filename
 from app import (
@@ -113,6 +114,7 @@ def api_query():
 
 
 @api_bp.route('/api/saved_search', methods=['POST'])
+@login_required
 def api_create_saved_search():
     """Create a new saved search."""
     data = request.get_json(force=True, silent=True)
@@ -163,12 +165,12 @@ def api_create_saved_search():
                 '''INSERT INTO saved_searches (
                     id, title, description, query, cron_schedule, trigger, lookback,
                     throttle, throttle_time_period, throttle_by, event_message,
-                    send_email, email_address, email_content, file_location
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    send_email, email_address, email_content, file_location, owner_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 (
                     search_id, data['title'], description, query, cron_schedule, trigger,
                     lookback, throttle, str(throttle_time_period), throttle_by, event_message,
-                    send_email, email_address, email_content, dest_file
+                    send_email, email_address, email_content, dest_file, current_user.get_id()
                 )
             )
             conn.commit()
@@ -179,6 +181,7 @@ def api_create_saved_search():
 
 
 @api_bp.route('/api/saved_search/<search_id>', methods=['PATCH'])
+@login_required
 def api_update_saved_search(search_id):
     """Update an existing saved search."""
     data = request.get_json(force=True, silent=True)
@@ -197,6 +200,13 @@ def api_update_saved_search(search_id):
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
+            cursor.execute('SELECT owner_id FROM saved_searches WHERE id=?', (search_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
+            owner_id = row[0]
+            if str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
+                return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
             cursor.execute(
                 '''UPDATE saved_searches SET title=?, description=?, query=?, cron_schedule=?, trigger=?,
                     lookback=?, throttle=?, throttle_time_period=?, throttle_by=?, event_message=?,
@@ -216,6 +226,7 @@ def api_update_saved_search(search_id):
 
 
 @api_bp.route('/api/saved_search/<search_id>', methods=['DELETE'])
+@login_required
 def api_delete_saved_search(search_id):
     """Delete a saved search."""
     ip = request.remote_addr
@@ -224,10 +235,16 @@ def api_delete_saved_search(search_id):
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
-            cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
-            if cursor.rowcount == 0:
+            cursor.execute('SELECT owner_id FROM saved_searches WHERE id=?', (search_id,))
+            row = cursor.fetchone()
+            if not row:
                 _record_failure(ip)
                 return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
+            owner_id = row[0]
+            if str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
+                _record_failure(ip)
+                return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
+            cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
             conn.commit()
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
@@ -272,6 +289,7 @@ def api_get_saved_search_settings(search_id):
 
 
 @api_bp.route('/api/lookup/<name>', methods=['DELETE'])
+@login_required
 def api_delete_lookup(name):
     """Delete a lookup file by name."""
     ip = request.remote_addr
@@ -291,6 +309,16 @@ def api_delete_lookup(name):
         return jsonify({'status': 'error', 'message': 'File not found.'}), 404
 
     try:
+        with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT owner_id FROM lookup_files WHERE filename=?', (safe_name,))
+            row = cursor.fetchone()
+            owner_id = row[0] if row else None
+            if owner_id is not None and str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
+                _record_failure(ip)
+                return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
+            cursor.execute('DELETE FROM lookup_files WHERE filename=?', (safe_name,))
+            conn.commit()
         os.remove(file_path)
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
