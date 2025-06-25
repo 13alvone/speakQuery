@@ -23,11 +23,25 @@ The easiest way to run SpeakQuery is inside a Docker container.
    SMTP_SERVER=smtp.gmail.com
    SMTP_PORT=587
    ```
+
 3. Run the container:
    ```bash
    docker run -d --name speakquery --env-file .env -p 5000:5000 --restart unless-stopped speakquery
    ```
    The container launches the web interface along with the background engines and will automatically restart unless stopped.
+
+### Docker Compose
+
+For persistent development use the provided compose file. Ensure a `.env` file exists
+then start all services with:
+```bash
+docker compose up --build -d
+```
+Volumes defined in `docker-compose.yml` keep database and index directories on the
+host. Stop the services with:
+```bash
+docker compose down
+```
 
 The manual setup steps below remain available for local development.
 

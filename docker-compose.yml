@@ -2,8 +2,20 @@ version: '3.8'
 services:
   speakquery:
     build: .
-    ports:
-      - "5000:5000"
+    container_name: speakquery
     env_file:
       - .env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./indexes:/opt/speakquery/indexes
+      - ./logs:/opt/speakquery/logs
+      - ./lookups:/opt/speakquery/lookups
+      - ./executed_scheduled_searches:/opt/speakquery/executed_scheduled_searches
+      - ./scheduled_input_scripts:/opt/speakquery/scheduled_input_scripts
+      - ./saved_searches.db:/opt/speakquery/saved_searches.db
+      - ./saved_search_history.db:/opt/speakquery/saved_search_history.db
+      - ./scheduled_inputs.db:/opt/speakquery/scheduled_inputs.db
+      - ./scheduled_inputs_history.db:/opt/speakquery/scheduled_inputs_history.db
+      - ./history.db:/opt/speakquery/history.db
     restart: unless-stopped

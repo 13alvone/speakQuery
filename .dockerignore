@@ -1,0 +1,15 @@
+# Ignore virtual environments and Python cache
+env/
+__pycache__/
+*.py[cod]
+*.so
+
+# Ignore test and development artifacts
+tests/
+logs/
+indexes/
+executed_scheduled_searches/
+*.db
+
+# VCS
+.git
