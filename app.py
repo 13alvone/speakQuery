@@ -109,9 +109,10 @@ limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["100 per minute"],
     storage_uri="memory://",
-    enabled=False,
+    enabled=True,
 )
 limiter.init_app(app)
+limiter.enabled = False
 
 # Default queue before settings are loaded
 app.config['TASK_QUEUE'] = TaskQueue(10, 2)
@@ -306,8 +307,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
         # Insert default settings if table is empty
         cursor.execute('SELECT COUNT(*) FROM app_settings')
         count = cursor.fetchone()[0]
-        if count == 0:
-            default_settings = {
+        default_settings = {
                 'UPLOAD_FOLDER': str(PROJECT_ROOT / 'lookups'),
                 'ALLOWED_EXTENSIONS': 'sqlite3,system4.system4.parquet,csv,json',
                 'MAX_CONTENT_LENGTH': '16777216',  # 16 MB in bytes
@@ -324,14 +324,26 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
                 'QUEUE_SIZE': '20',
                 'PROCESSING_LIMIT': '5',
                 'THROTTLE_ENABLED': 'true',
+                'LOGIN_RATE_LIMIT': '5 per minute',
                 'BAN_DELETIONS_ENABLED': 'false',
                 'BAN_DURATION': '3600',
             }
+        if count == 0:
             for key, value in default_settings.items():
                 cursor.execute(
                     'INSERT INTO app_settings (key, value) VALUES (?, ?)',
                     (key, value)
                 )
+            conn.commit()
+        else:
+            cursor.execute('SELECT key FROM app_settings')
+            existing_keys = {row[0] for row in cursor.fetchall()}
+            for key, value in default_settings.items():
+                if key not in existing_keys:
+                    cursor.execute(
+                        'INSERT INTO app_settings (key, value) VALUES (?, ?)',
+                        (key, value)
+                    )
             conn.commit()
 
     # Initialize history.db and create history table
@@ -372,6 +384,8 @@ def load_settings_into_config():
             app.config[key] = str(value).lower() in {'true', '1', 'yes'}
         elif key == 'BAN_DURATION':
             app.config[key] = int(value)
+        elif key == 'LOGIN_RATE_LIMIT':
+            app.config[key] = value
         else:
             app.config[key] = value
 
@@ -459,6 +473,7 @@ def index():
 
 @csrf.exempt
 @app.route('/login', methods=['POST'])
+@limiter.limit(lambda: app.config.get('LOGIN_RATE_LIMIT', '5 per minute'))
 def login():
     """Authenticate a user and start a session."""
     data = request.get_json() or request.form

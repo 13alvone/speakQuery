@@ -30,3 +30,32 @@ def test_login_logout(mock_heavy_modules, tmp_path, monkeypatch):
     assert resp.status_code == 401
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
+
+
+def test_login_rate_limit(mock_heavy_modules, tmp_path, monkeypatch):
+    from app import app, initialize_database, load_settings_into_config, limiter
+
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    shutil.copy(orig_db, tmp_db)
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
+    load_settings_into_config()
+    limiter.enabled = True
+    limiter.reset()
+
+    client = app.test_client()
+
+    for _ in range(5):
+        resp = client.post('/login', json={'username': 'admin', 'password': 'bad'})
+        assert resp.status_code == 401
+
+    resp = client.post('/login', json={'username': 'admin', 'password': 'bad'})
+    assert resp.status_code == 429
+
+    limiter.enabled = False
+    limiter.reset()
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
