@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
+from utils.auth import admin_required
 import sqlite3
 import logging
 
 settings_bp = Blueprint('settings_bp', __name__)
 
 @settings_bp.route('/get_settings', methods=['GET'])
+@admin_required
 def get_settings():
     try:
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
@@ -33,6 +35,7 @@ def get_settings():
 
 
 @settings_bp.route('/update_settings', methods=['POST'])
+@admin_required
 def update_settings():
     try:
         data = request.json
