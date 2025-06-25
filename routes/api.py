@@ -1,6 +1,12 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
-from app import execute_speakQuery, save_dataframe, validator, is_title_unique
+from app import (
+    execute_speakQuery,
+    save_dataframe,
+    validator,
+    is_title_unique,
+)
+from queue import Full
 import sqlite3
 import time
 import uuid
@@ -19,7 +25,8 @@ def api_query():
 
     query_str = data.get('query')
     try:
-        result_df = execute_speakQuery(query_str)
+        future = app.config['TASK_QUEUE'].submit(execute_speakQuery, query_str)
+        result_df = future.result()
         if result_df is None or result_df.empty:
             return jsonify({'status': 'error', 'message': 'No data returned from query.'}), 200
 
@@ -42,6 +49,8 @@ def api_query():
             'time_received': end_ts,
             'duration_ms': duration_ms
         })
+    except Full:
+        return jsonify({'status': 'error', 'message': 'Server busy'}), 429
     except Exception as exc:
         logging.error(f"Error processing query: {exc}")
         return jsonify({'status': 'error', 'message': str(exc)}), 500
