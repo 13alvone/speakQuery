@@ -9,7 +9,7 @@
 
 /* Query Textarea Styling */
 #query {
-    font-family: Consolas, monospace;
+    font-family: var(--font-family);
     font-size: 10pt;
     min-height: 150px; /* Approx. 10 lines of text */
     overflow-y: auto;

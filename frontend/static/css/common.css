@@ -8,8 +8,20 @@
     --hover-background-color: #ddd;
     --error-color: red;
     --success-color: green;
+    /* Global font for the entire application */
+    --font-family: 'Courier New', Courier, monospace;
     --modal-z-index: 1000;
     /* Add more variables as needed */
+}
+
+body {
+    font-family: var(--font-family);
+}
+
+/* Ensure form controls use the same font as the page */
+input,
+textarea {
+    font-family: inherit;
 }
 
 /* Menu Styles */
