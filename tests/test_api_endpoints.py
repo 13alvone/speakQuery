@@ -63,3 +63,41 @@ def test_api_saved_search_crud(mock_heavy_modules):
     resp = client.delete(f'/api/saved_search/{search_id}')
     assert resp.status_code == 200
 
+
+def test_api_saved_search_settings(mock_heavy_modules, monkeypatch):
+    from app import app
+
+    fixed_time = '2023-01-01T00:00:00Z'
+    monkeypatch.setattr('routes.api.get_next_runtime', lambda s: fixed_time)
+
+    client = app.test_client()
+
+    search_id = f"{time.time()}_{uuid.uuid4()}"
+    payload = {
+        'request_id': search_id,
+        'title': f'Test {uuid.uuid4()}',
+        'description': 'desc',
+        'query': 'index="dummy"',
+        'cron_schedule': '* * * * *',
+        'trigger': 'Once',
+        'lookback': '-1h',
+        'throttle': 'no',
+        'throttle_time_period': '-1h',
+        'throttle_by': 'user',
+        'event_message': 'msg',
+        'send_email': 'no',
+        'email_address': 'test@example.com',
+        'email_content': 'body'
+    }
+
+    resp = client.post('/api/saved_search', json=payload)
+    assert resp.status_code == 201
+
+    resp = client.get(f'/api/saved_search/{search_id}/settings')
+    assert resp.status_code == 200
+    data = resp.get_json()['search']
+    assert data['id'] == search_id
+    assert data['next_scheduled_time'] == fixed_time
+
+    client.delete(f'/api/saved_search/{search_id}')
+

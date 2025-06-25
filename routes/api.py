@@ -7,6 +7,7 @@ from app import (
     save_dataframe,
     validator,
     is_title_unique,
+    get_next_runtime,
 )
 from queue import Full
 import sqlite3
@@ -249,6 +250,24 @@ def api_get_saved_search(search_id):
 
     search = {key: row[key] for key in row.keys()}
     search['disabled'] = bool(search.get('disabled', 0))
+    return jsonify({'status': 'success', 'search': search}), 200
+
+
+@api_bp.route('/api/saved_search/<search_id>/settings', methods=['GET'])
+def api_get_saved_search_settings(search_id):
+    """Return saved search settings including next scheduled runtime."""
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM saved_searches WHERE id = ?', (search_id,))
+        row = cursor.fetchone()
+
+    if not row:
+        return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
+
+    search = {key: row[key] for key in row.keys()}
+    search['disabled'] = bool(search.get('disabled', 0))
+    search['next_scheduled_time'] = get_next_runtime(search.get('cron_schedule', '* * * * *'))
     return jsonify({'status': 'success', 'search': search}), 200
 
 
