@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from flask_login import login_required, current_user
-from app import get_row_count, allowed_file
+from utils.file_utils import get_row_count, allowed_file
 import pandas as pd
 import csv
 import os
@@ -68,7 +68,7 @@ def upload_file():
     if file.filename == '':
         return jsonify({'status': 'error', 'message': 'No file selected for uploading.'}), 400
 
-    if not allowed_file(file.filename):
+    if not allowed_file(file.filename, app.config['ALLOWED_EXTENSIONS']):
         return jsonify({'status': 'error', 'message': 'File type not allowed.'}), 400
 
     file_ext = file.filename.rsplit('.', 1)[-1].lower()
