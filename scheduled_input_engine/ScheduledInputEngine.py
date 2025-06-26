@@ -176,9 +176,38 @@ async def initialize_history_db():
                 )
             ''')
             await db.commit()
-            logger.info("Initialized history database and ensured the required tables exist.")
+        logger.info("Initialized history database and ensured the required tables exist.")
     except Exception as e:
         logger.error(f"Error initializing the history database: {str(e)}")
+
+
+# Function to initialize the scheduled inputs database (if it doesn't exist)
+async def initialize_scheduled_inputs_db():
+    """Ensure the scheduled_inputs table exists in SCHEDULED_INPUTS_DB."""
+    try:
+        async with aiosqlite.connect(SCHEDULED_INPUTS_DB) as db:
+            await db.execute(
+                '''
+                CREATE TABLE IF NOT EXISTS scheduled_inputs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT UNIQUE,
+                    description TEXT,
+                    code TEXT,
+                    cron_schedule TEXT,
+                    overwrite BOOLEAN,
+                    subdirectory TEXT,
+                    api_url TEXT,
+                    created_at REAL,
+                    disabled BOOLEAN DEFAULT 0
+                )
+                '''
+            )
+            await db.commit()
+            logger.info(
+                "[i] Initialized scheduled inputs database and ensured the scheduled_inputs table exists."
+            )
+    except Exception as e:
+        logger.error(f"[x] Error initializing the scheduled inputs database: {str(e)}")
 
 
 # Signal handler for graceful shutdown
@@ -190,6 +219,7 @@ def handle_shutdown_signal(signum, frame):
 # Main function to start everything
 async def main():
     await initialize_history_db()  # Initialize the history database
+    await initialize_scheduled_inputs_db()  # Ensure scheduled inputs table exists
 
     # Schedule the cleanup task to run every 4 hours
     scheduler.add_job(
