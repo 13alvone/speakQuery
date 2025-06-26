@@ -3,13 +3,34 @@ from flask import current_app as app
 from flask_login import login_required, current_user
 import os
 from werkzeug.utils import secure_filename
-from app import (
-    execute_speakQuery,
-    save_dataframe,
-    validator,
-    is_title_unique,
-    get_next_runtime,
-)
+def execute_speakQuery(*args, **kwargs):
+    """Proxy to ``app.execute_speakQuery`` to avoid import cycles."""
+    from app import execute_speakQuery as _execute
+    return _execute(*args, **kwargs)
+
+
+def save_dataframe(*args, **kwargs):
+    """Proxy to ``app.save_dataframe`` to avoid import cycles."""
+    from app import save_dataframe as _save
+    return _save(*args, **kwargs)
+
+
+def is_title_unique(*args, **kwargs):
+    """Proxy to ``app.is_title_unique`` to avoid import cycles."""
+    from app import is_title_unique as _unique
+    return _unique(*args, **kwargs)
+
+
+def get_next_runtime(*args, **kwargs):
+    """Proxy to ``app.get_next_runtime`` to avoid import cycles."""
+    from app import get_next_runtime as _next
+    return _next(*args, **kwargs)
+
+
+def _get_validator():
+    """Return the global ``validator`` instance from ``app``."""
+    from app import validator as _validator
+    return _validator
 from queue import Full
 import sqlite3
 import time
@@ -125,13 +146,14 @@ def api_create_saved_search():
     if not search_id:
         return jsonify({'status': 'error', 'message': 'request_id is required.'}), 400
 
-    validate_utf8 = getattr(validator, 'validate_utf8', lambda x: x)
-    validate_cron = getattr(validator, 'validate_cron_schedule', lambda x: x)
-    validate_trigger = getattr(validator, 'validate_trigger', lambda x: x)
-    validate_lookback = getattr(validator, 'validate_lookback', lambda x: x)
-    validate_bool = getattr(validator, 'validate_boolean', lambda x: x)
-    validate_tp = getattr(validator, 'validate_throttle_time_period', lambda x: x)
-    validate_email = getattr(validator, 'validate_email', lambda x: x)
+    v = _get_validator()
+    validate_utf8 = getattr(v, 'validate_utf8', lambda x: x)
+    validate_cron = getattr(v, 'validate_cron_schedule', lambda x: x)
+    validate_trigger = getattr(v, 'validate_trigger', lambda x: x)
+    validate_lookback = getattr(v, 'validate_lookback', lambda x: x)
+    validate_bool = getattr(v, 'validate_boolean', lambda x: x)
+    validate_tp = getattr(v, 'validate_throttle_time_period', lambda x: x)
+    validate_email = getattr(v, 'validate_email', lambda x: x)
 
     if not is_title_unique(validate_utf8(data.get('title', ''))):
         return jsonify({'status': 'error', 'message': 'Title must be unique.'}), 400
