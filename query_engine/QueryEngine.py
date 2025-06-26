@@ -164,6 +164,41 @@ async def initialize_history_db():
         logger.error(f"[x] Error initializing the history database: {str(e)}")
 
 
+# Function to initialize the saved searches database
+async def initialize_saved_searches_db():
+    """Ensure the saved_searches table exists in SEARCHES_DB."""
+    try:
+        async with aiosqlite.connect(SEARCHES_DB) as db:
+            await db.execute(
+                '''
+                CREATE TABLE IF NOT EXISTS saved_searches (
+                    id TEXT PRIMARY KEY,
+                    title TEXT,
+                    description TEXT,
+                    query TEXT,
+                    cron_schedule TEXT,
+                    trigger TEXT,
+                    lookback TEXT,
+                    throttle TEXT,
+                    throttle_time_period TEXT,
+                    throttle_by TEXT,
+                    event_message TEXT,
+                    send_email TEXT,
+                    email_address TEXT,
+                    email_content TEXT,
+                    file_location TEXT,
+                    owner_id INTEGER REFERENCES users(id)
+                )
+                '''
+            )
+            await db.commit()
+            logger.info(
+                "[i] Initialized saved searches database and ensured the saved_searches table exists."
+            )
+    except Exception as e:
+        logger.error(f"[x] Error initializing the saved searches database: {str(e)}")
+
+
 # Function to fetch tasks from the database
 async def fetch_tasks():
     try:
@@ -205,6 +240,7 @@ async def main():
     process_parquet_files(parquet_files, date_field_name='timestamp')  # Adjust 'timestamp' if needed
 
     await initialize_history_db()  # Initialize the history database
+    await initialize_saved_searches_db()  # Ensure saved searches table exists
     await schedule_tasks()  # Schedule and run tasks
 
     # Run indefinitely
