@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from concurrent.futures import ProcessPoolExecutor
 from queue import Full
 from utils.task_queue import TaskQueue
+from utils.file_utils import get_row_count as util_get_row_count, allowed_file as util_allowed_file
 
 # Third-party imports
 import requests
@@ -189,13 +190,8 @@ os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
 
 
 def allowed_file(filename):
-    """Check if the file has an allowed extension, supporting multi-dot extensions."""
-    filename_lower = filename.lower()
-    for ext in app.config['ALLOWED_EXTENSIONS']:
-        ext_lower = ext.lower()
-        if filename_lower.endswith(f".{ext_lower}"):
-            return True
-    return False
+    """Check if *filename* uses one of the extensions configured in ALLOWED_EXTENSIONS."""
+    return util_allowed_file(filename, app.config['ALLOWED_EXTENSIONS'])
 
 
 def is_allowed_api_url(api_url):
@@ -1277,24 +1273,8 @@ def get_directory_tree():
 
 
 def get_row_count(filepath):
-    """Return the number of rows in *filepath*.
-
-    For CSV files the count is performed line by line to avoid reading the
-    entire file into memory. Other formats fall back to ``pandas.read_csv``.
-    """
-
-    try:
-        if str(filepath).lower().endswith(".csv"):
-            with open(filepath, "r", encoding="utf-8", errors="ignore") as fh:
-                # Subtract one for the header line if present.
-                row_count = sum(1 for _ in fh) - 1
-            return max(row_count, 0)
-
-        df = pd.read_csv(filepath)
-        return len(df)
-    except Exception as exc:
-        logging.error(f"Error reading file for row count: {exc}")
-        return 0
+    """Return the number of rows in ``filepath`` using :mod:`utils.file_utils`."""
+    return util_get_row_count(filepath)
 
 
 def sanitize_dataframe(df):
