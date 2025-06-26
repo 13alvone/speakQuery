@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
-from app import execute_speakQuery, save_dataframe, load_dataframe, is_allowed_api_url, is_title_unique
+import app as app_module
 import requests
 import sqlite3
 import time
@@ -13,7 +13,7 @@ query_bp = Blueprint('query_bp', __name__)
 def check_title_unique_route():
     title = request.json.get('title')
     if title:
-        is_unique = is_title_unique(title)
+        is_unique = app_module.is_title_unique(title)
         return jsonify({'is_unique': is_unique})
     else:
         return jsonify({'error': 'No title provided'}), 400
@@ -28,7 +28,7 @@ def fetch_api_data():
         return jsonify({'status': 'error', 'message': 'API URL is required.'}), 400
 
     try:
-        if not is_allowed_api_url(api_url):
+        if not app_module.is_allowed_api_url(api_url):
             return jsonify({'status': 'error', 'message': 'Domain not allowed.'}), 400
 
         response = requests.get(api_url, timeout=10)
@@ -49,7 +49,7 @@ def run_query():
     logging.info(f"[i] Query received: {query_str}")
 
     try:
-        result_df = execute_speakQuery(data.get('query'))
+        result_df = app_module.execute_speakQuery(data.get('query'))
         logging.info(f"Query result before processing: {result_df}")
 
         if result_df is None or result_df.empty:
@@ -65,7 +65,7 @@ def run_query():
         logging.debug(f"Data: {row_data}.")
 
         request_id = f'{time.time()}_{str(uuid.uuid4())}'
-        save_dataframe(request_id, result_df, data.get('query'))
+        app_module.save_dataframe(request_id, result_df, data.get('query'))
 
         response = {
             'status': 'success',
@@ -115,7 +115,7 @@ def save_results():
     logging.info(f"Saving results: {format_type} - {save_type}")
 
     try:
-        result_df = load_dataframe(request_id)
+        result_df = app_module.load_dataframe(request_id)
         if save_type == 'current_page':
             result_df = result_df.iloc[start:end]
 
