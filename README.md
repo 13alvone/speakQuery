@@ -9,7 +9,7 @@ The easiest way to run SpeakQuery is inside a Docker container.
 
 1. Build the image:
    ```bash
-   docker build -t speakquery .
+   sudo docker build --no-cache -t speakquery .
    ```
 2. Create a `.env` file and set at least the following variables:
    ```bash
@@ -26,7 +26,7 @@ The easiest way to run SpeakQuery is inside a Docker container.
 
 3. Run the container:
    ```bash
-   docker run -d --name speakquery --env-file .env -p 5000:5000 --restart unless-stopped speakquery
+   sudo docker run -d --name speakquery --env-file .env -p 5000:5000 --restart unless-stopped speakquery
    ```
    The container launches the web interface along with the background engines and will automatically restart unless stopped.
 
@@ -35,12 +35,12 @@ The easiest way to run SpeakQuery is inside a Docker container.
 For persistent development use the provided compose file. Ensure a `.env` file exists
 then start all services with:
 ```bash
-docker compose up --build -d
+sudo docker compose up --build -d
 ```
 Volumes defined in `docker-compose.yml` keep database and index directories on the
 host. Stop the services with:
 ```bash
-docker compose down
+sudo docker compose down
 ```
 
 The manual setup steps below remain available for local development.
