@@ -265,19 +265,23 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {Object} tree - The directory tree data.
      * @returns {string} - The HTML string for the directory tree.
      */
-    function buildTreeHtml(tree) {
+    function buildTreeHtml(node) {
         let html = '<ul>';
-        for (const [dir, content] of Object.entries(tree)) {
-            html += `<li><strong>${dir}</strong>`;
-            if (content.files.length) {
-                html += '<ul>';
-                content.files.forEach(file => {
-                    html += `<li><a href="#" class="file-link" data-file="${dir}/${file}">${file}</a></li>`;
-                });
-                html += '</ul>';
-            }
-            html += '</li>';
+
+        if (node.files) {
+            node.files.forEach(f => {
+                html += `<li><a href="#" class="file-link" data-file="${f.path}">${f.name}</a></li>`;
+            });
         }
+
+        if (node.dirs) {
+            for (const [dirName, child] of Object.entries(node.dirs)) {
+                html += `<li><details><summary>${dirName}</summary>`;
+                html += buildTreeHtml(child);
+                html += '</details></li>';
+            }
+        }
+
         html += '</ul>';
         return html;
     }
