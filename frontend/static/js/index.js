@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('directory-tree').innerHTML = treeHtml;
                     attachFileClickEvents();
                 } else {
-                    showError('Error loading directory structure.');
+                    showError(data.message || 'Error loading directory structure.');
                 }
             })
             .catch(error => {

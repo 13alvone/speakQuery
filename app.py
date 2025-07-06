@@ -1243,6 +1243,10 @@ def get_directory_tree():
 
     root_dir = app.config['INDEXES_DIR']
 
+    if not os.path.isdir(root_dir):
+        logging.error(f"[x] Indexes directory not found: {root_dir}")
+        return jsonify({'status': 'error', 'message': 'Indexes directory not found'}), 404
+
     def build_tree(current_path):
         tree = {"dirs": {}, "files": []}
 
