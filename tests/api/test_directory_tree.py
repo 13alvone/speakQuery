@@ -20,3 +20,57 @@ def test_directory_tree_missing_dir(mock_heavy_modules, tmp_path):
     assert data['message'] == 'Indexes directory not found'
 
     app.config['INDEXES_DIR'] = orig_dir
+
+
+def test_directory_tree_listing(mock_heavy_modules, tmp_path):
+    """Verify /get_directory_tree returns all parquet files and directories."""
+    from app import app
+
+    orig_dir = app.config['INDEXES_DIR']
+    root = tmp_path / 'indexes'
+    root.mkdir()
+
+    (root / 'archive').mkdir()
+    (root / 'archive' / 'ignored.parquet').touch()
+
+    (root / 'root.parquet').touch()
+    dir1 = root / 'dir1'
+    dir1.mkdir()
+    (dir1 / 'file1.parquet').touch()
+    sub = dir1 / 'sub'
+    sub.mkdir()
+    (sub / 'file2.parquet').touch()
+
+    dir2 = root / 'dir2'
+    dir2.mkdir()
+    (dir2 / 'file3.parquet').touch()
+
+    (root / 'other.txt').touch()
+
+    app.config['INDEXES_DIR'] = str(root)
+
+    client = app.test_client()
+    resp = client.get('/get_directory_tree')
+    data = resp.get_json()
+
+    assert resp.status_code == 200
+    assert data['status'] == 'success'
+
+    def gather(tree):
+        paths = [f['path'] for f in tree['files']]
+        for sub in tree['dirs'].values():
+            paths.extend(gather(sub))
+        return paths
+
+    expected = {
+        'root.parquet',
+        'dir1/file1.parquet',
+        'dir1/sub/file2.parquet',
+        'dir2/file3.parquet',
+    }
+    assert set(gather(data['tree'])) == expected
+
+    assert set(data['tree']['dirs']) == {'dir1', 'dir2'}
+    assert 'archive' not in data['tree']['dirs']
+
+    app.config['INDEXES_DIR'] = orig_dir
