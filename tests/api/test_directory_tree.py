@@ -23,7 +23,7 @@ def test_directory_tree_missing_dir(mock_heavy_modules, tmp_path):
 
 
 def test_directory_tree_listing(mock_heavy_modules, tmp_path):
-    """Verify /get_directory_tree returns all parquet files and directories."""
+    """Verify /get_directory_tree returns all files and directories."""
     from app import app
 
     orig_dir = app.config['INDEXES_DIR']
@@ -34,9 +34,11 @@ def test_directory_tree_listing(mock_heavy_modules, tmp_path):
     (root / 'archive' / 'ignored.parquet').touch()
 
     (root / 'root.parquet').touch()
+    (root / 'root.db').touch()
     dir1 = root / 'dir1'
     dir1.mkdir()
     (dir1 / 'file1.parquet').touch()
+    (dir1 / 'notes.txt').touch()
     sub = dir1 / 'sub'
     sub.mkdir()
     (sub / 'file2.parquet').touch()
@@ -46,6 +48,8 @@ def test_directory_tree_listing(mock_heavy_modules, tmp_path):
     (dir2 / 'file3.parquet').touch()
 
     (root / 'other.txt').touch()
+    empty = root / 'empty_dir'
+    empty.mkdir()
 
     app.config['INDEXES_DIR'] = str(root)
 
@@ -64,13 +68,16 @@ def test_directory_tree_listing(mock_heavy_modules, tmp_path):
 
     expected = {
         'root.parquet',
+        'root.db',
+        'other.txt',
         'dir1/file1.parquet',
+        'dir1/notes.txt',
         'dir1/sub/file2.parquet',
         'dir2/file3.parquet',
     }
     assert set(gather(data['tree'])) == expected
 
-    assert set(data['tree']['dirs']) == {'dir1', 'dir2'}
+    assert set(data['tree']['dirs']) == {'dir1', 'dir2', 'empty_dir'}
     assert 'archive' not in data['tree']['dirs']
 
     app.config['INDEXES_DIR'] = orig_dir
