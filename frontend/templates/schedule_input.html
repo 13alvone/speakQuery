@@ -156,8 +156,6 @@ GENERATE_RESULTS(df)
 {% block extra_js %}
     <!-- Include Axios if not already included globally -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- Include Bulma's JavaScript (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bulma@0.9.4/js/bulma.min.js"></script>
     <!-- Include your JavaScript file -->
     <script src="{{ url_for('static', filename='js/schedule_input.js') }}"></script>
 {% endblock %}
