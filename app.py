@@ -1259,9 +1259,8 @@ def get_directory_tree():
             full_path = os.path.join(current_path, entry)
             if os.path.isdir(full_path):
                 subtree = build_tree(full_path)
-                if subtree["dirs"] or subtree["files"]:
-                    tree["dirs"][entry] = subtree
-            elif entry.endswith('.parquet'):
+                tree["dirs"][entry] = subtree
+            else:
                 rel_path = os.path.relpath(full_path, root_dir)
                 tree["files"].append({"name": entry, "path": rel_path})
 
