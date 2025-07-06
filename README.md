@@ -52,6 +52,8 @@ The manual setup steps below remain available for local development.
 3. Copy `.env.example` to `.env` and edit the values for your environment.
 4. Start all services with `./run_all.sh`.
 5. Open a browser to the provided URL to use the web interface.
+6. If the sidebar shows **No index files found or directory missing.**, create or
+   mount index files under the configured `indexes` directory.
 
 ## Architecture
 
