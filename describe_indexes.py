@@ -29,13 +29,27 @@ def explore_directory() -> str:
     return "\n".join(lines)
 
 
-def find_parquet_files() -> Generator[str, None, None]:
-    """Find all parquet files recursively."""
-    for root, _, files in os.walk('../indexes/'):
+def find_parquet_files(base_dir: str | None = None) -> Generator[str, None, None]:
+    """Yield all parquet files under ``base_dir`` excluding ``archive``.
+
+    Parameters
+    ----------
+    base_dir:
+        Optional directory to search. If ``None`` the path ``indexes`` relative
+        to this script is used. Using an explicit base directory avoids relying
+        on the caller's working directory.
+    """
+
+    if base_dir is None:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir = os.path.join(script_dir, "indexes")
+
+    for root, _, files in os.walk(base_dir):
+        if "archive" in os.path.relpath(root, base_dir).split(os.sep):
+            continue
         for file in files:
-            if file.endswith('.parquet'):
-                if "/archive/" not in root:
-                    yield os.path.join(root, file)
+            if file.endswith(".parquet"):
+                yield os.path.join(root, file)
 
 
 def read_parquet_preview(filepath: str, max_rows: int = 20) -> str:
@@ -58,6 +72,8 @@ def read_parquet_preview(filepath: str, max_rows: int = 20) -> str:
 
 def main():
     """Print information about available parquet indexes."""
+
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
 
     # Step 1: print directory structure if needed
     # print(explore_directory())
