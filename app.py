@@ -1239,26 +1239,31 @@ def update_scheduled_input(input_id):
 
 @app.route('/get_directory_tree', methods=['GET'])
 def get_directory_tree():
+    """Return a nested representation of the indexes directory."""
+
     root_dir = app.config['INDEXES_DIR']
 
-    def get_tree(path):
-        tree = {}
-        for dir_path, _, filenames in os.walk(path):
-            relative_dir_path = os.path.relpath(dir_path, root_dir)
+    def build_tree(current_path):
+        tree = {"dirs": {}, "files": []}
 
-            # Skip if the directory path includes 'archive'
-            if 'archive' in relative_dir_path.split(os.sep):
+        for entry in sorted(os.listdir(current_path)):
+            if entry == 'archive':
                 continue
 
-            parquet_files = [f for f in filenames if f.endswith('.parquet')]
-            if parquet_files:
-                tree[relative_dir_path] = {'files': parquet_files}
+            full_path = os.path.join(current_path, entry)
+            if os.path.isdir(full_path):
+                subtree = build_tree(full_path)
+                if subtree["dirs"] or subtree["files"]:
+                    tree["dirs"][entry] = subtree
+            elif entry.endswith('.parquet'):
+                rel_path = os.path.relpath(full_path, root_dir)
+                tree["files"].append({"name": entry, "path": rel_path})
 
         return tree
 
     directory_tree = {
         "status": "success",
-        "tree": get_tree(root_dir)
+        "tree": build_tree(root_dir)
     }
     return jsonify(directory_tree)
 

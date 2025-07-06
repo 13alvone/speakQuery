@@ -52,6 +52,14 @@
     text-decoration: underline;
 }
 
+#directory-tree details {
+    margin-left: 20px;
+}
+
+#directory-tree summary {
+    cursor: pointer;
+}
+
 #tree-toggle {
     cursor: pointer;
 }
