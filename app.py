@@ -187,6 +187,8 @@ def load_user_from_request(request):
 
 # Ensure temp directory exists
 os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
+# Ensure indexes directory exists
+os.makedirs(app.config['INDEXES_DIR'], exist_ok=True)
 
 
 def allowed_file(filename):
