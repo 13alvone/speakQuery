@@ -242,20 +242,43 @@ document.addEventListener('DOMContentLoaded', function() {
      * Load the directory tree structure from the server.
      */
     function loadDirectoryTree() {
+        const treeEl = document.getElementById('directory-tree');
+        const messageEl = document.getElementById('directory-tree-message');
         axios.get('/get_directory_tree')
             .then(response => {
                 const data = response.data;
                 if (data.status === 'success') {
                     const treeData = data.tree;
-                    const treeHtml = buildTreeHtml(treeData);
-                    document.getElementById('directory-tree').innerHTML = treeHtml;
-                    attachFileClickEvents();
+                    if (
+                        (!treeData.files || treeData.files.length === 0) &&
+                        (!treeData.dirs || Object.keys(treeData.dirs).length === 0)
+                    ) {
+                        treeEl.innerHTML = '';
+                        if (messageEl) {
+                            messageEl.textContent = 'No index files found or directory missing.';
+                        }
+                    } else {
+                        const treeHtml = buildTreeHtml(treeData);
+                        treeEl.innerHTML = treeHtml;
+                        if (messageEl) {
+                            messageEl.textContent = '';
+                        }
+                        attachFileClickEvents();
+                    }
                 } else {
+                    treeEl.innerHTML = '';
+                    if (messageEl) {
+                        messageEl.textContent = 'No index files found or directory missing.';
+                    }
                     showError(data.message || 'Error loading directory structure.');
                 }
             })
             .catch(error => {
                 console.error('[x] Error loading directory tree:', error);
+                treeEl.innerHTML = '';
+                if (messageEl) {
+                    messageEl.textContent = 'No index files found or directory missing.';
+                }
                 showError('Error loading directory structure.');
             });
     }
