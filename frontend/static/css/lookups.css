@@ -62,7 +62,7 @@
 
 .loading-overlay p {
     font-size: 1.2em;
-    color: #363636;
+    color: var(--text-color);
 }
 
 /* Keyframes for spinner animation */

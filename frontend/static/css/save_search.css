@@ -2,7 +2,7 @@
 
 /* Readonly Field Styling */
 input[readonly] {
-    background-color: #f5f5f5; /* Light grey background for readonly fields */
+    background-color: var(--box-background-color); /* Consistent with dark theme */
     color: #7a7a7a;
 }
 
