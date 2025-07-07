@@ -134,10 +134,9 @@ class speakQueryListener(ParseTreeListener):
         self.target_index = None
         self.initial_sequence_enabled = False
         self.original_query = cleaned_query.strip()
-        # Remove spaces from the first pipe-separated part of the query
-        self.original_index_call = "".join(
-            self.original_query.split("|")[0].strip()
-        ).replace(" ", "")
+        # Strip all whitespace from the first segment (index clause)
+        first_seg = self.original_query.split("|")[0]
+        self.original_index_call = re.sub(r"\s+", "", first_seg)
         self.general_handler = GeneralHandler()
         self.lookup_handler = LookupHandler()
         self.search_cmd_handler = SearchDirective()
