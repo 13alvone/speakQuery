@@ -24,6 +24,11 @@ textarea {
     font-family: inherit;
 }
 
+/* Ensure textareas span the full width of their container */
+.textarea {
+    width: 100%;
+}
+
 /* Menu Styles */
 .menu {
     display: flex;
