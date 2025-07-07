@@ -32,15 +32,24 @@ def test_initialize_scheduled_inputs_db_creates_table(tmp_path):
         db_path = tmp_path / "scheduled_inputs.db"
         sie.SCHEDULED_INPUTS_DB = db_path
 
+        async def precreate():
+            async with aiosqlite.connect(db_path) as db:
+                await db.execute(
+                    '''CREATE TABLE scheduled_inputs (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT UNIQUE
+                    )'''
+                )
+                await db.commit()
+        asyncio.run(precreate())
+
         asyncio.run(sie.initialize_scheduled_inputs_db())
 
         async def check():
             async with aiosqlite.connect(db_path) as db:
-                async with db.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table' AND name='scheduled_inputs'"
-                ) as cursor:
-                    row = await cursor.fetchone()
-                    assert row is not None
+                async with db.execute("PRAGMA table_info(scheduled_inputs)") as cursor:
+                    cols = [row[1] async for row in cursor]
+                    assert 'api_url' in cols
 
         asyncio.run(check())
     finally:
