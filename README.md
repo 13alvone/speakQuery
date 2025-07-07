@@ -187,17 +187,20 @@ This command sets up the necessary tables and inserts the specified account so f
 
 ## Testing
 
-After running `setup.sh` and activating the virtual environment, install the development
-dependencies before executing the test suite. Packages such as
-`werkzeug`, `pandas`, `aiosqlite`, `antlr4-python3-runtime`, and `PyYAML` are
-required:
+After running `setup.sh` and activating the virtual environment, install the
+base requirements followed by the development packages before executing the
+test suite. Packages such as `werkzeug`, `pandas`, `aiosqlite`,
+`antlr4-python3-runtime`, and `PyYAML` are required:
 ```bash
 source env/bin/activate
+pip install -r requirements.txt
 pip install -r requirements-dev.txt
 flake8 --exclude=env
 bandit -r .
 pytest -vv
 ```
+For CI environments the helper script `ci_setup.sh` installs these
+dependencies and builds the custom components automatically.
 The script `tests/automated_build_test.sh` demonstrates compiling the extensions
 and running a small sample test in one step.
 
