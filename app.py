@@ -910,12 +910,23 @@ def commit_saved_search():
 @login_required
 def commit_scheduled_input():
     try:
-        title = request.form['title']
-        description = request.form.get('description', '').strip()
-        code = request.form['code']
-        cron_schedule = request.form['cron_schedule']
-        overwrite = request.form['overwrite']
-        subdirectory = request.form.get('subdirectory', '').strip() or None
+        data = request.get_json(silent=True)
+        if data:
+            title = data.get('title')
+            description = data.get('description', '').strip()
+            code = data.get('code')
+            cron_schedule = data.get('cron_schedule')
+            overwrite = data.get('overwrite')
+            subdirectory = data.get('subdirectory', '').strip() or None
+            api_url = data.get('api_url')
+        else:
+            title = request.form['title']
+            description = request.form.get('description', '').strip()
+            code = request.form['code']
+            cron_schedule = request.form['cron_schedule']
+            overwrite = request.form['overwrite']
+            subdirectory = request.form.get('subdirectory', '').strip() or None
+            api_url = request.form.get('api_url')
 
         # Validate the cron schedule format
         if not croniter.is_valid(cron_schedule):
@@ -932,7 +943,8 @@ def commit_scheduled_input():
             code=code,
             cron_schedule=cron_schedule,
             overwrite=overwrite,
-            subdirectory=subdirectory
+            subdirectory=subdirectory,
+            api_url=api_url,
         )
 
         return jsonify({'status': 'success'})

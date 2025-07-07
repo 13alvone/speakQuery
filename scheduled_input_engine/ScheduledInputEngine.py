@@ -202,6 +202,10 @@ async def initialize_scheduled_inputs_db():
                 )
                 '''
             )
+            async with db.execute("PRAGMA table_info(scheduled_inputs)") as cur:
+                cols = [row[1] async for row in cur]
+                if 'api_url' not in cols:
+                    await db.execute('ALTER TABLE scheduled_inputs ADD COLUMN api_url TEXT')
             await db.commit()
             logger.info(
                 "[i] Initialized scheduled inputs database and ensured the scheduled_inputs table exists."

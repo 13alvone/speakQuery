@@ -44,7 +44,8 @@ class ScheduledInputBackend:
         """Initialize the SQLite database for scheduled inputs."""
         with sqlite3.connect(self.SCHEDULED_INPUTS_DB) as conn:
             cursor = conn.cursor()
-            cursor.execute('''
+            cursor.execute(
+                '''
                 CREATE TABLE IF NOT EXISTS scheduled_inputs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT UNIQUE,
@@ -53,10 +54,16 @@ class ScheduledInputBackend:
                     cron_schedule TEXT,
                     overwrite BOOLEAN,
                     subdirectory TEXT,
+                    api_url TEXT,
                     created_at REAL,
                     disabled BOOLEAN DEFAULT 0
                 )
-            ''')
+                '''
+            )
+            cursor.execute('PRAGMA table_info(scheduled_inputs)')
+            cols = [c[1] for c in cursor.fetchall()]
+            if 'api_url' not in cols:
+                cursor.execute('ALTER TABLE scheduled_inputs ADD COLUMN api_url TEXT')
             conn.commit()
 
     def schedule_cleanup(self):
@@ -101,7 +108,7 @@ class ScheduledInputBackend:
         except ValueError:
             return False
 
-    def add_scheduled_input(self, title, description, code, cron_schedule, overwrite, subdirectory):
+    def add_scheduled_input(self, title, description, code, cron_schedule, overwrite, subdirectory, api_url=None):
         # Validate inputs
         self.validate_inputs(title, description, cron_schedule, overwrite, subdirectory)
 
@@ -112,11 +119,24 @@ class ScheduledInputBackend:
         try:
             with sqlite3.connect(self.SCHEDULED_INPUTS_DB) as conn:
                 cursor = conn.cursor()
-                cursor.execute('''
-                    INSERT INTO scheduled_inputs 
-                    (title, description, code, cron_schedule, overwrite, subdirectory, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (title, description, code, cron_schedule, overwrite_bool, subdirectory, time.time()))
+                cursor.execute(
+                    '''
+                    INSERT INTO scheduled_inputs (
+                        title, description, code, cron_schedule, overwrite,
+                        subdirectory, api_url, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ''',
+                    (
+                        title,
+                        description,
+                        code,
+                        cron_schedule,
+                        overwrite_bool,
+                        subdirectory,
+                        api_url,
+                        time.time(),
+                    ),
+                )
                 conn.commit()
         except sqlite3.IntegrityError:
             raise ValueError('Title must be unique.')
