@@ -50,7 +50,14 @@ async def execute_task(task_id, title, code, cron_schedule, overwrite, subdirect
         engine = ScheduledInputBackend()
 
         # Execute the task using the backend
-        await loop.run_in_executor(None, engine.execute_task, title, code, overwrite, subdirectory, api_url)
+        await loop.run_in_executor(
+            None,
+            engine.execute_scheduled_code,
+            title,
+            code,
+            overwrite,
+            subdirectory,
+        )
 
         # Capture execution end time and calculate runtime
         execution_end_time = time.time()
