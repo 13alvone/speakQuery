@@ -9,14 +9,15 @@
 }
 
 .dropdown-trigger .button {
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: var(--box-background-color);
+    color: var(--text-color);
+    border: 1px solid var(--secondary-color);
 }
 
 .dropdown-menu {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: var(--box-background-color);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: var(--modal-z-index);
@@ -27,14 +28,14 @@
 }
 
 .dropdown-content .dropdown-item {
-    color: black;
+    color: var(--text-color);
     padding: 12px 16px;
     text-decoration: none;
     display: block;
 }
 
 .dropdown-content .dropdown-item:hover {
-    background-color: #f1f1f1;
+    background-color: var(--hover-background-color-dark);
 }
 
 /* Load Button Styles */
@@ -68,11 +69,11 @@
 }
 
 .table th {
-    background-color: #f5f5f5;
+    background-color: var(--box-background-color);
 }
 
 .table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: var(--hover-background-color-dark);
 }
 
 /* Modal Styles (if any specific styles are needed beyond common.css) */

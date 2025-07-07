@@ -2,7 +2,7 @@
 
 /* Static Code Block Styling */
 .static-code-block {
-    background-color: #f9f9f9;
+    background-color: var(--box-background-color);
     padding: 10px;
     border-radius: 4px;
     white-space: pre-wrap;
@@ -13,7 +13,7 @@
 
 /* JSON Display Styling */
 #json-display-container pre.json-display {
-    background-color: #f9f9f9;
+    background-color: var(--box-background-color);
     padding: 10px;
     border-radius: 4px;
     white-space: pre-wrap;
@@ -23,7 +23,7 @@
 
 /* DataFrame Summary Styling */
 #df-summary-container pre {
-    background-color: #f9f9f9;
+    background-color: var(--box-background-color);
     padding: 10px;
     border-radius: 4px;
     white-space: pre-wrap;
