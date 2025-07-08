@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Register</h1>
+    <form method="post" action="/register">
+      <div class="field">
+        <label class="label">Username</label>
+        <div class="control">
+          <input class="input" type="text" name="username" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Password</label>
+        <div class="control">
+          <input class="input" type="password" name="password" required>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <label class="checkbox">
+            <input type="checkbox" name="is_admin">
+            Register as admin
+          </label>
+        </div>
+      </div>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit">Register</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
