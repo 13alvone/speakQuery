@@ -22,7 +22,7 @@ from utils.file_utils import get_row_count as util_get_row_count, allowed_file a
 import requests
 import pandas as pd
 import antlr4
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_wtf import CSRFProtect
 from flask_login import (
     LoginManager,
@@ -630,6 +630,8 @@ def history():
 @app.route('/settings.html')
 @login_required
 def settings():
+    if getattr(current_user, 'role', None) != 'admin':
+        return redirect(url_for('login_page'))
     return render_template('settings.html')
 
 
