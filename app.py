@@ -565,6 +565,8 @@ def login():
 @app.route('/login.html')
 def login_page():
     """Render the login page."""
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     return render_template('login.html')
 
 
