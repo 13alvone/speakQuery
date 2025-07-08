@@ -49,6 +49,23 @@ def test_stats_directive(monkeypatch):
     assert listener.main_df.equals(df)
 
 
+def test_stats_directive_paren_collapse(monkeypatch):
+    df = pd.DataFrame({"a": [1]})
+    monkeypatch.setattr(
+        "lexers.speakQueryListener.process_index_calls", lambda tokens: df
+    )
+    called = {}
+
+    def fake_stats(self, tokens, d):
+        called["t"] = tokens
+        return d
+
+    monkeypatch.setattr("handlers.StatsHandler.StatsHandler.run_stats", fake_stats)
+    listener = run_query('index="dummy" | stats values(a) as levels')
+    assert called["t"] == ["stats", "values(a)", "as", "levels"]
+    assert listener.main_df.equals(df)
+
+
 def test_eval_directive(monkeypatch):
     df = pd.DataFrame({"a": [1]})
     monkeypatch.setattr(
