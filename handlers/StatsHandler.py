@@ -67,7 +67,8 @@ class StatsHandler:
         specs = []
         tokens = self.split_arguments(funcs_str)
         for tok in tokens:
-            m = re.match(r"(\w+)\s*(?:\(\s*([\w\.]+)?\s*\))?(?:\s+as\s+(\w+))?", tok, flags=re.IGNORECASE)
+            # Allow '*' as a field or alias for later expansion
+            m = re.match(r"(\w+)\s*(?:\(\s*([\w\.\*]+)?\s*\))?(?:\s+as\s+([\w\*]+))?", tok, flags=re.IGNORECASE)
             if not m:
                 logging.error(f"[x] Invalid function spec: '{tok}'")
                 raise ValueError(f"Invalid function spec: '{tok}'")
@@ -82,6 +83,19 @@ class StatsHandler:
         """
         Compute stats and return aggregated DataFrame.
         """
+        # Expand wildcard fields and aliases before aggregation
+        expanded = []
+        for s in specs:
+            if s['field'] == '*':
+                fields = [c for c in df.columns if c not in group_fields]
+                for col in fields:
+                    alias = col if s['alias'] == '*' else s['alias']
+                    expanded.append({'func': s['func'], 'field': col, 'alias': alias})
+            else:
+                alias = s['field'] if s['alias'] == '*' and s['field'] else s['alias']
+                expanded.append({'func': s['func'], 'field': s['field'], 'alias': alias})
+        specs = expanded
+
         if group_fields:
             missing = [c for c in group_fields if c not in df.columns]
             if missing:
