@@ -285,10 +285,19 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             username TEXT UNIQUE,
             password_hash TEXT,
             role TEXT DEFAULT 'standard_user',
-            api_token TEXT
+            api_token TEXT,
+            force_password_change INTEGER DEFAULT 0
         )
     ''')
         conn.commit()
+
+        cursor.execute('PRAGMA table_info(users)')
+        user_cols = [c[1] for c in cursor.fetchall()]
+        if 'force_password_change' not in user_cols:
+            cursor.execute(
+                'ALTER TABLE users ADD COLUMN force_password_change INTEGER DEFAULT 0'
+            )
+            conn.commit()
 
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS indexes_meta (
@@ -314,7 +323,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
                 password_hash = generate_password_hash(password)
                 token_hash = hashlib.sha256(api_token.encode()).hexdigest()
                 cursor.execute(
-                    'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                    'INSERT INTO users (username, password_hash, role, api_token, force_password_change) VALUES (?, ?, ?, ?, 1)',
                     (username, password_hash, role, token_hash),
                 )
                 conn.commit()
@@ -332,7 +341,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
                     password_hash = generate_password_hash(admin_password)
                     token_hash = hashlib.sha256(token.encode()).hexdigest()
                     cursor.execute(
-                        'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                        'INSERT INTO users (username, password_hash, role, api_token, force_password_change) VALUES (?, ?, ?, ?, 0)',
                         (admin_username, password_hash, admin_role, token_hash),
                     )
                     conn.commit()
@@ -511,7 +520,8 @@ def index():
 @limiter.limit(lambda: app.config.get('LOGIN_RATE_LIMIT', '5 per minute'))
 def login():
     """Authenticate a user and start a session."""
-    data = request.get_json() or request.form
+    data = request.get_json(silent=True) or request.form
+    wants_json = request.is_json or request.headers.get('Accept', '').startswith('application/json')
     username = data.get('username') if data else None
     password = data.get('password') if data else None
     if not username or not password:
@@ -520,14 +530,19 @@ def login():
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                'SELECT id, password_hash, role, api_token FROM users WHERE username = ?',
+                'SELECT id, password_hash, role, api_token, force_password_change FROM users WHERE username = ?',
                 (username,),
             )
             row = cursor.fetchone()
             if row and check_password_hash(row[1], password):
                 user = User(id=row[0], username=username, role=row[2], api_token=row[3])
                 login_user(user)
-                return jsonify({'status': 'success'})
+                force_flag = bool(row[4]) if len(row) > 4 else False
+                if wants_json:
+                    return jsonify({'status': 'success', 'force_password_change': force_flag})
+                if force_flag:
+                    return redirect(url_for('change_password_page'))
+                return redirect(url_for('index'))
     except Exception as exc:
         if isinstance(exc, sqlite3.Error) and 'no such table' in str(exc):
             logging.error(
@@ -557,6 +572,13 @@ def login_page():
 def register_page():
     """Render the registration page."""
     return render_template('register.html')
+
+
+@app.route('/change_password.html')
+@login_required
+def change_password_page():
+    """Render the change password page."""
+    return render_template('change_password.html')
 
 
 @csrf.exempt
@@ -597,7 +619,7 @@ def register():
             token = uuid.uuid4().hex
             token_hash = hashlib.sha256(token.encode()).hexdigest()
             cursor.execute(
-                'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                'INSERT INTO users (username, password_hash, role, api_token, force_password_change) VALUES (?, ?, ?, ?, 0)',
                 (username, password_hash, role, token_hash),
             )
             conn.commit()
@@ -613,6 +635,43 @@ def logout():
     """Log out the current user."""
     logout_user()
     return jsonify({'status': 'success'})
+
+
+@csrf.exempt
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    """Allow authenticated users to change their password."""
+    if request.method == 'GET':
+        return render_template('change_password.html')
+
+    data = request.get_json(silent=True) or request.form
+    wants_json = request.is_json or request.headers.get('Accept', '').startswith('application/json')
+    old_pw = data.get('old_password') if data else None
+    new_pw = data.get('new_password') if data else None
+    if not old_pw or not new_pw:
+        return jsonify({'status': 'error', 'message': 'Missing credentials'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT password_hash FROM users WHERE id = ?', (current_user.id,))
+            row = cursor.fetchone()
+            if not row or not check_password_hash(row[0], old_pw):
+                return jsonify({'status': 'error', 'message': 'Incorrect password'}), 400
+            if not validate_password_strength(new_pw):
+                return jsonify({'status': 'error', 'message': 'Weak password'}), 400
+            new_hash = generate_password_hash(new_pw)
+            cursor.execute(
+                'UPDATE users SET password_hash = ?, force_password_change = 0 WHERE id = ?',
+                (new_hash, current_user.id),
+            )
+            conn.commit()
+        if wants_json:
+            return jsonify({'status': 'success'})
+        return redirect(url_for('index'))
+    except Exception as exc:
+        logging.error(f"[x] Failed to change password for user {current_user.id}: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
 
 
 @app.route('/lookups.html')
