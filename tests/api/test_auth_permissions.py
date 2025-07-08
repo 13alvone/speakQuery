@@ -16,14 +16,23 @@ def _setup_db(app, tmp_path, monkeypatch):
     orig_saved = app.config['SAVED_SEARCHES_DB']
     tmp_sched = tmp_path / 'scheduled_inputs.db'
     tmp_saved = tmp_path / 'saved_searches.db'
-    shutil.copy(orig_sched, tmp_sched)
-    shutil.copy(orig_saved, tmp_saved)
+    # Start with fresh databases for each test
+    sqlite3.connect(tmp_sched).close()
+    sqlite3.connect(tmp_saved).close()
     app.config['SCHEDULED_INPUTS_DB'] = str(tmp_sched)
     app.config['SAVED_SEARCHES_DB'] = str(tmp_saved)
     monkeypatch.setenv('ADMIN_USERNAME', 'admin')
     monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
     monkeypatch.setenv('ADMIN_API_TOKEN', 'admintoken')
     initialize_database()
+    # Ensure 'disabled' column exists for saved_searches
+    with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute('PRAGMA table_info(saved_searches)')
+        cols = [c[1] for c in cursor.fetchall()]
+        if 'disabled' not in cols:
+            cursor.execute('ALTER TABLE saved_searches ADD COLUMN disabled INTEGER DEFAULT 0')
+            conn.commit()
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         cursor = conn.cursor()
         cursor.execute(
