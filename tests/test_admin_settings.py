@@ -49,3 +49,47 @@ def test_admin_required_for_settings(mock_heavy_modules, tmp_path, monkeypatch):
     assert resp.status_code == 200
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
+
+
+def test_settings_page_admin_only(mock_heavy_modules, tmp_path, monkeypatch):
+    """Verify only admins can access the settings page."""
+    from app import app, initialize_database
+
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    shutil.copy(orig_db, tmp_db)
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
+
+    # Regular user
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            'INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)',
+            ('user', generate_password_hash('pw'), 'user'),
+        )
+        conn.commit()
+
+    client = app.test_client()
+
+    resp = client.get('/settings.html')
+    assert resp.status_code == 302
+    assert '/login.html' in resp.headers.get('Location', '')
+
+    resp = client.post('/login', json={'username': 'user', 'password': 'pw'})
+    assert resp.status_code == 200
+    resp = client.get('/settings.html')
+    assert resp.status_code == 302
+    assert '/login.html' in resp.headers.get('Location', '')
+    client.get('/logout')
+
+    resp = client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    assert resp.status_code == 200
+    resp = client.get('/settings.html')
+    assert resp.status_code == 200
+
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
+
