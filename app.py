@@ -82,6 +82,7 @@ app.config['WTF_CSRF_ENABLED'] = True
 # Authentication setup
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login_page'
 
 
 class User:
@@ -465,6 +466,7 @@ def is_title_unique(title):
 
 
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html')
 
@@ -510,6 +512,12 @@ def login():
     return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401
 
 
+@app.route('/login.html')
+def login_page():
+    """Render the login page."""
+    return render_template('login.html')
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -519,16 +527,19 @@ def logout():
 
 
 @app.route('/lookups.html')
+@login_required
 def lookups():
     return render_template('lookups.html')
 
 
 @app.route('/history.html')
+@login_required
 def history():
     return render_template('history.html')
 
 
 @app.route('/settings.html')
+@login_required
 def settings():
     return render_template('settings.html')
 

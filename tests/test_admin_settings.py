@@ -32,7 +32,7 @@ def test_admin_required_for_settings(mock_heavy_modules, tmp_path, monkeypatch):
     client = app.test_client()
 
     resp = client.get('/get_settings')
-    assert resp.status_code == 401
+    assert resp.status_code == 302
 
     resp = client.post('/login', json={'username': 'user', 'password': 'pw'})
     assert resp.status_code == 200
