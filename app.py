@@ -281,7 +281,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password_hash TEXT,
-            role TEXT,
+            role TEXT DEFAULT 'standard_user',
             api_token TEXT
         )
     ''')
@@ -516,6 +516,48 @@ def login():
 def login_page():
     """Render the login page."""
     return render_template('login.html')
+
+
+@app.route('/register.html')
+def register_page():
+    """Render the registration page."""
+    return render_template('register.html')
+
+
+@csrf.exempt
+@app.route('/register', methods=['POST'])
+def register():
+    """Create a new user account."""
+    data = request.get_json() or request.form
+    username = data.get('username') if data else None
+    password = data.get('password') if data else None
+    is_admin = data.get('is_admin') if data else None
+    if not username or not password:
+        return jsonify({'status': 'error', 'message': 'Missing credentials'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) FROM users')
+            user_count = cursor.fetchone()[0]
+            cursor.execute('SELECT 1 FROM users WHERE username = ?', (username,))
+            if cursor.fetchone():
+                return jsonify({'status': 'error', 'message': 'Username already exists'}), 400
+
+            role = 'admin' if user_count == 0 else (
+                'admin' if str(is_admin).lower() in {'on', 'true', '1'} else 'standard_user'
+            )
+            password_hash = generate_password_hash(password)
+            token = uuid.uuid4().hex
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
+            cursor.execute(
+                'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                (username, password_hash, role, token_hash),
+            )
+            conn.commit()
+        return jsonify({'status': 'success', 'api_token': token}), 201
+    except Exception as exc:
+        logging.error(f"[x] Registration failed for {username}: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
 
 
 @app.route('/logout')
