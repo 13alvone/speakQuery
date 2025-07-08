@@ -316,6 +316,8 @@ class speakQueryListener(ParseTreeListener):
                 try:
                     dctx = valid_lines[i].directive()
                     seg_tokens = ctx_flatten(dctx, self.extract_screenshot_of_ctx)
+                    if cmd in ("stats", "eventstats", "streamstats"):
+                        seg_tokens = speakQueryListener.normalize_tokens(seg_tokens)
                 except Exception as e:
                     logging.error(f"[x] Failed to parse directive via context: {e}")
                     raise
@@ -1058,18 +1060,47 @@ class speakQueryListener(ParseTreeListener):
 
     @staticmethod
     def normalize_tokens(token_list):
+        """Return a cleaned token list with collapsed parentheses.
+
+        Tokens are first stripped of surrounding whitespace and any spaces
+        between an identifier and the opening parenthesis are removed.  Adjacent
+        tokens representing a function call (e.g. ``['values', '(', 'a', ')']``)
+        are then collapsed into a single token (``'values(a)'``).
         """
-        Normalizes a list of token strings by stripping extra whitespace and collapsing
-        spaces between function names and the opening parenthesis.
-        E.g. converts "lower ( userRole )" to "lower(userRole)".
-        """
+
+        # Initial whitespace/spacing cleanup
+        cleaned = []
+        for tok in token_list:
+            tok = tok.strip()
+            tok = re.sub(r"([a-zA-Z_][a-zA-Z_0-9]*)\s*\(", r"\1(", tok)
+            cleaned.append(tok)
+
         normalized = []
-        for token in token_list:
-            # Strip token first
-            token = token.strip()
-            # Remove spaces between identifiers and '('
-            token = re.sub(r"([a-zA-Z_][a-zA-Z_0-9]*)\s*\(", r"\1(", token)
-            normalized.append(token)
+        i = 0
+        while i < len(cleaned):
+            tok = cleaned[i]
+            # Detect pattern identifier '(' ... ')' and collapse
+            if (i + 1 < len(cleaned)) and cleaned[i + 1] == "(":
+                depth = 1
+                j = i + 2
+                inner = []
+                while j < len(cleaned) and depth > 0:
+                    t = cleaned[j]
+                    if t == "(":
+                        depth += 1
+                    elif t == ")":
+                        depth -= 1
+                        if depth == 0:
+                            break
+                    inner.append(t)
+                    j += 1
+                if depth == 0 and j < len(cleaned) and cleaned[j] == ")":
+                    normalized.append(f"{tok}({''.join(inner)})")
+                    i = j + 1
+                    continue
+            normalized.append(tok)
+            i += 1
+
         return normalized
 
 
