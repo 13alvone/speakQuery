@@ -1,6 +1,7 @@
 import os
 import sys
 import sqlite3
+import hashlib
 from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -71,6 +72,41 @@ def test_registration_rejects_weak_password(mock_heavy_modules, tmp_path, monkey
     client = app.test_client()
     resp = client.post('/register', json={'username': 'bad', 'password': 'short'})
     assert resp.status_code == 400
+
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
+    app.config['SAVED_SEARCHES_DB'] = orig_saved
+
+
+def test_admin_user_limit(mock_heavy_modules, tmp_path, monkeypatch):
+    from app import app
+    from werkzeug.security import generate_password_hash
+
+    orig_sched, orig_saved, db_path = _setup_tmp_dbs(app, tmp_path, monkeypatch)
+
+    # Pre-create 10 admin users
+    with sqlite3.connect(db_path) as conn:
+        for i in range(9):
+            conn.execute(
+                'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                (
+                    f'admin{i}',
+                    generate_password_hash('pw'),
+                    'admin',
+                    hashlib.sha256(f'token{i}'.encode()).hexdigest(),
+                ),
+            )
+        conn.commit()
+
+    client = app.test_client()
+    resp = client.post(
+        '/register',
+        json={'username': 'overflow', 'password': 'Passw0rd!', 'is_admin': 'on'},
+    )
+    assert resp.status_code == 400
+
+    with sqlite3.connect(db_path) as conn:
+        count = conn.execute('SELECT COUNT(*) FROM users WHERE role=?', ('admin',)).fetchone()[0]
+    assert count == 10
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_sched
     app.config['SAVED_SEARCHES_DB'] = orig_saved

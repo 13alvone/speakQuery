@@ -291,19 +291,43 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
 
         cursor.execute('SELECT COUNT(*) FROM users')
         users_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM users WHERE role='admin'")
+        admin_count = cursor.fetchone()[0]
+
         if users_count == 0:
-            username = admin_username or os.environ.get('ADMIN_USERNAME', 'admin')
-            password = admin_password or os.environ.get('ADMIN_PASSWORD', 'admin')
-            role = admin_role or os.environ.get('ADMIN_ROLE', 'admin')
-            api_token = admin_api_token or os.environ.get('ADMIN_API_TOKEN', str(uuid.uuid4()))
-            password_hash = generate_password_hash(password)
-            token_hash = hashlib.sha256(api_token.encode()).hexdigest()
-            cursor.execute(
-                'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
-                (username, password_hash, role, token_hash),
-            )
-            conn.commit()
-            logging.info('[i] Inserted default admin user')
+            if admin_count >= 10:
+                logging.error('[x] Admin user limit reached')
+            else:
+                username = admin_username or os.environ.get('ADMIN_USERNAME', 'admin')
+                password = admin_password or os.environ.get('ADMIN_PASSWORD', 'admin')
+                role = admin_role or os.environ.get('ADMIN_ROLE', 'admin')
+                api_token = admin_api_token or os.environ.get('ADMIN_API_TOKEN', str(uuid.uuid4()))
+                password_hash = generate_password_hash(password)
+                token_hash = hashlib.sha256(api_token.encode()).hexdigest()
+                cursor.execute(
+                    'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                    (username, password_hash, role, token_hash),
+                )
+                conn.commit()
+                logging.info('[i] Inserted default admin user')
+        elif admin_username and admin_password:
+            # allow CLI to create additional users
+            if admin_role == 'admin' and admin_count >= 10:
+                logging.error('[x] Admin user limit reached')
+            else:
+                cursor.execute('SELECT 1 FROM users WHERE username=?', (admin_username,))
+                if cursor.fetchone():
+                    logging.error(f"[x] Username {admin_username} already exists")
+                else:
+                    token = admin_api_token or str(uuid.uuid4())
+                    password_hash = generate_password_hash(admin_password)
+                    token_hash = hashlib.sha256(token.encode()).hexdigest()
+                    cursor.execute(
+                        'INSERT INTO users (username, password_hash, role, api_token) VALUES (?, ?, ?, ?)',
+                        (admin_username, password_hash, admin_role, token_hash),
+                    )
+                    conn.commit()
+                    logging.info(f"[i] Created user {admin_username} with role {admin_role}")
 
         # Insert default settings if table is empty
         cursor.execute('SELECT COUNT(*) FROM app_settings')
@@ -546,6 +570,8 @@ def register():
             cursor = conn.cursor()
             cursor.execute('SELECT COUNT(*) FROM users')
             user_count = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM users WHERE role='admin'")
+            admin_count = cursor.fetchone()[0]
             cursor.execute('SELECT 1 FROM users WHERE username = ?', (username,))
             if cursor.fetchone():
                 return jsonify({'status': 'error', 'message': 'Username already exists'}), 400
@@ -553,6 +579,11 @@ def register():
             role = 'admin' if user_count == 0 else (
                 'admin' if str(is_admin).lower() in {'on', 'true', '1'} else 'standard_user'
             )
+            if role == 'admin' and admin_count >= 10:
+                return (
+                    jsonify({'status': 'error', 'message': 'Admin user limit reached'}),
+                    400,
+                )
             password_hash = generate_password_hash(password)
             token = uuid.uuid4().hex
             token_hash = hashlib.sha256(token.encode()).hexdigest()
