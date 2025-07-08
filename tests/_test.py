@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 import pytest
+pytest.importorskip("pyarrow")
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')

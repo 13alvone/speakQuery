@@ -1,6 +1,7 @@
 import os
 import sys
 import pytest
+pytest.importorskip("pyarrow")
 
 # Compute the project root relative to this file (which is in <project_root>/tests)
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

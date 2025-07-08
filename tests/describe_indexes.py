@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 import os
+import pytest
+pytest.importorskip("pyarrow")
 import pyarrow.parquet as pq
 from subprocess import check_output
 from typing import Generator
