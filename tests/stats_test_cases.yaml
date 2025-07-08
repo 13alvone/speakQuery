@@ -276,3 +276,33 @@
   expected_columns: ["range_x"]
   expected_values:
     range_x: 2
+
+- id: 32
+  description: "Test Stats 32: values(level) and count by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | stats values(level) as levels, count() as full_count by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","values(level)","as","levels",",","count()","as","full_count","by","userRole"]
+  expected_columns: ["levels","full_count"]
+  expected_values:
+    levels: ["INFO","CRITICAL"]
+    full_count: 2
+
+- id: 33
+  description: "Test Stats 33: values(*) with count by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | stats values(*) as *, count() as full_count by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","values(*)","as","*",",","count()","as","full_count","by","userRole"]
+  expected_columns: ["full_count"]
+  expected_values:
+    full_count: 2
+
+- id: 34
+  description: "Test Stats 34: max test, earliest timestamp, values(*) and count by userRole"
+  original_query: 'index="output_parquets/test0.parquet" | stats max(test) as max_test, earliest(timestamp) as etime, values(*) as *, count() as full_count by userRole'
+  index_tokens: ["index","=","\"output_parquets/test0.parquet\""]
+  stats_tokens: ["stats","max(test)","as","max_test",",","earliest(timestamp)","as","etime",",","values(*)","as","*",",","count()","as","full_count","by","userRole"]
+  expected_columns: ["max_test","etime","full_count"]
+  expected_values:
+    max_test: 14
+    etime: "2024-01-02 00:00:00"
+    full_count: 2
