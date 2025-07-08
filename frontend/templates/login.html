@@ -2,9 +2,13 @@
 
 {% block title %}Login{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="section">
-  <div class="container">
+  <div class="container login-container">
     <h1 class="title">Login</h1>
     <form method="post" action="/login">
       <div class="field">

@@ -46,3 +46,32 @@ def test_page_requires_login(mock_heavy_modules, tmp_path, monkeypatch):
     assert '<nav' in page
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
+
+
+def test_login_page_redirects_when_authenticated(mock_heavy_modules, tmp_path, monkeypatch):
+    monkeypatch.setitem(sys.modules, 'antlr4', types.SimpleNamespace(
+        InputStream=object,
+        CommonTokenStream=object,
+        ParseTreeWalker=object
+    ))
+
+    from app import app, initialize_database
+
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    shutil.copy(orig_db, tmp_db)
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
+
+    client = app.test_client()
+
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+
+    resp = client.get('/login.html')
+    assert resp.status_code == 302
+    assert resp.headers['Location'].endswith('/')
+
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
