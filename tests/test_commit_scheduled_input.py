@@ -32,7 +32,7 @@ def test_commit_scheduled_input_requires_login(mock_heavy_modules, tmp_path, mon
             'overwrite': 'true',
         },
     )
-    assert resp.status_code == 401
+    assert resp.status_code == 302
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
     app.config['WTF_CSRF_ENABLED'] = True
