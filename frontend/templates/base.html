@@ -36,7 +36,9 @@
 </head>
 <body>
     <!-- Navbar Inclusion -->
+    {% if current_user.is_authenticated %}
     {% include 'navbar.html' %}
+    {% endif %}
 
     <!-- Notification Container -->
     <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
