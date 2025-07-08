@@ -266,6 +266,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
     ''')
         conn.commit()
 
+
     # Initialization for app_settings
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         # Assuming same DB; adjust if different
@@ -285,6 +286,14 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             password_hash TEXT,
             role TEXT DEFAULT 'standard_user',
             api_token TEXT
+        )
+    ''')
+        conn.commit()
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS indexes_meta (
+            path TEXT PRIMARY KEY,
+            is_private INTEGER DEFAULT 0
         )
     ''')
         conn.commit()
@@ -1352,27 +1361,49 @@ def get_directory_tree():
         logging.error(f"[x] Indexes directory not found: {root_dir}")
         return jsonify({'status': 'error', 'message': 'Indexes directory not found'}), 404
 
-    def build_tree(current_path):
-        tree = {"dirs": {}, "files": []}
+    user_is_admin = (
+        current_user.is_authenticated
+        and getattr(current_user, 'role', '') == 'admin'
+    )
 
-        for entry in sorted(os.listdir(current_path)):
-            if entry == 'archive':
-                continue
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        cursor = conn.cursor()
 
-            full_path = os.path.join(current_path, entry)
-            if os.path.isdir(full_path):
-                subtree = build_tree(full_path)
-                tree["dirs"][entry] = subtree
-            else:
-                rel_path = os.path.relpath(full_path, root_dir)
-                tree["files"].append({"name": entry, "path": rel_path})
+        def ensure_meta(path):
+            cursor.execute('SELECT is_private FROM indexes_meta WHERE path=?', (path,))
+            row = cursor.fetchone()
+            if row is None:
+                cursor.execute(
+                    'INSERT INTO indexes_meta (path, is_private) VALUES (?, 0)',
+                    (path,),
+                )
+                return 0
+            return row[0]
 
-        return tree
+        def build_tree(current_path):
+            tree = {"dirs": {}, "files": []}
 
-    directory_tree = {
-        "status": "success",
-        "tree": build_tree(root_dir)
-    }
+            for entry in sorted(os.listdir(current_path)):
+                if entry == 'archive':
+                    continue
+
+                full_path = os.path.join(current_path, entry)
+                if os.path.isdir(full_path):
+                    subtree = build_tree(full_path)
+                    tree["dirs"][entry] = subtree
+                else:
+                    rel_path = os.path.relpath(full_path, root_dir)
+                    is_private = ensure_meta(rel_path)
+                    if not user_is_admin and is_private:
+                        continue
+                    tree["files"].append({"name": entry, "path": rel_path})
+
+            return tree
+
+        tree = build_tree(root_dir)
+        conn.commit()
+
+    directory_tree = {"status": "success", "tree": tree}
     return jsonify(directory_tree)
 
 

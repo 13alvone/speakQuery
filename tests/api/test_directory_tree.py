@@ -1,15 +1,21 @@
 import os
 import sys
+import sqlite3
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 
 def test_directory_tree_missing_dir(mock_heavy_modules, tmp_path):
-    from app import app
+    from app import app, initialize_database
 
     orig_dir = app.config['INDEXES_DIR']
     missing = tmp_path / 'missing'
     app.config['INDEXES_DIR'] = str(missing)
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    sqlite3.connect(tmp_db).close()
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+    initialize_database()
 
     client = app.test_client()
     resp = client.get('/get_directory_tree')
@@ -20,11 +26,12 @@ def test_directory_tree_missing_dir(mock_heavy_modules, tmp_path):
     assert data['message'] == 'Indexes directory not found'
 
     app.config['INDEXES_DIR'] = orig_dir
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
 
 
-def test_directory_tree_listing(mock_heavy_modules, tmp_path):
+def test_directory_tree_listing(mock_heavy_modules, tmp_path, monkeypatch):
     """Verify /get_directory_tree returns all files and directories."""
-    from app import app
+    from app import app, initialize_database
 
     orig_dir = app.config['INDEXES_DIR']
     root = tmp_path / 'indexes'
@@ -52,6 +59,13 @@ def test_directory_tree_listing(mock_heavy_modules, tmp_path):
     empty.mkdir()
 
     app.config['INDEXES_DIR'] = str(root)
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    sqlite3.connect(tmp_db).close()
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
 
     client = app.test_client()
     resp = client.get('/get_directory_tree')
@@ -81,3 +95,47 @@ def test_directory_tree_listing(mock_heavy_modules, tmp_path):
     assert 'archive' not in data['tree']['dirs']
 
     app.config['INDEXES_DIR'] = orig_dir
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
+
+
+def test_directory_tree_private_filtering(mock_heavy_modules, tmp_path, monkeypatch):
+    """Private indexes should be hidden from non-admin users."""
+    from app import app, initialize_database
+
+    orig_dir = app.config['INDEXES_DIR']
+    orig_db = app.config['SCHEDULED_INPUTS_DB']
+
+    root = tmp_path / 'indexes'
+    root.mkdir()
+    (root / 'public.parquet').touch()
+    (root / 'private.parquet').touch()
+
+    app.config['INDEXES_DIR'] = str(root)
+    tmp_db = tmp_path / 'scheduled_inputs.db'
+    sqlite3.connect(tmp_db).close()
+    app.config['SCHEDULED_INPUTS_DB'] = str(tmp_db)
+    monkeypatch.setenv('ADMIN_USERNAME', 'admin')
+    monkeypatch.setenv('ADMIN_PASSWORD', 'admin')
+    initialize_database()
+
+    client = app.test_client()
+    # First call to populate indexes_meta
+    client.get('/get_directory_tree')
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        conn.execute('UPDATE indexes_meta SET is_private=1 WHERE path=?', ('private.parquet',))
+        conn.commit()
+
+    resp = client.get('/get_directory_tree')
+    data = resp.get_json()
+    paths = [f['path'] for f in data['tree']['files']]
+    assert 'public.parquet' in paths
+    assert 'private.parquet' not in paths
+
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    resp = client.get('/get_directory_tree')
+    data = resp.get_json()
+    paths = [f['path'] for f in data['tree']['files']]
+    assert 'private.parquet' in paths
+
+    app.config['INDEXES_DIR'] = orig_dir
+    app.config['SCHEDULED_INPUTS_DB'] = orig_db
