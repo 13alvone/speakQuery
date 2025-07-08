@@ -1,11 +1,19 @@
 import os
 import sys
 import shutil
+import types
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 def test_page_requires_login(mock_heavy_modules, tmp_path, monkeypatch):
+    # Stub out heavy antlr4 dependency before importing the app
+    monkeypatch.setitem(sys.modules, 'antlr4', types.SimpleNamespace(
+        InputStream=object,
+        CommonTokenStream=object,
+        ParseTreeWalker=object
+    ))
+
     from app import app, initialize_database
 
     orig_db = app.config['SCHEDULED_INPUTS_DB']
@@ -23,10 +31,18 @@ def test_page_requires_login(mock_heavy_modules, tmp_path, monkeypatch):
     assert resp.status_code == 302
     assert '/login.html' in resp.headers.get('Location', '')
 
+    # Login page should not show the navbar when unauthenticated
+    resp = client.get('/login.html')
+    assert resp.status_code == 200
+    page = resp.get_data(as_text=True)
+    assert '<nav' not in page
+
     resp = client.post('/login', json={'username': 'admin', 'password': 'admin'})
     assert resp.status_code == 200
 
     resp = client.get('/')
     assert resp.status_code == 200
+    page = resp.get_data(as_text=True)
+    assert '<nav' in page
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
