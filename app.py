@@ -143,6 +143,8 @@ validator = SavedSearchValidation()
 UUID_REGEX = re.compile(
     r'^[0-9]{10}\.[0-9]{6,7}_[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$'
 )
+# Minimum eight characters, at least one letter and one digit
+PASSWORD_REGEX = re.compile(r"^(?=.*[A-Za-z])(?=.*\d).{8,}$")
 
 
 @login_manager.user_loader
@@ -534,6 +536,11 @@ def register():
     is_admin = data.get('is_admin') if data else None
     if not username or not password:
         return jsonify({'status': 'error', 'message': 'Missing credentials'}), 400
+    if not validate_password_strength(password):
+        return (
+            jsonify({'status': 'error', 'message': 'Weak password'}),
+            400,
+        )
     try:
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cursor = conn.cursor()
@@ -1407,6 +1414,17 @@ def validate_uuid(request_id):
         return False
 
 
+def validate_password_strength(password):
+    """Return True if password meets minimum length and complexity."""
+    try:
+        if isinstance(password, str) and PASSWORD_REGEX.match(password):
+            return True
+        return False
+    except Exception as e:
+        logging.error(f"Password validation error: {str(e)}")
+        return False
+
+
 def execute_sql_query(db_path, query, params=()):
     """
     Executes an SQL query against the provided SQLite database.
@@ -1471,6 +1489,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.command == 'create-admin':
+        if not validate_password_strength(args.password):
+            logging.error('[x] Provided password does not meet complexity requirements')
+            sys.exit(1)
         initialize_database(args.username, args.password, args.role, args.token)
         sys.exit(0)
 
