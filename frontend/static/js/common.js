@@ -244,3 +244,28 @@ function closeAllDropdowns() {
         menu.classList.remove('is-active');
     });
 }
+
+/** Apply stored theme on page load. */
+function initializeTheme() {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light') {
+        document.body.classList.add('light-theme');
+    }
+}
+
+/** Attach click handler for the theme toggle button. */
+function setupThemeToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) {
+        return;
+    }
+    btn.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
+    setupThemeToggle();
+});

@@ -2,19 +2,30 @@
 
 /* CSS Variables */
 :root {
-    --primary-color: #28a745;
-    --secondary-color: #555;
-    --background-color: #121212;
-    --text-color: #e0e0e0;
-    --box-background-color: #1f1f1f;
+    --primary-color: #4f46e5;
+    --secondary-color: #6b7280;
+    --background-color: #1e1e1e;
+    --text-color: #f3f4f6;
+    --box-background-color: #262626;
     --hover-background-color: #333333;
-    --hover-background-color-dark: #2a2a2a;
+    --hover-background-color-dark: #4b5563;
     --error-color: red;
     --success-color: green;
     /* Global font for the entire application */
-    --font-family: 'Courier New', Courier, monospace;
+    --font-family: 'Inter', sans-serif;
     --modal-z-index: 1000;
     /* Add more variables as needed */
+}
+
+/* Light theme overrides */
+body.light-theme {
+    --primary-color: #4f46e5;
+    --secondary-color: #6b7280;
+    --background-color: #ffffff;
+    --text-color: #1f2937;
+    --box-background-color: #f9fafb;
+    --hover-background-color: #e5e7eb;
+    --hover-background-color-dark: #d1d5db;
 }
 
 body {
@@ -38,6 +49,8 @@ textarea {
 .box {
     background-color: var(--box-background-color);
     color: var(--text-color);
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Menu Styles */
@@ -65,6 +78,21 @@ textarea {
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
     color: var(--text-color);
+}
+
+.menu-list li button {
+    padding: 10px 15px;
+    background-color: var(--box-background-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu-list li button:hover {
+    background-color: var(--hover-background-color);
+    color: #3273dc;
 }
 
 .menu-list li a:hover {
@@ -118,6 +146,12 @@ textarea {
 .dropdown-content .dropdown-item:hover {
     background-color: var(--hover-background-color-dark);
     overflow: visible;
+}
+
+/* Global button styling */
+.button {
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: 4px;
 }
 
 /* Run Button Styles */
