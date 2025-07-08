@@ -21,7 +21,25 @@ def test_login_logout(mock_heavy_modules, tmp_path, monkeypatch):
 
     resp = client.post('/login', json={'username': 'admin', 'password': 'admin'})
     assert resp.status_code == 200
+    data = resp.get_json()
+    assert data['status'] == 'success'
+    assert data['force_password_change'] is True
+
+    resp = client.post(
+        '/change_password',
+        json={'old_password': 'admin', 'new_password': 'Newpass1!'}
+    )
+    assert resp.status_code == 200
     assert resp.get_json()['status'] == 'success'
+
+    client.get('/logout')
+
+    resp = client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    assert resp.status_code == 401
+
+    resp = client.post('/login', json={'username': 'admin', 'password': 'Newpass1!'})
+    assert resp.status_code == 200
+    assert resp.get_json()['force_password_change'] is False
 
     resp = client.get('/logout')
     assert resp.status_code == 200

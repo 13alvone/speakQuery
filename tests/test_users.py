@@ -20,8 +20,12 @@ def test_users_table_created(mock_heavy_modules, tmp_path, monkeypatch):
 
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         cursor = conn.cursor()
-        cursor.execute('SELECT username FROM users')
-        rows = cursor.fetchall()
-        assert rows and rows[0][0] == 'admin'
+        cursor.execute('PRAGMA table_info(users)')
+        cols = [c[1] for c in cursor.fetchall()]
+        assert 'force_password_change' in cols
+        cursor.execute('SELECT username, force_password_change FROM users')
+        row = cursor.fetchone()
+        assert row[0] == 'admin'
+        assert row[1] == 1
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
