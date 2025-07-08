@@ -31,7 +31,7 @@ def test_first_registration_is_admin(mock_heavy_modules, tmp_path, monkeypatch):
         conn.commit()
 
     client = app.test_client()
-    resp = client.post('/register', json={'username': 'first', 'password': 'pw'})
+    resp = client.post('/register', json={'username': 'first', 'password': 'Passw0rd!'})
     assert resp.status_code == 201
 
     with sqlite3.connect(db_path) as conn:
@@ -47,18 +47,30 @@ def test_registration_defaults_standard_user(mock_heavy_modules, tmp_path, monke
     orig_sched, orig_saved, db_path = _setup_tmp_dbs(app, tmp_path, monkeypatch)
 
     client = app.test_client()
-    resp = client.post('/register', json={'username': 'user1', 'password': 'pw'})
+    resp = client.post('/register', json={'username': 'user1', 'password': 'Passw0rd!'})
     assert resp.status_code == 201
 
     with sqlite3.connect(db_path) as conn:
         role = conn.execute('SELECT role FROM users WHERE username=?', ('user1',)).fetchone()[0]
     assert role == 'standard_user'
 
-    resp = client.post('/register', json={'username': 'admin2', 'password': 'pw', 'is_admin': 'on'})
+    resp = client.post('/register', json={'username': 'admin2', 'password': 'Passw0rd!', 'is_admin': 'on'})
     assert resp.status_code == 201
     with sqlite3.connect(db_path) as conn:
         role = conn.execute('SELECT role FROM users WHERE username=?', ('admin2',)).fetchone()[0]
     assert role == 'admin'
+
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
+    app.config['SAVED_SEARCHES_DB'] = orig_saved
+
+
+def test_registration_rejects_weak_password(mock_heavy_modules, tmp_path, monkeypatch):
+    from app import app
+    orig_sched, orig_saved, _ = _setup_tmp_dbs(app, tmp_path, monkeypatch)
+
+    client = app.test_client()
+    resp = client.post('/register', json={'username': 'bad', 'password': 'short'})
+    assert resp.status_code == 400
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_sched
     app.config['SAVED_SEARCHES_DB'] = orig_saved
