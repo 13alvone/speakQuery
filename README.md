@@ -184,6 +184,24 @@ python app.py create-admin <username> <password> --token <api_token>
 
 This command sets up the necessary tables and inserts the specified account so future logins succeed.
 
+### Web user management
+
+After signing in with an admin account, open `/users.html` to manage
+additional users. The page lists current accounts and provides a form to
+create new ones. Choose **Standard** to create a regular user or
+**Admin** to grant full access to all settings and management views.
+
+Example workflow:
+
+```text
+1. Log in as an administrator.
+2. Visit http://localhost:5000/users.html
+3. Enter the username, password and select the desired role.
+```
+
+Standard users may search and schedule queries but cannot access
+administrative pages such as `settings.html` or `users.html`.
+
 
 ## Testing
 
