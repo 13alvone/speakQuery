@@ -36,7 +36,7 @@
 </head>
 <body>
     <!-- Navbar Inclusion -->
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and not current_user.force_password_change %}
     {% include 'navbar.html' %}
     {% endif %}
 

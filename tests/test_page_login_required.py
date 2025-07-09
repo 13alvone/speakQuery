@@ -40,10 +40,10 @@ def test_page_requires_login(mock_heavy_modules, tmp_path, monkeypatch):
     resp = client.post('/login', json={'username': 'admin', 'password': 'admin'})
     assert resp.status_code == 200
 
+    # Access is redirected due to forced password change
     resp = client.get('/')
-    assert resp.status_code == 200
-    page = resp.get_data(as_text=True)
-    assert '<nav' in page
+    assert resp.status_code == 302
+    assert '/change_password.html' in resp.headers.get('Location', '')
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db
 
@@ -72,6 +72,6 @@ def test_login_page_redirects_when_authenticated(mock_heavy_modules, tmp_path, m
 
     resp = client.get('/login.html')
     assert resp.status_code == 302
-    assert resp.headers['Location'].endswith('/')
+    assert resp.headers['Location'].endswith('/change_password.html')
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_db

@@ -88,11 +88,13 @@ login_manager.login_view = 'login_page'
 class User:
     """Simple user model for authentication."""
 
-    def __init__(self, id, username, role, api_token=None):
+    def __init__(self, id, username, role, api_token=None, force_password_change=0):
         self.id = str(id)
         self.username = username
         self.role = role
         self.api_token = api_token
+        # stored as bool for convenience
+        self.force_password_change = bool(force_password_change)
 
     @property
     def is_authenticated(self):
@@ -154,12 +156,19 @@ def load_user(user_id):
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                'SELECT id, username, role, api_token FROM users WHERE id = ?',
+                'SELECT id, username, role, api_token, force_password_change '
+                'FROM users WHERE id = ?',
                 (user_id,),
             )
             row = cursor.fetchone()
             if row:
-                return User(id=row[0], username=row[1], role=row[2], api_token=row[3])
+                return User(
+                    id=row[0],
+                    username=row[1],
+                    role=row[2],
+                    api_token=row[3],
+                    force_password_change=row[4],
+                )
     except Exception as exc:
         logging.error(f"[x] Failed to load user {user_id}: {exc}")
     return None
@@ -177,12 +186,19 @@ def load_user_from_request(request):
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                'SELECT id, username, role, api_token FROM users WHERE api_token = ?',
+                'SELECT id, username, role, api_token, force_password_change '
+                'FROM users WHERE api_token = ?',
                 (token_hash,),
             )
             row = cursor.fetchone()
             if row:
-                return User(id=row[0], username=row[1], role=row[2], api_token=row[3])
+                return User(
+                    id=row[0],
+                    username=row[1],
+                    role=row[2],
+                    api_token=row[3],
+                    force_password_change=row[4],
+                )
     except Exception as exc:
         logging.error(f"[x] Token auth failed: {exc}")
     return None
@@ -192,6 +208,20 @@ def load_user_from_request(request):
 os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
 # Ensure indexes directory exists
 os.makedirs(app.config['INDEXES_DIR'], exist_ok=True)
+
+
+@app.before_request
+def enforce_password_change():
+    """Redirect authenticated users to change password if required."""
+    if (
+        current_user.is_authenticated
+        and getattr(current_user, 'force_password_change', False)
+    ):
+        if request.endpoint in {'change_password', 'change_password_page', 'static'}:
+            return None
+        if request.path.startswith(app.static_url_path):
+            return None
+        return redirect(url_for('change_password_page'))
 
 
 def allowed_file(filename):
@@ -676,6 +706,8 @@ def change_password():
                 (new_hash, current_user.id),
             )
             conn.commit()
+        # Update current_user so before_request reflects the new state
+        current_user.force_password_change = False
         if wants_json:
             return jsonify({'status': 'success'})
         return redirect(url_for('index'))
