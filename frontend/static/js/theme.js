@@ -1,9 +1,15 @@
 /** Simple theme persistence module reused from common.js */
 
 function initTheme() {
-    const stored = localStorage.getItem('theme');
+    let stored = localStorage.getItem('theme');
+    if (!stored) {
+        stored = 'light';
+        localStorage.setItem('theme', 'light');
+    }
     if (stored === 'light') {
         document.body.classList.add('light-theme');
+    } else {
+        document.body.classList.remove('light-theme');
     }
 }
 
