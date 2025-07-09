@@ -65,6 +65,11 @@
     color: var(--text-color);
 }
 
+/* Smaller font for lookup tables */
+.table {
+    font-size: 0.8rem;
+}
+
 /* Keyframes for spinner animation */
 @keyframes spin {
     to { transform: rotate(360deg); }

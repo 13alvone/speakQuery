@@ -4,11 +4,11 @@
 :root {
     --primary-color: #4f46e5;
     --secondary-color: #6b7280;
-    --background-color: #1e1e1e;
-    --text-color: #ffffff;
-    --box-background-color: #262626;
-    --hover-background-color: #333333;
-    --hover-background-color-dark: #4b5563;
+    --background-color: #1b1b1b;
+    --text-color: #f5f5f5;
+    --box-background-color: #222222;
+    --hover-background-color: #2c2c2c;
+    --hover-background-color-dark: #404040;
     --error-color: red;
     --success-color: green;
     /* Global font for the entire application */
@@ -54,7 +54,7 @@ textarea {
 .box {
     background-color: var(--box-background-color);
     color: var(--text-color);
-    border-radius: 6px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -183,7 +183,7 @@ textarea {
     border-collapse: collapse;
     width: 100%;
     font-size: 0.9rem;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
 }
 
