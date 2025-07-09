@@ -30,7 +30,7 @@ from flask_login import (
     logout_user,
     current_user,
 )
-from utils.auth import login_required
+from utils.auth import login_required, admin_required
 from croniter import croniter
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -286,7 +286,8 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
             password_hash TEXT,
             role TEXT DEFAULT 'standard_user',
             api_token TEXT,
-            force_password_change INTEGER DEFAULT 0
+            force_password_change INTEGER DEFAULT 0,
+            last_login INTEGER DEFAULT 0
         )
     ''')
         conn.commit()
@@ -296,6 +297,11 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
         if 'force_password_change' not in user_cols:
             cursor.execute(
                 'ALTER TABLE users ADD COLUMN force_password_change INTEGER DEFAULT 0'
+            )
+            conn.commit()
+        if 'last_login' not in user_cols:
+            cursor.execute(
+                'ALTER TABLE users ADD COLUMN last_login INTEGER DEFAULT 0'
             )
             conn.commit()
 
@@ -536,6 +542,8 @@ def login():
             row = cursor.fetchone()
             if row and check_password_hash(row[1], password):
                 user = User(id=row[0], username=username, role=row[2], api_token=row[3])
+                cursor.execute('UPDATE users SET last_login = ? WHERE id = ?', (int(time.time()), row[0]))
+                conn.commit()
                 login_user(user)
                 force_flag = bool(row[4]) if len(row) > 4 else False
                 if wants_json:
@@ -701,6 +709,13 @@ def settings():
 def user_settings_page():
     """Render user settings page with theme toggle."""
     return render_template('user_settings.html')
+
+
+@app.route('/users.html')
+@admin_required
+def users_page():
+    """Render admin user management page."""
+    return render_template('users.html')
 
 
 # Blueprint routes moved to routes/query.py
@@ -1598,16 +1613,19 @@ from routes.query import query_bp
 from routes.lookups import lookups_bp
 from routes.settings import settings_bp
 from routes.api import api_bp
+from routes.users import users_bp
 
 csrf.exempt(query_bp)
 csrf.exempt(lookups_bp)
 csrf.exempt(settings_bp)
 csrf.exempt(api_bp)
+csrf.exempt(users_bp)
 
 app.register_blueprint(query_bp)
 app.register_blueprint(lookups_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(api_bp)
+app.register_blueprint(users_bp)
 
 
 if __name__ == '__main__':
