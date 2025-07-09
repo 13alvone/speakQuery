@@ -110,3 +110,23 @@ def test_admin_user_limit(mock_heavy_modules, tmp_path, monkeypatch):
 
     app.config['SCHEDULED_INPUTS_DB'] = orig_sched
     app.config['SAVED_SEARCHES_DB'] = orig_saved
+
+
+def test_registration_password_mismatch(mock_heavy_modules, tmp_path, monkeypatch):
+    """Registration should fail when passwords do not match."""
+    from app import app
+    orig_sched, orig_saved, _ = _setup_tmp_dbs(app, tmp_path, monkeypatch)
+
+    client = app.test_client()
+    resp = client.post(
+        '/register',
+        json={
+            'username': 'mismatch',
+            'password': 'Passw0rd!',
+            'confirm_password': 'WrongPass1!'
+        },
+    )
+    assert resp.status_code == 400
+
+    app.config['SCHEDULED_INPUTS_DB'] = orig_sched
+    app.config['SAVED_SEARCHES_DB'] = orig_saved

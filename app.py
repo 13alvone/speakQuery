@@ -628,9 +628,15 @@ def register():
     data = request.get_json() or request.form
     username = data.get('username') if data else None
     password = data.get('password') if data else None
+    confirm_pw = data.get('confirm_password') if data else None
     is_admin = data.get('is_admin') if data else None
     if not username or not password:
         return jsonify({'status': 'error', 'message': 'Missing credentials'}), 400
+    if confirm_pw is not None and confirm_pw != password:
+        return (
+            jsonify({'status': 'error', 'message': 'Passwords do not match'}),
+            400,
+        )
     if not validate_password_strength(password):
         return (
             jsonify({'status': 'error', 'message': 'Weak password'}),
