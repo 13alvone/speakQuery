@@ -696,6 +696,13 @@ def settings():
     return render_template('settings.html')
 
 
+@app.route('/user_settings.html')
+@login_required
+def user_settings_page():
+    """Render user settings page with theme toggle."""
+    return render_template('user_settings.html')
+
+
 # Blueprint routes moved to routes/query.py
 
 

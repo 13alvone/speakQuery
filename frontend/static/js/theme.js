@@ -1,0 +1,24 @@
+/** Simple theme persistence module reused from common.js */
+
+function initTheme() {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light') {
+        document.body.classList.add('light-theme');
+    }
+}
+
+function attachThemeToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) {
+        return;
+    }
+    btn.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    attachThemeToggle();
+});
