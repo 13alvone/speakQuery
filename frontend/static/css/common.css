@@ -34,6 +34,11 @@ body {
     color: var(--text-color);
 }
 
+/* Ensure Bulma's .section component matches the page background */
+.section {
+    background-color: var(--background-color);
+}
+
 /* Ensure form controls use the same font as the page */
 input,
 textarea {
