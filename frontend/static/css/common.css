@@ -4,11 +4,12 @@
 :root {
     --primary-color: #4f46e5;
     --secondary-color: #6b7280;
-    --background-color: #1b1b1b;
-    --text-color: #f5f5f5;
-    --box-background-color: #222222;
+    /* Default dark theme */
+    --background-color: #161616; /* Slightly darker for improved contrast */
+    --text-color: #fafafa;       /* Brighter text */
+    --box-background-color: #202020;
     --hover-background-color: #2c2c2c;
-    --hover-background-color-dark: #404040;
+    --hover-background-color-dark: #454545;
     --error-color: red;
     --success-color: green;
     /* Global font for the entire application */
@@ -26,6 +27,15 @@ body.light-theme {
     --box-background-color: #f9fafb;
     --hover-background-color: #e5e7eb;
     --hover-background-color-dark: #d1d5db;
+}
+
+/* Optional high contrast dark scheme */
+body.dark-high-contrast {
+    --background-color: #000000;
+    --text-color: #ffffff;
+    --box-background-color: #1a1a1a;
+    --hover-background-color: #333333;
+    --hover-background-color-dark: #444444;
 }
 
 body {
