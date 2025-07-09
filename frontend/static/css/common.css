@@ -5,7 +5,7 @@
     --primary-color: #4f46e5;
     --secondary-color: #6b7280;
     --background-color: #1e1e1e;
-    --text-color: #f3f4f6;
+    --text-color: #ffffff;
     --box-background-color: #262626;
     --hover-background-color: #333333;
     --hover-background-color-dark: #4b5563;
@@ -178,15 +178,21 @@ textarea {
     white-space: nowrap;
 }
 
+
 .table {
     border-collapse: collapse;
     width: 100%;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     border: 1px solid var(--secondary-color);
     padding: 8px;
     text-align: left;
+    font-size: inherit;
 }
 
 .table th {

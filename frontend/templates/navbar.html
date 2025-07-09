@@ -9,6 +9,7 @@
         <li class="{% if request.path == '/scheduled_inputs.html' %}active{% endif %}"><a href="/scheduled_inputs.html">Scheduled Inputs</a></li>
         {% if current_user.role == 'admin' %}
         <li class="{% if request.path == '/settings.html' %}active{% endif %}"><a href="/settings.html">Settings</a></li>
+        <li class="{% if request.path == '/users.html' %}active{% endif %}"><a href="/users.html">Users</a></li>
         {% endif %}
         <li class="{% if request.path == '/user_settings.html' %}active{% endif %}"><a href="/user_settings.html">User Settings</a></li>
     </ul>

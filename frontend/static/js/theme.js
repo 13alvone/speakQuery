@@ -18,7 +18,13 @@ function attachThemeToggle() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeThemeToggle() {
     initTheme();
     attachThemeToggle();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeThemeToggle);
+} else {
+    initializeThemeToggle();
+}

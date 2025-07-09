@@ -265,7 +265,13 @@ function setupThemeToggle() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initThemeSystem() {
     initializeTheme();
     setupThemeToggle();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeSystem);
+} else {
+    initThemeSystem();
+}
