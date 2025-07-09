@@ -92,8 +92,8 @@ function populateForm(settings) {
             const input = document.getElementById(key);
             if (input) {
                 if (key === 'MAX_CONTENT_LENGTH') {
-                    // Convert bytes to gigabytes for display
-                    input.value = (parseInt(settings[key], 10) / (1024 ** 3)).toFixed(2);
+                    // Convert bytes to megabytes for display
+                    input.value = (parseInt(settings[key], 10) / (1024 ** 2)).toFixed(2);
                 } else if (key === 'ALLOWED_EXTENSIONS') {
                     // Ensure no spaces after commas
                     input.value = settings[key].split(',').map(ext => ext.trim()).join(',');
@@ -109,7 +109,7 @@ function populateForm(settings) {
 }
 
 /**
- * Collect form data, convert Max Content Length from GB to bytes, and send an update request to the server.
+ * Collect form data, convert Max Content Length from MB to bytes, and send an update request to the server.
  */
 function updateSettings() {
     const form = document.getElementById('settings-form');
@@ -120,14 +120,14 @@ function updateSettings() {
         settings[pair[0]] = pair[1];
     }
 
-    // Convert Max Content Length from GB to bytes
+    // Convert Max Content Length from MB to bytes
     if (settings['MAX_CONTENT_LENGTH']) {
-        const gbValue = parseFloat(settings['MAX_CONTENT_LENGTH']);
-        if (isNaN(gbValue) || gbValue < 0) {
+        const mbValue = parseFloat(settings['MAX_CONTENT_LENGTH']);
+        if (isNaN(mbValue) || mbValue < 0) {
             showError('Max Content Length must be a positive number.');
             return;
         }
-        settings['MAX_CONTENT_LENGTH'] = Math.round(gbValue * (1024 ** 3)); // Convert GB to bytes
+        settings['MAX_CONTENT_LENGTH'] = Math.round(mbValue * (1024 ** 2)); // Convert MB to bytes
     }
 
     // Validate form data
