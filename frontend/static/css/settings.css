@@ -85,3 +85,9 @@
 .input.monospaced-input {
     transition: width 0.2s ease;
 }
+
+/* Ensure log level dropdown displays full text */
+#LOG_LEVEL {
+    min-width: 8em;
+    width: 100%;
+}

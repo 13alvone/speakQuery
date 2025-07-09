@@ -11,7 +11,7 @@
 #query {
     font-family: var(--font-family);
     font-size: 10pt;
-    min-height: 150px; /* Approx. 10 lines of text */
+    min-height: 250px; /* Increased height for longer queries */
     width: 100%;
     overflow-y: auto;
     resize: none; /* Disable manual resizing */
