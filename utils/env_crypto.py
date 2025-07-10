@@ -19,6 +19,14 @@ def _get_key() -> bytes:
     return key.encode()
 
 
+def _ensure_secure_permissions(path: str) -> None:
+    """Raise ``PermissionError`` if *path* is not mode 0600."""
+    mode = os.stat(path).st_mode & 0o777
+    if mode != 0o600:
+        logging.error("[x] %s permissions must be 0600, found %o", path, mode)
+        raise PermissionError(f"insecure permissions {oct(mode)} on {path}")
+
+
 def encrypt_env(src: str, dst: str) -> None:
     """Encrypt *src* and write to *dst* using ``Fernet``."""
     fernet = Fernet(_get_key())
@@ -33,6 +41,7 @@ def encrypt_env(src: str, dst: str) -> None:
 
 def decrypt_env(src: str) -> str:
     """Return the decrypted contents of *src*."""
+    _ensure_secure_permissions(src)
     fernet = Fernet(_get_key())
     with open(src, "rb") as f_in:
         data = f_in.read()

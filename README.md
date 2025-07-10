@@ -34,7 +34,12 @@ PY
    python utils/env_crypto.py encrypt \
        input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
    rm input_repos/speakQuery/.env
+   # verify restrictive permissions (required)
+   chmod 600 input_repos/speakQuery/.env.enc
    ```
+   `utils/env_crypto.py` sets the correct permissions for you. The
+   application will refuse to run if `input_repos/speakQuery/.env.enc`
+   is readable by group or others.
 
 3. Run the container:
    ```bash
@@ -77,6 +82,7 @@ PY
    python utils/env_crypto.py encrypt \
        input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
    rm input_repos/speakQuery/.env
+   chmod 600 input_repos/speakQuery/.env.enc
    ```
 4. Start all services with `./run_all.sh`.
 5. Open a browser to the provided URL to use the web interface.
@@ -142,7 +148,10 @@ PY
    python utils/env_crypto.py encrypt \
        input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
    rm input_repos/speakQuery/.env
+   chmod 600 input_repos/speakQuery/.env.enc
    ```
+   The encryption script enforces `0600` mode on the output. Startup
+   scripts will abort if the file is more permissive.
    `run_all.sh` decrypts `input_repos/speakQuery/.env.enc` at startup.
 6. **Run the application**
    - The recommended approach is to launch all services together using the helper script:
