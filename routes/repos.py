@@ -9,6 +9,24 @@ import logging
 
 repos_bp = Blueprint('repos_bp', __name__)
 
+@repos_bp.route('/list_repos', methods=['GET'])
+@admin_required
+def list_repos():
+    """Return a list of repos stored in the database."""
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT id, name, git_url FROM input_repos ORDER BY id')
+            rows = cur.fetchall()
+        repos = [
+            {'id': r[0], 'name': r[1], 'git_url': r[2]}
+            for r in rows
+        ]
+        return jsonify({'status': 'success', 'repos': repos})
+    except Exception as exc:
+        logging.error(f"[x] Error listing repos: {exc}")
+        return jsonify({'status': 'error', 'message': 'Failed to list repos'}), 500
+
 @repos_bp.route('/clone_repo', methods=['POST'])
 @admin_required
 def clone_repo():

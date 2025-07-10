@@ -1,171 +1,159 @@
-// schedule_input.js
+// schedule_input.js - repo management interface
 
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById('scheduled-input-form');
-    const testScriptBtn = document.getElementById('test-script-btn');
-    const populateDataBtn = document.getElementById('populate-data-btn');
-    const codeTextarea = document.getElementById('code');
-    const dfSummaryContainer = document.getElementById('df-summary-container');
-    const apiUrlInput = document.getElementById('api_url');
-    const jsonDisplayContainer = document.getElementById('json-display-container');
-    const notificationContainer = document.getElementById('notification-container');
+document.addEventListener('DOMContentLoaded', function () {
+    loadRepos();
 
-    // Attach the validation function to form submit
-    form.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Validate the form
-        if (!validateForm()) {
+    const cloneForm = document.getElementById('clone-repo-form');
+    cloneForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('clone-name').value.trim();
+        const url = document.getElementById('clone-url').value.trim();
+        if (!name || !url) {
+            showError('Name and URL required');
             return;
         }
+        axios.post('/clone_repo', { name: name, git_url: url })
+            .then(() => {
+                showSuccess('Repository cloned');
+                cloneForm.reset();
+                loadRepos();
+            })
+            .catch(err => handleError(err, 'Failed to clone repository'));
+    });
 
-        const formData = new FormData(form);
+    function loadRepos() {
+        axios.get('/list_repos')
+            .then(resp => {
+                if (resp.data.status === 'success') {
+                    renderRepos(resp.data.repos);
+                } else {
+                    showError('Failed to load repositories');
+                }
+            })
+            .catch(err => handleError(err, 'Failed to load repositories'));
+    }
 
-        // Convert FormData to JSON, handling the 'disabled' checkbox
-        const jsonData = {};
-        formData.forEach((value, key) => {
-            if (key === 'disabled') {
-                jsonData[key] = true; // Checkbox is checked
-            } else {
-                jsonData[key] = value;
-            }
+    function renderRepos(repos) {
+        const container = document.getElementById('repos-container');
+        container.innerHTML = '';
+        repos.forEach(repo => {
+            const box = document.createElement('div');
+            box.className = 'box';
+            const title = document.createElement('h2');
+            title.className = 'subtitle';
+            title.textContent = repo.name;
+            box.appendChild(title);
+
+            const pullBtn = document.createElement('button');
+            pullBtn.className = 'button is-info mr-2';
+            pullBtn.textContent = 'Pull';
+            pullBtn.addEventListener('click', () => {
+                axios.post(`/pull_repo/${repo.id}`, {})
+                    .then(() => showSuccess('Repository updated'))
+                    .catch(err => handleError(err, 'Failed to pull repository'));
+            });
+            box.appendChild(pullBtn);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'button is-danger mr-2';
+            delBtn.textContent = 'Delete Repo';
+            delBtn.addEventListener('click', () => {
+                if (confirm('Delete this repository?')) {
+                    axios.post(`/delete_repo/${repo.id}`, {})
+                        .then(() => {
+                            showSuccess('Repository deleted');
+                            loadRepos();
+                        })
+                        .catch(err => handleError(err, 'Failed to delete repo'));
+                }
+            });
+            box.appendChild(delBtn);
+
+            const scriptsDiv = document.createElement('div');
+            scriptsDiv.id = `repo-${repo.id}-scripts`;
+            scriptsDiv.className = 'mt-3';
+            box.appendChild(scriptsDiv);
+
+            container.appendChild(box);
+            loadScripts(repo.id);
         });
-
-        // If 'disabled' checkbox is not checked, set it to false
-        if (!formData.has('disabled')) {
-            jsonData['disabled'] = false;
-        }
-
-        // Submit the form using Axios
-        axios.post('/commit_scheduled_input', jsonData)
-            .then(response => {
-                const result = response.data;
-                if (response.status === 200 && result.status === 'success') {
-                    // Redirect to the scheduled_inputs.html page after a successful save
-                    window.location.href = '/scheduled_inputs.html';
-                } else {
-                    // If there is an error, display the error message
-                    showError(result.message || 'An error occurred while saving the scheduled input.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showError('An unexpected error occurred.');
-            });
-    });
-
-    // Function to validate input fields
-    function validateForm() {
-        const cronSchedule = document.getElementById('cron_schedule').value;
-
-        // Simple validation pattern for cron schedule
-        const cronPattern = /^[\w\s*\/,-]+$/;
-
-        if (!cronPattern.test(cronSchedule)) {
-            showError('Invalid cron schedule format.');
-            return false;
-        }
-
-        return true;
     }
 
-    // Function to escape HTML special characters
-    function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;',
-            '`': '&#096;',
-        };
-        return text.replace(/[&<>"'`]/g, function(m) { return map[m]; });
-    }
-
-    // Event listener for the Populate Sample Data button
-    populateDataBtn.addEventListener('click', function () {
-        const apiUrl = apiUrlInput.value.trim();
-
-        if (!apiUrl) {
-            showError('Please enter an API URL.');
-            return;
-        }
-
-        if (!isValidUrl(apiUrl)) {
-            showError('Please enter a valid API URL.');
-            return;
-        }
-
-        // Fetch the JSON data from the API
-        axios.post('/fetch_api_data', { api_url: apiUrl })
-            .then(response => {
-                const data = response.data;
-                if (data.status === 'success') {
-                    // Limit the JSON data to 2000 lines
-                    let jsonString = JSON.stringify(data.api_data, null, 2);
-                    let lines = jsonString.split('\n');
-                    if (lines.length > 2000) {
-                        lines = lines.slice(0, 2000);
-                        lines.push('... (truncated)');
-                        jsonString = lines.join('\n');
-                    }
-
-                    // Display the prettified JSON in the right column
-                    jsonDisplayContainer.innerHTML = `
-                        <label class="label">Sample API Data</label>
-                        <pre class="json-display">${escapeHtml(jsonString)}</pre>
-                    `;
+    function loadScripts(repoId) {
+        axios.get(`/list_repo_scripts/${repoId}`)
+            .then(resp => {
+                if (resp.data.status === 'success') {
+                    renderScripts(repoId, resp.data.scripts);
                 } else {
-                    showError('Error fetching API data: ' + data.message);
+                    showError('Failed to list scripts');
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                showError('An error occurred while fetching the API data.');
-            });
-    });
-
-    // Function to validate the API URL
-    function isValidUrl(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (_) {
-            return false;
-        }
+            .catch(err => handleError(err, 'Failed to list scripts'));
     }
 
-    // Event listener for the Test Script button
-    testScriptBtn.addEventListener('click', function () {
-        const userCode = codeTextarea.value.trim();
-
-        if (!userCode) {
-            showError('Please enter your Python code before testing.');
+    function renderScripts(repoId, scripts) {
+        const container = document.getElementById(`repo-${repoId}-scripts`);
+        container.innerHTML = '';
+        if (scripts.length === 0) {
+            container.textContent = 'No scripts found.';
             return;
         }
+        scripts.forEach(name => {
+            const row = document.createElement('div');
+            row.className = 'field is-grouped mb-1';
 
-        // Send the code to the server for testing
-        axios.post('/test_scheduled_input', { code: userCode })
-            .then(response => {
-                const data = response.data;
-                if (data.status === 'success') {
-                    // Display the DataFrame summary
-                    dfSummaryContainer.style.display = 'block';
-                    dfSummaryContainer.innerHTML = `
-                        <label class="label">DataFrame Summary</label>
-                        <pre>${escapeHtml(data.df_summary)}</pre>
-                    `;
-                } else {
-                    dfSummaryContainer.style.display = 'none';
-                    showError('Error testing script: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                dfSummaryContainer.style.display = 'none';
-                showError('An error occurred while testing the script.');
+            const nameEl = document.createElement('p');
+            nameEl.className = 'control';
+            nameEl.textContent = name;
+            row.appendChild(nameEl);
+
+            const inputEl = document.createElement('input');
+            inputEl.className = 'input control';
+            inputEl.type = 'text';
+            inputEl.placeholder = 'Cron schedule';
+            const inputWrap = document.createElement('p');
+            inputWrap.className = 'control';
+            inputWrap.appendChild(inputEl);
+            row.appendChild(inputWrap);
+
+            const setBtn = document.createElement('button');
+            setBtn.className = 'button is-primary control';
+            setBtn.textContent = 'Set';
+            setBtn.addEventListener('click', () => {
+                const cron = inputEl.value.trim();
+                if (!cron) { showError('Cron schedule required'); return; }
+                axios.post('/set_script_schedule', { repo_id: repoId, script_name: name, cron_schedule: cron })
+                    .then(() => showSuccess('Schedule saved'))
+                    .catch(err => handleError(err, 'Failed to set schedule'));
             });
-    });
+            row.appendChild(setBtn);
 
-    // Notifications are provided by common.js
+            const editBtn = document.createElement('button');
+            editBtn.className = 'button is-link control';
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', () => {
+                const content = prompt('New file contents?');
+                if (content !== null) {
+                    axios.post('/edit_repo_file', { repo_id: repoId, file_path: name, content: content })
+                        .then(() => showSuccess('File updated'))
+                        .catch(err => handleError(err, 'Failed to edit file'));
+                }
+            });
+            row.appendChild(editBtn);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'button is-danger control';
+            delBtn.textContent = 'Delete';
+            delBtn.addEventListener('click', () => {
+                if (confirm('Delete this file?')) {
+                    axios.post('/delete_repo_file', { repo_id: repoId, file_path: name })
+                        .then(() => { showSuccess('File deleted'); loadScripts(repoId); })
+                        .catch(err => handleError(err, 'Failed to delete file'));
+                }
+            });
+            row.appendChild(delBtn);
+
+            container.appendChild(row);
+        });
+    }
 });
