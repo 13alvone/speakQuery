@@ -11,28 +11,42 @@ The easiest way to run SpeakQuery is inside a Docker container.
    ```bash
    sudo docker build --no-cache -t speakquery .
    ```
-2. Create a `.env` file and set at least the following variables:
+2. Create an environment file and encrypt it:
    ```bash
-   SECRET_KEY=change_me
-   ADMIN_USERNAME=admin
-   ADMIN_PASSWORD=admin
-   ADMIN_ROLE=admin
-   ADMIN_API_TOKEN=changeme
-   SMTP_USER=you@example.com
-   SMTP_PASSWORD=your_email_password
-   SMTP_SERVER=smtp.gmail.com
-   SMTP_PORT=587
+   mkdir -p input_repos/speakQuery
+   chmod 700 input_repos/speakQuery
+   cat <<EOF > input_repos/speakQuery/.env
+SECRET_KEY=change_me
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin
+ADMIN_ROLE=admin
+ADMIN_API_TOKEN=changeme
+SMTP_USER=you@example.com
+SMTP_PASSWORD=your_email_password
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+EOF
+   export MASTER_KEY=$(python - <<'PY'
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+PY
+   )
+   python utils/env_crypto.py encrypt \
+       input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
+   rm input_repos/speakQuery/.env
    ```
 
 3. Run the container:
    ```bash
-   sudo docker run -d --name speakquery --env-file .env -p 5000:5000 --restart unless-stopped speakquery
+   python utils/env_crypto.py decrypt input_repos/speakQuery/.env.enc > /tmp/sq_env
+   sudo docker run -d --name speakquery --env-file /tmp/sq_env -p 5000:5000 --restart unless-stopped speakquery
+   rm /tmp/sq_env
    ```
    The container launches the web interface along with the background engines and will automatically restart unless stopped.
 
 ### Docker Compose
 
-For persistent development use the provided compose file. Ensure a `.env` file exists
+For persistent development use the provided compose file. Ensure an encrypted `.env.enc` file exists
 then start all services with:
 ```bash
 sudo docker compose up --build -d
@@ -49,7 +63,21 @@ The manual setup steps below remain available for local development.
 
 1. Clone this repository.
 2. Run `bash setup.sh` to install dependencies and initialize databases.
-3. Copy `.env.example` to `.env` and edit the values for your environment.
+3. Copy `.env.example` to `input_repos/speakQuery/.env`, edit the values, then encrypt it:
+   ```bash
+   mkdir -p input_repos/speakQuery
+   chmod 700 input_repos/speakQuery
+   cp .env.example input_repos/speakQuery/.env
+   # edit input_repos/speakQuery/.env
+   export MASTER_KEY=$(python - <<'PY'
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+PY
+   )
+   python utils/env_crypto.py encrypt \
+       input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
+   rm input_repos/speakQuery/.env
+   ```
 4. Start all services with `./run_all.sh`.
 5. Open a browser to the provided URL to use the web interface.
 6. If the sidebar shows **No index files found or directory missing.**, create or
@@ -99,22 +127,32 @@ tools are available:
    python build_custom_components.py --rebuild
    ```
    You can also build a single component with `--component`.
-5. **Create an environment file**
-   Copy `.env.example` to `.env` and replace the placeholder values with your own.
-   The application uses `python-dotenv` to load variables from this file:
+5. **Create an encrypted environment file**
+   Place your variables in `input_repos/speakQuery/.env` and encrypt it:
    ```bash
-   cp .env.example .env
-   # edit .env to provide real credentials
+   mkdir -p input_repos/speakQuery
+   chmod 700 input_repos/speakQuery
+   cp .env.example input_repos/speakQuery/.env
+   # edit input_repos/speakQuery/.env to provide real credentials
+   export MASTER_KEY=$(python - <<'PY'
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+PY
+   )
+   python utils/env_crypto.py encrypt \
+       input_repos/speakQuery/.env input_repos/speakQuery/.env.enc
+   rm input_repos/speakQuery/.env
    ```
+   `run_all.sh` decrypts `input_repos/speakQuery/.env.enc` at startup.
 6. **Run the application**
    - The recommended approach is to launch all services together using the helper script:
      ```bash
-     ./run_all.sh
-     ```
-     This loads variables from `.env` and starts the Flask app, query engine and scheduled input engine. Press `Ctrl+C` to stop everything at once.
+    ./run_all.sh
+    ```
+    This decrypts `input_repos/speakQuery/.env.enc` and starts the Flask app, query engine and scheduled input engine. Press `Ctrl+C` to stop everything at once.
 
    - Alternatively you can start each component manually:
-     - Start the Flask server (the `SECRET_KEY` loaded from `.env` is required):
+    - Start the Flask server (requires the decrypted environment variables):
        ```bash
        python app.py
        ```
@@ -131,14 +169,14 @@ tools are available:
 
 ### SMTP configuration
 
-Email alerts require SMTP credentials. Set these values in your `.env` file or export them before running the query engine:
+Email alerts require SMTP credentials. Set these values in your `input_repos/speakQuery/.env` (before encryption) or export them before running the query engine:
 
 ```bash
 export SMTP_USER="your_email@example.com"
 export SMTP_PASSWORD="your_app_password"
 ```
 
-`SMTP_SERVER` and `SMTP_PORT` can also be specified in `.env` or via environment variables to override the default Gmail settings.
+`SMTP_SERVER` and `SMTP_PORT` can also be specified in the environment file or via environment variables to override the default Gmail settings.
 
 ### Concurrency and Rate Limiting
 
@@ -163,7 +201,7 @@ SpeakQuery uses a hybrid authentication system based on **Flask-Login**. When th
 python app.py create-admin <username> <password> --token <api_token>
 ```
 
-If `--token` is omitted a random value is generated. Set `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_ROLE` and `ADMIN_API_TOKEN` in `.env` to control the initial admin user.
+If `--token` is omitted a random value is generated. Set `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_ROLE` and `ADMIN_API_TOKEN` in `input_repos/speakQuery/.env` before encrypting to control the initial admin user.
 
 Include the API token in the `Authorization` header when calling the API:
 
