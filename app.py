@@ -62,12 +62,17 @@ app = Flask(
 # Determine project root based on this file's location
 PROJECT_ROOT = Path(__file__).resolve().parent
 
-dotenv_path = PROJECT_ROOT / '.env'
-if dotenv_path.exists():
-    load_dotenv(dotenv_path)
-    logging.info("[i] Loaded environment variables from .env")
+env_path = os.environ.get('ENV_PATH')
+if env_path and Path(env_path).exists():
+    load_dotenv(env_path)
+    logging.info("[i] Loaded environment variables from %s", env_path)
 else:
-    logging.info("[i] No .env file found; using existing environment variables")
+    dotenv_path = PROJECT_ROOT / '.env'
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path)
+        logging.info("[i] Loaded environment variables from .env")
+    else:
+        logging.info("[i] No .env file found; using existing environment variables")
 
 secret_key = os.environ.get('SECRET_KEY', 'insecure-default-key')
 if secret_key == 'insecure-default-key':
