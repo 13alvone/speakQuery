@@ -132,6 +132,7 @@ app.config['LOADJOB_DIR'] = str(PROJECT_ROOT / 'frontend' / 'static' / 'temp')
 app.config['INDEXES_DIR'] = str(PROJECT_ROOT / 'indexes')
 app.config['SAVED_SEARCHES_DB'] = str(PROJECT_ROOT / 'saved_searches.db')
 app.config['SCHEDULED_INPUTS_DB'] = str(PROJECT_ROOT / 'scheduled_inputs.db')
+app.config['INPUT_REPOS_DIR'] = str(PROJECT_ROOT / 'input_repos')
 app.config['LOG_LEVEL'] = logging.DEBUG
 app.config['HISTORY_DB'] = str(PROJECT_ROOT / 'history.db')
 app.config['SCRIPT_DIR'] = str(PROJECT_ROOT)
@@ -208,6 +209,8 @@ def load_user_from_request(request):
 os.makedirs(app.config['TEMP_DIR'], exist_ok=True)
 # Ensure indexes directory exists
 os.makedirs(app.config['INDEXES_DIR'], exist_ok=True)
+# Ensure input repositories directory exists
+os.makedirs(app.config['INPUT_REPOS_DIR'], exist_ok=True)
 
 
 @app.before_request
@@ -343,6 +346,27 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
     ''')
         conn.commit()
 
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS input_repos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
+            git_url TEXT,
+            path TEXT,
+            active INTEGER DEFAULT 1
+        )
+    ''')
+        conn.commit()
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS repo_scripts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            repo_id INTEGER REFERENCES input_repos(id),
+            script_name TEXT,
+            cron_schedule TEXT
+        )
+    ''')
+        conn.commit()
+
         cursor.execute('SELECT COUNT(*) FROM users')
         users_count = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM users WHERE role='admin'")
@@ -394,6 +418,7 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
                 'LOOKUP_DIR': str(PROJECT_ROOT / 'lookups'),
                 'LOADJOB_DIR': str(PROJECT_ROOT / 'frontend' / 'static' / 'temp'),
                 'INDEXES_DIR': str(PROJECT_ROOT / 'indexes'),
+                'INPUT_REPOS_DIR': str(PROJECT_ROOT / 'input_repos'),
                 'SAVED_SEARCHES_DB': str(PROJECT_ROOT / 'saved_searches.db'),
                 'SCHEDULED_INPUTS_DB': str(PROJECT_ROOT / 'scheduled_inputs.db'),
                 'HISTORY_DB': str(PROJECT_ROOT / 'history.db'),  # Added HISTORY_DB to default settings
@@ -1652,18 +1677,21 @@ from routes.lookups import lookups_bp
 from routes.settings import settings_bp
 from routes.api import api_bp
 from routes.users import users_bp
+from routes.repos import repos_bp
 
 csrf.exempt(query_bp)
 csrf.exempt(lookups_bp)
 csrf.exempt(settings_bp)
 csrf.exempt(api_bp)
 csrf.exempt(users_bp)
+csrf.exempt(repos_bp)
 
 app.register_blueprint(query_bp)
 app.register_blueprint(lookups_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(users_bp)
+app.register_blueprint(repos_bp)
 
 
 if __name__ == '__main__':
