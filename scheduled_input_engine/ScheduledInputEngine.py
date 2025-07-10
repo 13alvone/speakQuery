@@ -10,6 +10,7 @@ from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import signal
+from .subprocess_runner import run_in_subprocess
 
 # Add current directory to PYTHONPATH
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -146,22 +147,25 @@ async def fetch_repo_scripts():
         return []
 
 async def execute_repo_script(script_id, repo_path, script_name, cron_schedule, retry_count=0):
+    """Run a repo script in an isolated subprocess."""
     path = Path(repo_path) / script_name
+    start = time.time()
     try:
-        code = path.read_text()
-    except Exception as e:
-        logger.error(f"Error reading script {path}: {e}")
+        result = await run_in_subprocess(path)
+    except FileNotFoundError:
+        logger.error(f"[x] Repo script not found: {path}")
         return
-    await execute_task(
-        f"repo-{script_id}",
-        script_name,
-        code,
-        cron_schedule,
-        'false',
-        '',
-        None,
-        retry_count,
+    except Exception as exc:
+        logger.error(f"[x] Failed running repo script {path}: {exc}")
+        return
+
+    end = time.time()
+    await store_execution_telemetry(
+        f"repo-{script_id}", script_name, end - start, start, end
     )
+
+    if result.returncode != 0:
+        logger.error(f"[x] Repo script {script_name} failed")
 
 async def schedule_repo_scripts():
     scripts = await fetch_repo_scripts()
