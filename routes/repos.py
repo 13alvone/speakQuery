@@ -16,7 +16,11 @@ def clone_repo():
     git_url = data.get('git_url') if data else None
     if not name or not git_url:
         return jsonify({'status': 'error', 'message': 'Missing name or git_url'}), 400
-    target_dir = Path(app.config['INPUT_REPOS_DIR']) / name
+    base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+    target_dir = (base_dir / name).resolve()
+    if not target_dir.is_relative_to(base_dir):
+        logging.warning(f"[!] Clone path {target_dir} outside of INPUT_REPOS_DIR")
+        return jsonify({'status': 'error', 'message': 'Invalid path'}), 400
     if target_dir.exists():
         return jsonify({'status': 'error', 'message': 'Repo already exists'}), 400
     try:
@@ -46,7 +50,11 @@ def list_repo_scripts(repo_id):
             row = cur.fetchone()
         if not row:
             return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
-        repo_path = Path(row[0])
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
         scripts = [str(p.relative_to(repo_path)) for p in repo_path.rglob('*.py')]
         return jsonify({'status': 'success', 'scripts': scripts})
     except Exception as exc:
@@ -85,7 +93,11 @@ def pull_repo(repo_id):
             row = cur.fetchone()
         if not row:
             return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
-        repo_path = Path(row[0])
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
         if not repo_path.exists():
             return jsonify({'status': 'error', 'message': 'Path missing'}), 404
         subprocess.check_call(['git', '-C', str(repo_path), 'pull'])
