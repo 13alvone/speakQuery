@@ -128,6 +128,54 @@ async def schedule_input_tasks():
 
     logger.info("Scheduler started for scheduled input tasks.")
 
+# --- New logic for repository scripts ---
+async def fetch_repo_scripts():
+    try:
+        async with aiosqlite.connect(SCHEDULED_INPUTS_DB) as db:
+            query = (
+                'SELECT rs.id, ir.path, rs.script_name, rs.cron_schedule '
+                'FROM repo_scripts rs JOIN input_repos ir ON rs.repo_id = ir.id '
+                'WHERE ir.active = 1'
+            )
+            async with db.execute(query) as cursor:
+                rows = await cursor.fetchall()
+                logger.info(f"Retrieved {len(rows)} repo scripts from the database.")
+                return rows
+    except Exception as e:
+        logger.error(f"Error fetching repo scripts: {str(e)}")
+        return []
+
+async def execute_repo_script(script_id, repo_path, script_name, cron_schedule, retry_count=0):
+    path = Path(repo_path) / script_name
+    try:
+        code = path.read_text()
+    except Exception as e:
+        logger.error(f"Error reading script {path}: {e}")
+        return
+    await execute_task(
+        f"repo-{script_id}",
+        script_name,
+        code,
+        cron_schedule,
+        'false',
+        '',
+        None,
+        retry_count,
+    )
+
+async def schedule_repo_scripts():
+    scripts = await fetch_repo_scripts()
+    for script in scripts:
+        s_id, repo_path, name, cron = script
+        scheduler.add_job(
+            execute_repo_script,
+            CronTrigger.from_crontab(cron),
+            args=[s_id, repo_path, name, cron],
+            id=f"repo_{s_id}",
+            replace_existing=True,
+        )
+        logger.info(f"Scheduled repo script '{name}' with cron: {cron}")
+
 
 # Function to store deletion events in the history database
 async def store_deletion_event(deleted_file, reason):
@@ -242,6 +290,7 @@ async def main():
 
     # Schedule input tasks
     await schedule_input_tasks()
+    await schedule_repo_scripts()
 
     # Start the scheduler
     scheduler.start()
