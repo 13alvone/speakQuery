@@ -4,6 +4,7 @@ from utils.auth import admin_required
 import sqlite3
 from pathlib import Path
 import subprocess
+import shutil
 import logging
 
 repos_bp = Blueprint('repos_bp', __name__)
@@ -107,4 +108,109 @@ def pull_repo(repo_id):
         return jsonify({'status': 'error', 'message': 'Pull failed'}), 500
     except Exception as exc:
         logging.error(f"[x] Error pulling repo: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal error'}), 500
+
+
+@repos_bp.route('/edit_repo_file', methods=['POST'])
+@admin_required
+def edit_repo_file():
+    """Edit the contents of an existing file within a repo."""
+    data = request.get_json(silent=True) or request.form
+    repo_id = data.get('repo_id') if data else None
+    rel_path = data.get('file_path') if data else None
+    content = data.get('content') if data else None
+    if not repo_id or not rel_path or content is None:
+        return jsonify({'status': 'error', 'message': 'Missing parameters'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT path FROM input_repos WHERE id=?', (repo_id,))
+            row = cur.fetchone()
+        if not row:
+            return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
+
+        file_path = (repo_path / rel_path).resolve()
+        if not file_path.is_relative_to(repo_path):
+            logging.warning(f"[!] File path {file_path} outside repo {repo_path}")
+            return jsonify({'status': 'error', 'message': 'Invalid file path'}), 400
+        if not file_path.exists():
+            return jsonify({'status': 'error', 'message': 'File not found'}), 404
+        if file_path.is_dir():
+            return jsonify({'status': 'error', 'message': 'Path is directory'}), 400
+        with file_path.open('w', encoding='utf-8') as fh:
+            fh.write(content)
+        return jsonify({'status': 'success'})
+    except Exception as exc:
+        logging.error(f"[x] Error editing repo file: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal error'}), 500
+
+
+@repos_bp.route('/delete_repo_file', methods=['POST'])
+@admin_required
+def delete_repo_file():
+    """Delete a file from a repo."""
+    data = request.get_json(silent=True) or request.form
+    repo_id = data.get('repo_id') if data else None
+    rel_path = data.get('file_path') if data else None
+    if not repo_id or not rel_path:
+        return jsonify({'status': 'error', 'message': 'Missing parameters'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT path FROM input_repos WHERE id=?', (repo_id,))
+            row = cur.fetchone()
+        if not row:
+            return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
+
+        file_path = (repo_path / rel_path).resolve()
+        if not file_path.is_relative_to(repo_path):
+            logging.warning(f"[!] File path {file_path} outside repo {repo_path}")
+            return jsonify({'status': 'error', 'message': 'Invalid file path'}), 400
+        if not file_path.exists():
+            return jsonify({'status': 'error', 'message': 'File not found'}), 404
+        if file_path.is_dir():
+            return jsonify({'status': 'error', 'message': 'Path is directory'}), 400
+        file_path.unlink()
+        return jsonify({'status': 'success'})
+    except Exception as exc:
+        logging.error(f"[x] Error deleting repo file: {exc}")
+        return jsonify({'status': 'error', 'message': 'Internal error'}), 500
+
+
+@repos_bp.route('/delete_repo/<int:repo_id>', methods=['POST'])
+@admin_required
+def delete_repo(repo_id):
+    """Delete an entire repo and its database record."""
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT path FROM input_repos WHERE id=?', (repo_id,))
+            row = cur.fetchone()
+        if not row:
+            return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
+        if repo_path.exists():
+            shutil.rmtree(repo_path)
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('DELETE FROM repo_scripts WHERE repo_id=?', (repo_id,))
+            cur.execute('DELETE FROM input_repos WHERE id=?', (repo_id,))
+            conn.commit()
+        return jsonify({'status': 'success'})
+    except Exception as exc:
+        logging.error(f"[x] Error deleting repo: {exc}")
         return jsonify({'status': 'error', 'message': 'Internal error'}), 500
