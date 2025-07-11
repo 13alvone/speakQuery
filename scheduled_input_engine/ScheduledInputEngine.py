@@ -131,27 +131,49 @@ async def schedule_input_tasks():
 
 # --- New logic for repository scripts ---
 async def fetch_repo_scripts():
+    """Retrieve active repo scripts with their output settings."""
     try:
         async with aiosqlite.connect(SCHEDULED_INPUTS_DB) as db:
             query = (
-                'SELECT rs.id, ir.path, rs.script_name, rs.cron_schedule '
+                'SELECT rs.id, ir.path, rs.script_name, rs.cron_schedule, '
+                'rs.output_subdir, rs.overwrite '
                 'FROM repo_scripts rs JOIN input_repos ir ON rs.repo_id = ir.id '
                 'WHERE ir.active = 1'
             )
             async with db.execute(query) as cursor:
                 rows = await cursor.fetchall()
-                logger.info(f"Retrieved {len(rows)} repo scripts from the database.")
+                logger.info(
+                    f"Retrieved {len(rows)} repo scripts from the database."
+                )
                 return rows
     except Exception as e:
         logger.error(f"Error fetching repo scripts: {str(e)}")
         return []
 
-async def execute_repo_script(script_id, repo_path, script_name, cron_schedule, retry_count=0):
+async def execute_repo_script(
+    script_id,
+    repo_path,
+    script_name,
+    cron_schedule,
+    output_subdir,
+    overwrite,
+    retry_count=0,
+):
     """Run a repo script in an isolated subprocess."""
     path = Path(repo_path) / script_name
     start = time.time()
     try:
-        result = await run_in_subprocess(path)
+        output_dir = Path('indexes')
+        if output_subdir:
+            output_dir /= output_subdir
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        env = {
+            'SPEAKQUERY_OUTPUT_DIR': str(output_dir),
+            'SPEAKQUERY_OVERWRITE': '1' if overwrite else '0',
+        }
+
+        result = await run_in_subprocess(path, env=env)
     except FileNotFoundError:
         logger.error(f"[x] Repo script not found: {path}")
         return
@@ -168,13 +190,14 @@ async def execute_repo_script(script_id, repo_path, script_name, cron_schedule, 
         logger.error(f"[x] Repo script {script_name} failed")
 
 async def schedule_repo_scripts():
+    """Schedule all active repo scripts."""
     scripts = await fetch_repo_scripts()
     for script in scripts:
-        s_id, repo_path, name, cron = script
+        s_id, repo_path, name, cron, out_dir, overwrite = script
         scheduler.add_job(
             execute_repo_script,
             CronTrigger.from_crontab(cron),
-            args=[s_id, repo_path, name, cron],
+            args=[s_id, repo_path, name, cron, out_dir, overwrite],
             id=f"repo_{s_id}",
             replace_existing=True,
         )
