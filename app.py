@@ -371,6 +371,13 @@ def initialize_database(admin_username=None, admin_password=None, admin_role='ad
         )
     ''')
         conn.commit()
+        cursor.execute('PRAGMA table_info(repo_scripts)')
+        repo_cols = [c[1] for c in cursor.fetchall()]
+        if 'output_subdir' not in repo_cols:
+            cursor.execute('ALTER TABLE repo_scripts ADD COLUMN output_subdir TEXT')
+        if 'overwrite' not in repo_cols:
+            cursor.execute('ALTER TABLE repo_scripts ADD COLUMN overwrite INTEGER DEFAULT 0')
+        conn.commit()
 
         cursor.execute('SELECT COUNT(*) FROM users')
         users_count = cursor.fetchone()[0]
