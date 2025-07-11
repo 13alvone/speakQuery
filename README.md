@@ -91,6 +91,24 @@ PY
 6. Open a browser to the provided URL to use the web interface.
 7. If the sidebar shows **No index files found or directory missing.**, create or
    mount index files under the configured `indexes` directory.
+8. Schedule repository scripts using `/set_script_schedule`:
+   - `repo_id` – numeric ID returned when cloning the repo.
+   - `script_name` – path to the Python script within the repo.
+   - `cron_schedule` – when the script runs (standard cron syntax).
+   - `output_subdir` – optional subfolder of `indexes/` for results.
+   - `overwrite` – `true` to replace existing files, otherwise results get a
+     timestamped name.
+
+   Example API call:
+   ```bash
+   curl -X POST http://localhost:5000/set_script_schedule \
+        -H 'Content-Type: application/json' \
+        -d '{"repo_id": 1,
+             "script_name": "scheduled_input_scripts/example_dataframe_job.py",
+             "cron_schedule": "0 * * * *",
+             "output_subdir": "daily",
+             "overwrite": true}'
+   ```
 
 ## Architecture
 
