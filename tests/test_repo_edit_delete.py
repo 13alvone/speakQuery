@@ -27,6 +27,9 @@ def _setup_app(tmp_path, monkeypatch):
 
 def _create_repo(src_dir):
     (src_dir / 'script.py').write_text('print("hi")')
+    sub = src_dir / 'scheduled_input_scripts'
+    sub.mkdir()
+    (sub / 'example_dataframe_job.py').write_text('print("demo")')
     subprocess.check_call(['git', '-C', str(src_dir), 'init'])
     subprocess.check_call(['git', '-C', str(src_dir), 'config', 'user.email', 'a@b.com'])
     subprocess.check_call(['git', '-C', str(src_dir), 'config', 'user.name', 't'])

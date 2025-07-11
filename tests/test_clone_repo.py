@@ -28,6 +28,9 @@ def test_clone_repo_endpoint(mock_heavy_modules, tmp_path, monkeypatch):
     repo_src = tmp_path / 'src'
     repo_src.mkdir()
     (repo_src / 'script.py').write_text('print("hi")')
+    sub = repo_src / 'scheduled_input_scripts'
+    sub.mkdir()
+    (sub / 'example_dataframe_job.py').write_text('print("demo")')
     subprocess.check_call(['git', '-C', str(repo_src), 'init'])
     subprocess.check_call(['git', '-C', str(repo_src), 'config', 'user.email', 'a@b.com'])
     subprocess.check_call(['git', '-C', str(repo_src), 'config', 'user.name', 't'])
