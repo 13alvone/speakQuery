@@ -130,6 +130,45 @@ def set_script_schedule():
         logging.error(f"[x] Error setting schedule: {exc}")
         return jsonify({'status': 'error', 'message': 'Failed to set schedule'}), 500
 
+
+@repos_bp.route('/delete_script_schedule', methods=['POST'])
+@admin_required
+def delete_script_schedule():
+    """Remove a repo script schedule record."""
+    data = request.get_json(silent=True) or request.form
+    repo_id = data.get('repo_id') if data else None
+    script = data.get('script_name') if data else None
+    if not repo_id or not script:
+        return jsonify({'status': 'error', 'message': 'Missing parameters'}), 400
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT path FROM input_repos WHERE id=?', (repo_id,))
+            row = cur.fetchone()
+        if not row:
+            return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
+        script_path = (repo_path / script).resolve()
+        if not script_path.is_relative_to(repo_path):
+            logging.warning(f"[!] Script path {script_path} outside repo {repo_path}")
+            return jsonify({'status': 'error', 'message': 'Invalid script path'}), 400
+
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute(
+                'DELETE FROM repo_scripts WHERE repo_id=? AND script_name=?',
+                (int(repo_id), script)
+            )
+            conn.commit()
+        return jsonify({'status': 'success'})
+    except Exception as exc:
+        logging.error(f"[x] Error deleting script schedule: {exc}")
+        return jsonify({'status': 'error', 'message': 'Failed to delete schedule'}), 500
+
 @repos_bp.route('/pull_repo/<int:repo_id>', methods=['POST'])
 @admin_required
 def pull_repo(repo_id):

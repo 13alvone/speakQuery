@@ -128,6 +128,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             row.appendChild(setBtn);
 
+            const delSchedBtn = document.createElement('button');
+            delSchedBtn.className = 'button is-warning control';
+            delSchedBtn.textContent = 'Delete Schedule';
+            delSchedBtn.addEventListener('click', () => {
+                if (confirm('Delete this schedule?')) {
+                    axios.post('/delete_script_schedule', { repo_id: repoId, script_name: name })
+                        .then(() => showSuccess('Schedule removed'))
+                        .catch(err => handleError(err, 'Failed to delete schedule'));
+                }
+            });
+            row.appendChild(delSchedBtn);
+
             const editBtn = document.createElement('button');
             editBtn.className = 'button is-link control';
             editBtn.textContent = 'Edit';
