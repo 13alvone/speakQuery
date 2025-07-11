@@ -67,8 +67,11 @@ The manual setup steps below remain available for local development.
 ## Quick Start
 
 1. Clone this repository.
-2. Run `bash setup.sh` to install dependencies and initialize databases.
-3. Copy `.env.example` to `input_repos/speakQuery/.env`, edit the values, then encrypt it:
+2. Every repository that will run scheduled inputs must provide at least one
+   script inside `scheduled_input_scripts/`. See
+   `scheduled_input_scripts/example_dataframe_job.py` for a minimal template.
+3. Run `bash setup.sh` to install dependencies and initialize databases.
+4. Copy `.env.example` to `input_repos/speakQuery/.env`, edit the values, then encrypt it:
    ```bash
    mkdir -p input_repos/speakQuery
    chmod 700 input_repos/speakQuery
@@ -84,9 +87,9 @@ PY
    rm input_repos/speakQuery/.env
    chmod 600 input_repos/speakQuery/.env.enc
    ```
-4. Start all services with `./run_all.sh`.
-5. Open a browser to the provided URL to use the web interface.
-6. If the sidebar shows **No index files found or directory missing.**, create or
+5. Start all services with `./run_all.sh`.
+6. Open a browser to the provided URL to use the web interface.
+7. If the sidebar shows **No index files found or directory missing.**, create or
    mount index files under the configured `indexes` directory.
 
 ## Architecture

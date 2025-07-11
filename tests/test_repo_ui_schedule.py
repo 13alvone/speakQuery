@@ -28,6 +28,9 @@ def _setup_app(tmp_path, monkeypatch):
 
 def _create_repo(src_dir):
     (src_dir / 'script.py').write_text('print("hi")')
+    sub = src_dir / 'scheduled_input_scripts'
+    sub.mkdir()
+    (sub / 'example_dataframe_job.py').write_text('print("demo")')
     subprocess.check_call(['git', '-C', str(src_dir), 'init'])
     subprocess.check_call(['git', '-C', str(src_dir), 'config', 'user.email', 'a@b.com'])
     subprocess.check_call(['git', '-C', str(src_dir), 'config', 'user.name', 't'])
@@ -49,7 +52,14 @@ def test_ui_repo_schedule(mock_heavy_modules, tmp_path, monkeypatch):
     with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
         repo_id = conn.execute('SELECT id FROM input_repos WHERE name=?', ('r1',)).fetchone()[0]
 
-    resp = client.post('/set_script_schedule', json={'repo_id': repo_id, 'script_name': 'script.py', 'cron_schedule': '* * * * *'})
+    resp = client.post(
+        '/set_script_schedule',
+        json={
+            'repo_id': repo_id,
+            'script_name': 'scheduled_input_scripts/example_dataframe_job.py',
+            'cron_schedule': '* * * * *'
+        }
+    )
     assert resp.status_code == 200
 
     backend_mod = types.ModuleType('ScheduledInputBackend')
