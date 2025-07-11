@@ -17,7 +17,9 @@ class SubprocessResult:
     returncode: int
 
 
-async def run_in_subprocess(script_path: Path, timeout: int = 60) -> SubprocessResult:
+async def run_in_subprocess(
+    script_path: Path, timeout: int = 60, env: dict | None = None
+) -> SubprocessResult:
     """Execute a script in a subprocess with a timeout.
 
     Parameters
@@ -36,17 +38,19 @@ async def run_in_subprocess(script_path: Path, timeout: int = 60) -> SubprocessR
         raise FileNotFoundError(script_path)
 
     cwd = script_path.parent
-    env = {
+    base_env = {
         "PATH": os.environ.get("PATH", ""),
         "PYTHONPATH": os.environ.get("PYTHONPATH", ""),
         "PYTHONUNBUFFERED": "1",
     }
+    if env:
+        base_env.update(env)
 
     proc = await asyncio.create_subprocess_exec(
         sys.executable,
         str(script_path),
         cwd=str(cwd),
-        env=env,
+        env=base_env,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )

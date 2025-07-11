@@ -25,3 +25,13 @@ def test_run_script_failure(tmp_path):
     result = asyncio.run(run_in_subprocess(script, timeout=5))
     assert result.returncode != 0
     assert "boom" in result.stderr
+
+
+def test_run_script_with_env(tmp_path):
+    script = tmp_path / "env.py"
+    script.write_text('import os; print(os.environ.get("FOO"))')
+    result = asyncio.run(
+        run_in_subprocess(script, timeout=5, env={"FOO": "bar"})
+    )
+    assert result.returncode == 0
+    assert "bar" in result.stdout
