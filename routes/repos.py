@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import shutil
 import logging
+from apscheduler.triggers.cron import CronTrigger
 
 repos_bp = Blueprint('repos_bp', __name__)
 
@@ -89,7 +90,34 @@ def set_script_schedule():
     cron = data.get('cron_schedule')
     if not repo_id or not script or not cron:
         return jsonify({'status': 'error', 'message': 'Missing parameters'}), 400
+
+    # Validate cron expression
     try:
+        CronTrigger.from_crontab(cron)
+    except Exception as exc:  # ValueError on invalid spec
+        logging.warning(f"[!] Invalid cron schedule '{cron}': {exc}")
+        return jsonify({'status': 'error', 'message': 'Invalid cron schedule'}), 400
+
+    try:
+        with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT path FROM input_repos WHERE id=?', (repo_id,))
+            row = cur.fetchone()
+        if not row:
+            return jsonify({'status': 'error', 'message': 'Repo not found'}), 404
+        base_dir = Path(app.config['INPUT_REPOS_DIR']).resolve()
+        repo_path = Path(row[0]).resolve()
+        if not repo_path.is_relative_to(base_dir):
+            logging.warning(f"[!] Repo path {repo_path} outside of INPUT_REPOS_DIR")
+            return jsonify({'status': 'error', 'message': 'Invalid repo path'}), 400
+        script_path = (repo_path / script).resolve()
+        if not script_path.is_relative_to(repo_path):
+            logging.warning(f"[!] Script path {script_path} outside repo {repo_path}")
+            return jsonify({'status': 'error', 'message': 'Invalid script path'}), 400
+        if not script_path.is_file():
+            logging.warning(f"[!] Script file {script_path} not found")
+            return jsonify({'status': 'error', 'message': 'Script not found'}), 400
+
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
             cur = conn.cursor()
             cur.execute(
