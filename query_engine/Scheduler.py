@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
-import os
 import asyncio
+import logging
+import os
+from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-import logging
 from aiosqlite import connect
 
 logger = logging.getLogger(__name__)
 
-current_script_dir = os.path.dirname(os.path.abspath(__file__))
-SEARCHES_DB = f'{current_script_dir}../saved_searches.db'
-HISTORY_DB = f'{current_script_dir}../saved_search_history.db'
+current_script_dir = Path(__file__).resolve().parent
+SEARCHES_DB = current_script_dir.parent / 'saved_searches.db'
+HISTORY_DB = current_script_dir.parent / 'saved_search_history.db'
 
 
 # Task fetching function
