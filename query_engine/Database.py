@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 
-import os
 import asyncio
 import logging
-import aiosqlite
-import uuid
+import os
 import time
-import pandas as pd
+import uuid
 from pathlib import Path
+
+import aiosqlite
+import pandas as pd
 
 # Reuse the logger configuration from previous components
 logger = logging.getLogger(__name__)
 
-current_script_dir = os.path.dirname(os.path.abspath(__file__))
-SEARCHES_DB = f'{current_script_dir}../saved_searches.db'
-HISTORY_DB = f'{current_script_dir}../saved_search_history.db'
-RESULTS_DIR = Path(f'{current_script_dir}../executed_scheduled_searches')
+current_script_dir = Path(__file__).resolve().parent
+SEARCHES_DB = current_script_dir.parent / 'saved_searches.db'
+HISTORY_DB = current_script_dir.parent / 'saved_search_history.db'
+RESULTS_DIR = current_script_dir.parent / 'executed_scheduled_searches'
 
 
 # Custom function placeholder for executing query logic
