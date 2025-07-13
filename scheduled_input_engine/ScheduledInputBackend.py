@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 try:
     from SICleanup import cleanup_indexes
     from SIExecution import SIExecution
+    from cache import get_cached_or_fetch
 except Exception as e:
     raise e
 
@@ -178,8 +179,8 @@ class ScheduledInputBackend:
         try:
             # Create an instance of SIExecution
             executor = SIExecution(code)
-            # Execute the code and get the result DataFrame
-            result_df = executor.execute_code()
+            # Execute the code with cache helper
+            result_df = executor.execute_code({'get_cached_or_fetch': get_cached_or_fetch})
 
             # Handle the output file path
             output_filename = executor.output_path  # This is set during code execution

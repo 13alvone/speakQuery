@@ -172,13 +172,19 @@ class SIExecution:
     #         logger.error(f"Error executing code: {str(e)}")
     #         raise
 
-    def execute_code(self):
-        """
-        Executes the modified code within a restricted environment and saves the DataFrame.
+    def execute_code(self, extra_globals: dict | None = None):
+        """Execute the modified code with optional helper functions.
+
+        Parameters
+        ----------
+        extra_globals : dict | None
+            Mapping of additional globals exposed to the executed script.
         """
         try:
             restricted_globals = dict(safe_builtins)
             restricted_globals['pd'] = pd
+            if extra_globals:
+                restricted_globals.update(extra_globals)
 
             restricted_locals = {}
             exec(self.modified_code, restricted_globals, restricted_locals)  # nosec B102 - dynamic code execution required for user jobs

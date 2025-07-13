@@ -98,6 +98,7 @@ PY
    - `output_subdir` – optional subfolder of `indexes/` for results.
    - `overwrite` – `true` to replace existing files, otherwise results get a
      timestamped name.
+   - `ttl` – optional cache time in seconds passed to ``get_cached_or_fetch``.
 
    Example API call:
    ```bash
@@ -107,7 +108,8 @@ PY
              "script_name": "scheduled_input_scripts/example_dataframe_job.py",
              "cron_schedule": "0 * * * *",
              "output_subdir": "daily",
-             "overwrite": true}'
+             "overwrite": true,
+             "ttl": 3600}'
    ```
 
 ## Architecture
