@@ -2,16 +2,21 @@ import os
 import sys
 import types
 import sqlite3
+import pytest
+
+os.environ.setdefault("SECRET_KEY", "test")
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from scheduled_input_engine import cache
+from app import app as flask_app
 
 
 def test_get_cached_or_fetch(monkeypatch, tmp_path):
     db = tmp_path / "cache.db"
     monkeypatch.setattr(cache, "CACHE_DB", db)
+    flask_app.config['ALLOWED_API_DOMAINS'] = {"x"}
     calls = {"n": 0}
 
     def mock_get(url, timeout=10):
@@ -36,3 +41,20 @@ def test_get_cached_or_fetch(monkeypatch, tmp_path):
     with sqlite3.connect(db) as conn:
         cur = conn.execute("SELECT COUNT(*) FROM api_cache")
         assert cur.fetchone()[0] == 1
+
+
+def test_get_cached_or_fetch_disallowed_domain(monkeypatch, tmp_path):
+    db = tmp_path / "cache.db"
+    monkeypatch.setattr(cache, "CACHE_DB", db)
+    flask_app.config['ALLOWED_API_DOMAINS'] = {"allowed"}
+    calls = {"n": 0}
+
+    def mock_get(url, timeout=10):
+        calls["n"] += 1
+        return types.SimpleNamespace(content=b"data", raise_for_status=lambda: None)
+
+    monkeypatch.setattr(cache.requests, "get", mock_get)
+
+    with pytest.raises(ValueError):
+        cache.get_cached_or_fetch("http://blocked", 60)
+    assert calls["n"] == 0

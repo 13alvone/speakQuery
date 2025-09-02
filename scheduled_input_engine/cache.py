@@ -4,6 +4,7 @@ import logging
 import sqlite3
 import time
 from pathlib import Path
+from urllib.parse import urlparse
 import requests
 
 logger = logging.getLogger(__name__)
@@ -27,6 +28,14 @@ def get_cached_or_fetch(url: str, ttl: int) -> bytes:
     bytes
         Response body.
     """
+    from app import is_allowed_api_url
+
+    parsed = urlparse(url)
+    hostname = parsed.hostname or ""
+    if not is_allowed_api_url(url):
+        logger.error("[x] Domain not allowed for URL %s", hostname)
+        raise ValueError("Domain not allowed")
+
     now = time.time()
     with sqlite3.connect(CACHE_DB) as conn:
         conn.execute(
