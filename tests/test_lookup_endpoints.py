@@ -105,6 +105,24 @@ def test_upload_file_invalid_csv(mock_heavy_modules, tmp_path):
     assert not (tmp_path / 'bad.csv').exists()
 
 
+def test_upload_file_too_large(mock_heavy_modules, tmp_path, monkeypatch):
+    from app import app, initialize_database
+    import io
+
+    app.config['LOOKUP_DIR'] = str(tmp_path)
+    monkeypatch.setitem(app.config, 'MAX_CONTENT_LENGTH', 10 * 1024 * 1024)
+    monkeypatch.setitem(app.config, 'LOOKUP_MAX_FILESIZE', 100)
+    initialize_database()
+    client = app.test_client()
+    login_as_admin(app, client)
+
+    data = {'file': (io.BytesIO(b'a' * 200), 'big.csv')}
+    resp = client.post('/upload_file', data=data, content_type='multipart/form-data')
+    assert resp.status_code == 413
+    assert resp.get_json()['status'] == 'error'
+    assert not (tmp_path / 'big.csv').exists()
+
+
 def test_lookup_file_owner_restriction(mock_heavy_modules, tmp_path, monkeypatch):
     import io
     import sqlite3

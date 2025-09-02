@@ -104,6 +104,13 @@ Welcome to the `speakQuery` project! This document defines the **expectations an
 
 ---
 
+### Lookup File Upload Limits
+
+- Lookup table uploads are limited to 16 MB by default.
+- Adjust this limit via `LOOKUP_MAX_FILESIZE` or `MAX_CONTENT_LENGTH` in `app.py`.
+
+---
+
 ### 9. Contribution Checklist
 
 Before submitting code, every agent must:
