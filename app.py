@@ -797,6 +797,7 @@ def users_page():
 
 
 @app.route('/toggle_disable_scheduled_input/<int:input_id>', methods=['POST'])
+@login_required
 def toggle_disable_scheduled_input(input_id):
     try:
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
@@ -820,6 +821,7 @@ def toggle_disable_scheduled_input(input_id):
 
 
 @app.route('/delete_scheduled_input/<int:input_id>', methods=['POST'])
+@login_required
 def delete_scheduled_input(input_id):
     try:
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
@@ -833,6 +835,7 @@ def delete_scheduled_input(input_id):
 
 
 @app.route('/clone_scheduled_input/<int:input_id>', methods=['POST'])
+@login_required
 def clone_scheduled_input(input_id):
     try:
         with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
