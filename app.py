@@ -74,12 +74,13 @@ else:
     else:
         logging.info("[i] No .env file found; using existing environment variables")
 
-secret_key = os.environ.get('SECRET_KEY', 'insecure-default-key')
-if secret_key == 'insecure-default-key':
-    logging.warning(
-        "[!] SECRET_KEY environment variable not set. "
-        "Using insecure default for testing."
+# Retrieve the Flask secret key from the environment; fail fast if missing
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key:
+    logging.error(
+        "[x] SECRET_KEY environment variable not set; application cannot start."
     )
+    raise RuntimeError('SECRET_KEY environment variable not set')
 app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = True
