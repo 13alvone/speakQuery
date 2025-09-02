@@ -1,9 +1,13 @@
+import os
 import sys
 import types
 import subprocess
 from pathlib import Path
 import logging
 import pytest
+
+# Ensure required Flask configuration exists for tests
+os.environ.setdefault('SECRET_KEY', 'test-secret-key')
 
 
 # Build shared objects as soon as this file is imported so that test modules

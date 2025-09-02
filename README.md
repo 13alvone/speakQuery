@@ -16,6 +16,7 @@ The easiest way to run SpeakQuery is inside a Docker container.
    mkdir -p input_repos/speakQuery
    chmod 700 input_repos/speakQuery
    cat <<EOF > input_repos/speakQuery/.env
+# Required: Flask secret key; application fails to start if unset
 SECRET_KEY=change_me
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin
@@ -87,6 +88,8 @@ PY
    rm input_repos/speakQuery/.env
    chmod 600 input_repos/speakQuery/.env.enc
    ```
+   The `SECRET_KEY` in `.env` **must** be set; the application exits at startup
+   if this value is missing.
 5. Start all services with `./run_all.sh`.
 6. Open a browser to the provided URL to use the web interface.
 7. If the sidebar shows **No index files found or directory missing.**, create or
