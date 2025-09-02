@@ -10,6 +10,7 @@ import logging
 import sqlite3
 import time
 from datetime import datetime
+from pathlib import Path
 from werkzeug.utils import secure_filename
 
 lookups_bp = Blueprint('lookups_bp', __name__)
@@ -120,19 +121,15 @@ def view_lookup():
     filepath = request.args.get('file')
     if not filepath:
         return "<p>Error: No file specified.</p>", 400
-    filename = filepath.split('/')[-1]
-
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
+    lookup_dir = Path(app.config['LOOKUP_DIR']).resolve()
+    try:
+        target_path = Path(filepath).resolve(strict=False)
+    except OSError:
         return "<p>Error: Invalid file path.</p>", 400
-
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-    if not safe_filepath.startswith(target_filepath):
+    if not target_path.is_relative_to(lookup_dir):
         return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
+    if not target_path.exists():
         return "<p>Error: File not found.</p>", 404
-
     try:
         # Limit rows read to avoid loading large files entirely into memory
         row_limit = request.args.get('rows', '100')
@@ -142,10 +139,10 @@ def view_lookup():
             row_limit = 100
         if row_limit <= 0 or row_limit > 1000:
             row_limit = 100
-        df = pd.read_csv(safe_filepath, nrows=row_limit)
+        df = pd.read_csv(target_path, nrows=row_limit)
         return df.to_html()
     except Exception as e:
-        logging.error(f"Error reading file: {str(e)}")
+        logging.error("Error reading file: %s", e)
         return "<p>Error reading file.</p>", 500
 
 
@@ -156,19 +153,16 @@ def delete_lookup_file():
     filepath = data.get('filepath')
     if not filepath:
         return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
-    filename = filepath.split('/')[-1]
-
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
+    lookup_dir = Path(app.config['LOOKUP_DIR']).resolve()
+    try:
+        target_path = Path(filepath).resolve(strict=False)
+    except OSError:
         return jsonify({'status': 'error', 'message': 'Invalid file path.'}), 400
-
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-    if not safe_filepath.startswith(target_filepath):
+    if not target_path.is_relative_to(lookup_dir):
         return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
+    if not target_path.exists():
         return jsonify({'status': 'error', 'message': 'File not found.'}), 404
-
+    filename = target_path.name
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
@@ -179,10 +173,10 @@ def delete_lookup_file():
                 return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
             cursor.execute('DELETE FROM lookup_files WHERE filename=?', (filename,))
             conn.commit()
-        os.remove(safe_filepath)
+        target_path.unlink()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(f"Error deleting file: {str(e)}")
+        logging.error("Error deleting file: %s", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
@@ -194,27 +188,21 @@ def clone_lookup_file():
     new_name = data.get('new_name')
     if not filepath:
         return jsonify({'status': 'error', 'message': 'No file specified.'}), 400
-    filename = filepath.split('/')[-1]
-
-    if not filepath.startswith(app.config['LOOKUP_DIR']):
+    lookup_dir = Path(app.config['LOOKUP_DIR']).resolve()
+    try:
+        target_path = Path(filepath).resolve(strict=False)
+    except OSError:
         return jsonify({'status': 'error', 'message': 'Invalid file path.'}), 400
-
-    safe_filepath = os.path.normpath(filepath)
-    target_filepath = f"{os.path.abspath(app.config['LOOKUP_DIR']).replace(app.config['SCRIPT_DIR'], '')}/{filename}".lstrip('/')
-
-    if not safe_filepath.startswith(target_filepath):
+    if not target_path.is_relative_to(lookup_dir):
         return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
-
-    if not os.path.exists(safe_filepath):
+    if not target_path.exists():
         return jsonify({'status': 'error', 'message': 'File not found.'}), 404
-
     if not new_name:
-        base_name = os.path.basename(filepath)
-        new_name = f"{os.path.splitext(base_name)[0]}_copy{os.path.splitext(base_name)[1]}"
-
+        base_name = target_path.name
+        new_name = f"{Path(base_name).stem}_copy{Path(base_name).suffix}"
     new_filename = secure_filename(new_name)
-    new_filepath = os.path.join(os.path.dirname(safe_filepath), new_filename)
-
+    new_filepath = target_path.with_name(new_filename)
+    filename = target_path.name
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
@@ -223,7 +211,7 @@ def clone_lookup_file():
             owner_id = row[0] if row else None
             if owner_id is not None and str(getattr(current_user, 'role', '')) != 'admin' and str(current_user.get_id()) != str(owner_id):
                 return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
-        shutil.copy(safe_filepath, new_filepath)
+        shutil.copy(target_path, new_filepath)
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -233,6 +221,6 @@ def clone_lookup_file():
             conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(f"Error cloning file: {str(e)}")
+        logging.error("Error cloning file: %s", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 

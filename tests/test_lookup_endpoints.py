@@ -1,15 +1,23 @@
 import os
 import sys
 from pathlib import Path
+import sqlite3
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+def login_as_admin(app, client):
+    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    with sqlite3.connect(app.config['SCHEDULED_INPUTS_DB']) as conn:
+        conn.execute("UPDATE users SET force_password_change=0 WHERE username='admin'")
+        conn.commit()
 
 
 def test_view_lookup_missing_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.get('/view_lookup')
     assert resp.status_code == 400
     assert b"No file specified" in resp.data
@@ -19,7 +27,7 @@ def test_view_lookup_empty_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.get('/view_lookup?file=')
     assert resp.status_code == 400
     assert b"No file specified" in resp.data
@@ -29,7 +37,7 @@ def test_delete_lookup_file_missing_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.post('/delete_lookup_file', json={})
     assert resp.status_code == 400
     assert resp.get_json()['status'] == 'error'
@@ -39,7 +47,7 @@ def test_delete_lookup_file_empty_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.post('/delete_lookup_file', json={'filepath': ''})
     assert resp.status_code == 400
     assert resp.get_json()['status'] == 'error'
@@ -49,7 +57,7 @@ def test_clone_lookup_file_missing_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.post('/clone_lookup_file', json={'new_name': 'copy.csv'})
     assert resp.status_code == 400
     assert resp.get_json()['status'] == 'error'
@@ -59,7 +67,7 @@ def test_clone_lookup_file_empty_filepath(mock_heavy_modules):
     from app import app, initialize_database
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
     resp = client.post('/clone_lookup_file', json={'filepath': '', 'new_name': 'copy.csv'})
     assert resp.status_code == 400
     assert resp.get_json()['status'] == 'error'
@@ -72,7 +80,7 @@ def test_upload_file_valid_csv(mock_heavy_modules, tmp_path):
     app.config['LOOKUP_DIR'] = str(tmp_path)
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
 
     data = {'file': (io.BytesIO(b'a,b\n1,2\n'), 'good.csv')}
     resp = client.post('/upload_file', data=data, content_type='multipart/form-data')
@@ -88,7 +96,7 @@ def test_upload_file_invalid_csv(mock_heavy_modules, tmp_path):
     app.config['LOOKUP_DIR'] = str(tmp_path)
     initialize_database()
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
 
     data = {'file': (io.BytesIO(b'{"json": true}'), 'bad.csv')}
     resp = client.post('/upload_file', data=data, content_type='multipart/form-data')
@@ -156,7 +164,7 @@ def test_view_lookup_large_file_limited_rows(mock_heavy_modules, tmp_path, monke
             fh.write(f"{i}\n")
 
     client = app.test_client()
-    client.post('/login', json={'username': 'admin', 'password': 'admin'})
+    login_as_admin(app, client)
 
     called = {}
 
@@ -171,3 +179,48 @@ def test_view_lookup_large_file_limited_rows(mock_heavy_modules, tmp_path, monke
     resp = client.get(f'/view_lookup?file={large_file}')
     assert resp.status_code == 200
     assert called.get('nrows') is not None and called['nrows'] <= 100
+
+
+def test_lookup_endpoints_path_traversal(mock_heavy_modules, tmp_path):
+    from app import app, initialize_database
+
+    lookup_dir = tmp_path / 'lookups'
+    lookup_dir.mkdir()
+    outside_file = tmp_path / 'outside.csv'
+    outside_file.write_text('a,b\n1,2\n', encoding='utf-8')
+
+    app.config['LOOKUP_DIR'] = str(lookup_dir)
+    initialize_database()
+    client = app.test_client()
+    login_as_admin(app, client)
+
+    traversal_path = lookup_dir / '..' / outside_file.name
+    resp = client.get(f'/view_lookup?file={traversal_path}')
+    assert resp.status_code == 403
+    resp = client.post('/delete_lookup_file', json={'filepath': str(traversal_path)})
+    assert resp.status_code == 403
+    resp = client.post('/clone_lookup_file', json={'filepath': str(traversal_path), 'new_name': 'copy.csv'})
+    assert resp.status_code == 403
+
+
+def test_lookup_endpoints_symlink_traversal(mock_heavy_modules, tmp_path):
+    from app import app, initialize_database
+
+    lookup_dir = tmp_path / 'lookups'
+    lookup_dir.mkdir()
+    outside_file = tmp_path / 'outside.csv'
+    outside_file.write_text('a,b\n1,2\n', encoding='utf-8')
+    symlink_path = lookup_dir / 'link.csv'
+    symlink_path.symlink_to(outside_file)
+
+    app.config['LOOKUP_DIR'] = str(lookup_dir)
+    initialize_database()
+    client = app.test_client()
+    login_as_admin(app, client)
+
+    resp = client.get(f'/view_lookup?file={symlink_path}')
+    assert resp.status_code == 403
+    resp = client.post('/delete_lookup_file', json={'filepath': str(symlink_path)})
+    assert resp.status_code == 403
+    resp = client.post('/clone_lookup_file', json={'filepath': str(symlink_path), 'new_name': 'copy.csv'})
+    assert resp.status_code == 403
