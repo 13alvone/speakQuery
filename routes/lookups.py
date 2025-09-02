@@ -93,7 +93,7 @@ def upload_file():
                 if df.shape[1] <= 1 and ',' not in sample_decoded:
                     raise ValueError('parsed but single column')
             except Exception as e:
-                logging.warning("Invalid CSV upload %s: %s", file.filename, e)
+                logging.warning("[!] Invalid CSV upload %s: %s", file.filename, e)
                 return jsonify({'status': 'error', 'message': 'Invalid CSV content.'}), 400
 
     filename = secure_filename(file.filename)
@@ -112,7 +112,7 @@ def upload_file():
             conn.commit()
         return jsonify({'status': 'success', 'message': 'File uploaded successfully.'})
     except Exception as e:
-        logging.error(f"Error saving file: {str(e)}")
+        logging.error(f"[x] Error saving file: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)})
 
 
@@ -142,7 +142,7 @@ def view_lookup():
         df = pd.read_csv(target_path, nrows=row_limit)
         return df.to_html()
     except Exception as e:
-        logging.error("Error reading file: %s", e)
+        logging.error("[x] Error reading file: %s", e)
         return "<p>Error reading file.</p>", 500
 
 
@@ -176,7 +176,7 @@ def delete_lookup_file():
         target_path.unlink()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error("Error deleting file: %s", e)
+        logging.error("[x] Error deleting file: %s", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
@@ -221,6 +221,6 @@ def clone_lookup_file():
             conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error("Error cloning file: %s", e)
+        logging.error("[x] Error cloning file: %s", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 

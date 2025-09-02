@@ -6,4 +6,4 @@ url = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IB
 r = requests.get(url)
 data = r.json()
 
-logging.info(data)
+logging.info("[i] %s", data)

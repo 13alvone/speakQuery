@@ -63,7 +63,7 @@ index="output_parquets/test0.system4.system4.parquet,output_parquets/test1.syste
 
 
 def main():
-    logging.info("Starting the parsing process.")
+    logging.info("[i] Starting the parsing process.")
     cleaned_query = speak_query.strip('\n').strip(' ').strip('\n').strip(' ')
     input_stream = antlr4.InputStream(cleaned_query)  # Replace 'input_text' with your test query
     lexer = speakQueryLexer(input_stream)  # Set up the lexer and parser

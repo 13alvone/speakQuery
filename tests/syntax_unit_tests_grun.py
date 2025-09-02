@@ -9,7 +9,7 @@ import sys
 import shutil
 import datetime
 import subprocess
-from antlr4 import *
+from antlr4 import InputStream, CommonTokenStream
 from antlr4.error.ErrorListener import ErrorListener
 import logging
 import pandas as pd
@@ -42,7 +42,7 @@ def update_grammar():
     generated_dir = "lexers/antlr4_active"
     if os.path.exists(generated_dir):
         shutil.rmtree(generated_dir)
-        logging.info(f"Deleted existing '{generated_dir}' directory.")
+        logging.info(f"[i] Deleted existing '{generated_dir}' directory.")
     antlr_command = [
         "java",
         "-jar",
@@ -55,9 +55,9 @@ def update_grammar():
     ]
     try:
         subprocess.run(antlr_command, check=True)  # nosec - dev-only generation of parser files
-        logging.info("Regenerated the target antlr4 files successfully.")
+        logging.info("[i] Regenerated the target antlr4 files successfully.")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failed to regenerate target files: {e}")
+        logging.error(f"[x] Failed to regenerate target files: {e}")
 
 
 def run_unit_tests(_log_filename):
@@ -70,11 +70,11 @@ def run_unit_tests(_log_filename):
 
         def syntaxError(self, recognizer, offending_symbol, line, column, msg, err):
             self.hasError = True
-            logging.error(f"Syntax Error - line {line}:{column} {msg}")
+            logging.error(f"[x] Syntax Error - line {line}:{column} {msg}")
     event_delimiter = '-' * 20
     for i, test_query in enumerate(test_queries):
-        logging.info(event_delimiter)
-        logging.info(f"Test {i}: CATEGORY: [{test_query['category']}], "
+        logging.info("[i] %s", event_delimiter)
+        logging.info(f"[i] Test {i}: CATEGORY: [{test_query['category']}], "
                      f"COMPLEXITY: [{test_query['complexity']}], TITLE: [{test_query['title']}]")
         input_stream = InputStream(test_query["query"])
         lexer = speakQueryLexer(input_stream)
@@ -93,7 +93,7 @@ def run_unit_tests(_log_filename):
             summary_data["by_complexity"].setdefault(complexity, {"passed": 0, "failed": 1})
             summary_data["by_complexity"][complexity]["failed"] += 1
             print(f"FAILED QUERY:\n{test_query['query']}\nCategory: {category}\nComplexity: {complexity}, id={i}")
-            logging.error(f"FAILED QUERY:\n{test_query['query']}")
+            logging.error(f"[x] FAILED QUERY:\n{test_query['query']}")
         else:
             summary_data["passed"] += 1
             category = test_query["category"]

@@ -37,8 +37,8 @@ sys.path.insert(0, index_call_dir)
 sys.path.insert(0, datetime_parser_dir)
 sys.path.insert(0, root_dir)
 
-logging.info("Using Python: " + sys.version)
-logging.info("Sys path: " + str(sys.path))
+logging.info("[i] Using Python: " + sys.version)
+logging.info("[i] Sys path: " + str(sys.path))
 logging.info(f"[i] Current working directory: {os.getcwd()} - Contents: {os.listdir(os.getcwd())}")
 
 # Import the secure dynamic loader for .so files

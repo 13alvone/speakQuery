@@ -530,15 +530,15 @@ def delete_old_files(directory_path=None, keep_latest=20):
             try:
                 if file_path.is_file():
                     os.remove(file_path)
-                    logging.info(f"Deleted file: {file_path}")
+                    logging.info(f"[i] Deleted file: {file_path}")
                 elif file_path.is_dir():
                     shutil.rmtree(file_path)
-                    logging.info(f"Deleted directory: {file_path}")
+                    logging.info(f"[i] Deleted directory: {file_path}")
             except Exception as e:
-                logging.error(f"Error deleting {file_path}: {str(e)}")
+                logging.error(f"[x] Error deleting {file_path}: {str(e)}")
 
     except Exception as e:
-        logging.error(f"Error processing directory {directory_path}: {str(e)}")
+        logging.error(f"[x] Error processing directory {directory_path}: {str(e)}")
 
 
 def start_background_engines():
@@ -556,10 +556,10 @@ def get_next_runtime(cron_schedule):
         current_time = datetime.now(timezone.utc)  # Get the current time in GMT
         cron_iter = croniter(cron_schedule, current_time)
         next_runtime = cron_iter.get_next(datetime).astimezone(timezone.utc)
-        logging.info(f"Next runtime for schedule '{cron_schedule}' is {next_runtime.isoformat()}")
+        logging.info(f"[i] Next runtime for schedule '{cron_schedule}' is {next_runtime.isoformat()}")
         return next_runtime.isoformat()
     except Exception as e:
-        logging.error(f"Failed to calculate next runtime: {str(e)}")
+        logging.error(f"[x] Failed to calculate next runtime: {str(e)}")
         return None
 
 
@@ -573,13 +573,13 @@ def is_title_unique(title):
             cursor.execute("SELECT COUNT(*) FROM saved_searches WHERE title = ?", (title,))
             count = cursor.fetchone()[0]
             if count > 0:
-                logging.info(f"Title '{title}' already exists in the database.")
+                logging.info(f"[i] Title '{title}' already exists in the database.")
                 return False
             else:
-                logging.info(f"Title '{title}' is unique.")
+                logging.info(f"[i] Title '{title}' is unique.")
                 return True
     except sqlite3.Error as e:
-        logging.error(f"SQLite error: {str(e)}")
+        logging.error(f"[x] SQLite error: {str(e)}")
         return False
 
 
@@ -817,7 +817,7 @@ def toggle_disable_scheduled_input(input_id):
             conn.commit()
         return jsonify({'status': 'success', 'new_disabled': new_disabled})
     except Exception as e:
-        logging.error(f"Error toggling disable for input {input_id}: {str(e)}")
+        logging.error(f"[x] Error toggling disable for input {input_id}: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to toggle disable status.'}), 500
 
 
@@ -831,7 +831,7 @@ def delete_scheduled_input(input_id):
             conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(f"Error deleting scheduled input {input_id}: {str(e)}")
+        logging.error(f"[x] Error deleting scheduled input {input_id}: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to delete scheduled input.'}), 500
 
 
@@ -874,7 +874,7 @@ def clone_scheduled_input(input_id):
             conn.commit()
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(f"Error cloning scheduled input {input_id}: {str(e)}")
+        logging.error(f"[x] Error cloning scheduled input {input_id}: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to clone scheduled input.'}), 500
 
 
@@ -891,7 +891,7 @@ def toggle_disable_search(search_id):
         else:
             return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
     except Exception as e:
-        logging.error(f"Error toggling disabled status for saved search: {str(e)}")
+        logging.error(f"[x] Error toggling disabled status for saved search: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to toggle disabled status'}), 500
 
 
@@ -908,10 +908,10 @@ def delete_search(search_id):
             cursor.execute('DELETE FROM saved_searches WHERE id = ?', (search_id,))
             conn.commit()
 
-        logging.info(f"Deleted saved search with ID {search_id}")
+        logging.info(f"[i] Deleted saved search with ID {search_id}")
         return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(f"Error deleting saved search: {str(e)}")
+        logging.error(f"[x] Error deleting saved search: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to delete saved search'}), 500
 
 
@@ -945,7 +945,7 @@ def clone_search(search_id):
         else:
             return jsonify({'status': 'error', 'message': 'Saved search not found'}), 404
     except Exception as e:
-        logging.error(f"Error cloning saved search: {str(e)}")
+        logging.error(f"[x] Error cloning saved search: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to clone saved search'}), 500
 
 
@@ -987,7 +987,7 @@ def saved_search():
             cron_schedule=cron_schedule
         )
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {str(e)}")
+        logging.error(f"[x] An unexpected error occurred: {str(e)}")
         return render_template('save_search.html', saved_query=""), 500
 
 
@@ -1166,7 +1166,7 @@ def commit_saved_search():
         return jsonify({'status': 'success', 'message': f"Successfully saved search: '{title}'"}), 200
 
     except Exception as e:
-        logging.error(f"Error committing saved search: {str(e)}")
+        logging.error(f"[x] Error committing saved search: {str(e)}")
         return jsonify({'status': 'error', 'message': f'{e}'}), 400
 
 
@@ -1213,10 +1213,10 @@ def commit_scheduled_input():
 
         return jsonify({'status': 'success'})
     except ValueError as ve:
-        logging.error(f"Validation error: {str(ve)}")
+        logging.error(f"[x] Validation error: {str(ve)}")
         return jsonify({'status': 'error', 'message': str(ve)}), 400
     except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
+        logging.error(f"[x] Unexpected error: {str(e)}")
         return jsonify({'status': 'error', 'message': 'An unexpected error occurred.'}), 500
 
 
@@ -1230,16 +1230,16 @@ def create_saved_search():
         if not validate_uuid(request_id):
             return jsonify({'status': 'error', 'message': 'Invalid request_id.'}), 400
 
-        logging.info("Search saved successfully with request_id: %s", request_id)
+        logging.info("[i] Search saved successfully with request_id: %s", request_id)
 
         # Render the save_search.html template with the provided data
         return render_template('save_search.html', result=data)
 
     except ValueError as e:
-        logging.error("ValueError: %s", str(e))
+        logging.error("[x] ValueError: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 400
     except Exception as e:
-        logging.error("Exception: %s", str(e))
+        logging.error("[x] Exception: %s", str(e))
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
@@ -1270,7 +1270,7 @@ def get_saved_searches():
                 _saved_searches.append(_saved_search)
         return jsonify({'status': 'success', 'searches': _saved_searches})
     except Exception as e:
-        logging.error(f"Error fetching saved searches: {str(e)}")
+        logging.error(f"[x] Error fetching saved searches: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to fetch saved searches.'}), 500
 
 
@@ -1392,7 +1392,7 @@ def update_saved_search(search_id):
         return jsonify({'status': 'success', 'message': 'Saved search updated successfully.'})
 
     except Exception as e:
-        logging.error(f"Error updating saved search: {e}")
+        logging.error(f"[x] Error updating saved search: {e}")
         return jsonify({'status': 'error', 'message': 'Internal server error.'}), 500
 
 
@@ -1439,7 +1439,7 @@ def run_scheduled_input(input_id):
                 executor.execute_code_test()
                 return jsonify({'status': 'success'})
             except Exception as e:
-                logging.error(f"Error executing scheduled input: {str(e)}")
+                logging.error(f"[x] Error executing scheduled input: {str(e)}")
                 return jsonify({'status': 'error', 'message': str(e)}), 500
         else:
             return jsonify({'status': 'error', 'message': 'Scheduled input not found'}), 404
@@ -1511,7 +1511,7 @@ def update_scheduled_input(input_id):
             conn.commit()
             return jsonify({'status': 'success'})
     except Exception as e:
-        logging.error(e)
+        logging.error(f"[x] Failed to update scheduled input: {e}")
         return jsonify({'status': 'error', 'message': 'Failed to update scheduled input.'}), 500
 
 
@@ -1619,7 +1619,7 @@ def save_dataframe(request_id, df, query):
             ''', (query, request_id))
             conn.commit()
     except Exception as e:
-        logging.error(f"Error saving to history.db: {str(e)}")
+        logging.error(f"[x] Error saving to history.db: {str(e)}")
 
 
 def load_dataframe(request_id):
@@ -1636,7 +1636,7 @@ def validate_uuid(request_id):
             return True
         return False
     except Exception as e:
-        logging.error(f"UUID validation error: {str(e)}")
+        logging.error(f"[x] UUID validation error: {str(e)}")
         return False
 
 
@@ -1647,7 +1647,7 @@ def validate_password_strength(password):
             return True
         return False
     except Exception as e:
-        logging.error(f"Password validation error: {str(e)}")
+        logging.error(f"[x] Password validation error: {str(e)}")
         return False
 
 
@@ -1666,12 +1666,12 @@ def execute_sql_query(db_path, query, params=()):
                 result = None
             return result
     except sqlite3.Error as e:
-        logging.error(f"SQLite error: {e}")
+        logging.error(f"[x] SQLite error: {e}")
         raise
 
 
 def execute_speakQuery(speak_query: str):
-    logging.info("Starting the parsing process.")
+    logging.info("[i] Starting the parsing process.")
     if not isinstance(speak_query, str):
         raise ValueError("Query must be a string")
 

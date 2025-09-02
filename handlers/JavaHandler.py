@@ -17,12 +17,12 @@ def start_jvm():
     if not jpype.isJVMStarted():
         try:
             jpype.startJVM()
-            logging.info("JVM started.")
+            logging.info("[i] JVM started.")
         except Exception as e:
-            logging.error(f"Error starting JVM: {e}")
+            logging.error(f"[x] Error starting JVM: {e}")
             raise
     else:
-        logging.debug("JVM is already started.")
+        logging.debug("[DEBUG] JVM is already started.")
 
 
 def shutdown_jvm():
@@ -31,9 +31,9 @@ def shutdown_jvm():
     """
     if jpype.isJVMStarted():
         jpype.shutdownJVM()
-        logging.info("JVM shut down.")
+        logging.info("[i] JVM shut down.")
     else:
-        logging.debug("JVM is not running.")
+        logging.debug("[DEBUG] JVM is not running.")
 
 
 def get_java_class(class_name):
@@ -54,7 +54,7 @@ def get_java_class(class_name):
         try:
             _java_classes_cache[class_name] = jpype.JClass(class_name)
         except Exception as e:
-            logging.error(f"Error loading Java class '{class_name}': {e}")
+            logging.error(f"[x] Error loading Java class '{class_name}': {e}")
             raise
     return _java_classes_cache[class_name]
 
@@ -150,7 +150,7 @@ class JavaHandler:
         try:
             java_class = get_java_class(java_type)
         except Exception as e:
-            logging.error(f"Error processing entries: {e}")
+            logging.error(f"[x] Error processing entries: {e}")
             return [False] * len(entries)
         results = [isinstance(entry, java_class) for entry in entries]
         return results
@@ -176,12 +176,12 @@ if __name__ == "__main__":
     results = JavaHandler.process_entries(entries, 'java.lang.Long')
 
     for entry, result in zip(entries, results):
-        logging.info(f"{entry} is an instance of java.lang.Long: {result}")
+        logging.info(f"[i] {entry} is an instance of java.lang.Long: {result}")
 
     # Check if entries are any Java numeric type
     for entry in entries:
         is_num = JavaHandler.is_num(entry)
-        logging.info(f"{entry} is a Java numeric type: {is_num}")
+        logging.info(f"[i] {entry} is a Java numeric type: {is_num}")
 
     # Shutdown JVM if no further interaction with Java is needed
     shutdown_jvm()

@@ -30,7 +30,7 @@ def get_settings():
 
         return jsonify({'status': 'success', 'settings': settings_dict}), 200
     except Exception as e:
-        logging.error(f"Error fetching settings: {str(e)}")
+        logging.error(f"[x] Error fetching settings: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to fetch settings.'}), 500
 
 
@@ -74,6 +74,6 @@ def update_settings():
         return jsonify({'status': 'success', 'message': 'Settings updated successfully.'}), 200
 
     except Exception as e:
-        logging.error(f"Error updating settings: {str(e)}")
+        logging.error(f"[x] Error updating settings: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Failed to update settings.'}), 500
 

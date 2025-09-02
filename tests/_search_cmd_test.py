@@ -275,7 +275,7 @@ def test_process_index_calls():
 
 
 def execute_speak_query(query_str: str):
-    logging.info("Starting the parsing process.")
+    logging.info("[i] Starting the parsing process.")
     cleaned_query = query_str.strip('\n').strip(' ').strip('\n').strip(' ')
     input_stream = antlr4.InputStream(cleaned_query)  # Replace 'input_text' with your test query
     lexer = speakQueryLexer(input_stream)  # Set up the lexer and parser

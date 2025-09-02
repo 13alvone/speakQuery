@@ -953,7 +953,7 @@ class GeneralHandler:
                     query_line_formatted += f" {sub_entry}"
 
             space_buffer = (4 - len(str(index))) * " "
-            logging.info(f"{index}{space_buffer}{query_line_formatted}")
+            logging.info(f"[i] {index}{space_buffer}{query_line_formatted}")
 
     def convert_to_query_string(self, expression):
         """Converts the structured logical expression into a query string."""
@@ -1316,7 +1316,7 @@ class GeneralHandler:
         # Ensure all specified fields exist in the DataFrame
         missing_fields = [field for field in field_list if field not in main_df.columns]
         if missing_fields:
-            logging.error(f"Missing fields in DataFrame: {missing_fields}")
+            logging.error(f"[x] Missing fields in DataFrame: {missing_fields}")
             return None
 
         try:
@@ -1347,10 +1347,10 @@ class GeneralHandler:
                         columns=["temp_group", "temp_rank"]
                     )
 
-            logging.info("Duplicates removed successfully.")
+            logging.info("[i] Duplicates removed successfully.")
             return filtered_df
         except Exception as e:
-            logging.error(f"Error during deduplication: {str(e)}")
+            logging.error(f"[x] Error during deduplication: {str(e)}")
             return None
 
     @staticmethod

@@ -130,7 +130,7 @@ def api_query():
     except Full:
         return jsonify({'status': 'error', 'message': 'Server busy'}), 429
     except Exception as exc:
-        logging.error(f"Error processing query: {exc}")
+        logging.error(f"[x] Error processing query: {exc}")
         return jsonify({'status': 'error', 'message': str(exc)}), 500
 
 
@@ -198,7 +198,7 @@ def api_create_saved_search():
             conn.commit()
         return jsonify({'status': 'success', 'id': search_id}), 201
     except Exception as exc:
-        logging.error(f"Error creating saved search: {exc}")
+        logging.error(f"[x] Error creating saved search: {exc}")
         return jsonify({'status': 'error', 'message': str(exc)}), 400
 
 
@@ -243,7 +243,7 @@ def api_update_saved_search(search_id):
             conn.commit()
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
-        logging.error(f"Error updating saved search: {exc}")
+        logging.error(f"[x] Error updating saved search: {exc}")
         return jsonify({'status': 'error', 'message': 'Internal server error.'}), 500
 
 
@@ -270,7 +270,7 @@ def api_delete_saved_search(search_id):
             conn.commit()
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
-        logging.error(f"Error deleting saved search: {exc}")
+        logging.error(f"[x] Error deleting saved search: {exc}")
         _record_failure(ip)
         return jsonify({'status': 'error', 'message': 'Failed to delete saved search'}), 500
 
@@ -344,7 +344,7 @@ def api_delete_lookup(name):
         os.remove(file_path)
         return jsonify({'status': 'success'}), 200
     except Exception as exc:
-        logging.error(f"Error deleting lookup file: {exc}")
+        logging.error(f"[x] Error deleting lookup file: {exc}")
         _record_failure(ip)
         return jsonify({'status': 'error', 'message': 'Failed to delete file.'}), 500
 

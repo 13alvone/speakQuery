@@ -33,5 +33,5 @@ def get_row_count(filepath: str) -> int:
         df = pd.read_csv(filepath)
         return len(df)
     except Exception as exc:
-        logging.error("Error reading file for row count: %s", exc)
+        logging.error("[x] Error reading file for row count: %s", exc)
         return 0
