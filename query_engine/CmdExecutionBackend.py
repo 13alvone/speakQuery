@@ -63,7 +63,7 @@ def run_query_and_return_results_df(query):
 
 
 def execute_query(_speak_query):
-    logging.info("Starting the parsing process.")
+    logging.info("[i] Starting the parsing process.")
     if not isinstance(_speak_query, str):
         raise ValueError("Query must be a string")
 

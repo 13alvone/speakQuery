@@ -53,19 +53,19 @@ def run_query():
 
     try:
         result_df = execute_speakQuery(data.get('query'))
-        logging.info(f"Query result before processing: {result_df}")
+        logging.info(f"[i] Query result before processing: {result_df}")
 
         if result_df is None or result_df.empty:
-            logging.warning("No data returned from query.")
+            logging.warning("[!] No data returned from query.")
             return jsonify({'status': 'error', 'message': 'No data returned from query.'})
 
         result_df = result_df.fillna('')
-        logging.info(f"Query result after processing NaN values: {result_df}")
+        logging.info(f"[i] Query result after processing NaN values: {result_df}")
 
         column_names = result_df.columns.values.tolist()
         row_data = result_df.to_dict(orient='records')
-        logging.debug(f"Column names: {column_names}.")
-        logging.debug(f"Data: {row_data}.")
+        logging.debug(f"[DEBUG] Column names: {column_names}.")
+        logging.debug(f"[DEBUG] Data: {row_data}.")
 
         request_id = f'{time.time()}_{str(uuid.uuid4())}'
         save_dataframe(request_id, result_df, data.get('query'))
@@ -76,11 +76,11 @@ def run_query():
             'column_names': column_names,
             'request_id': request_id
         }
-        logging.debug(f"Response: {response}")
+        logging.debug(f"[DEBUG] Response: {response}")
 
         return jsonify(response)
     except Exception as e:
-        logging.error(f"Error processing query: {str(e)}")
+        logging.error(f"[x] Error processing query: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)})
 
 
@@ -102,7 +102,7 @@ def get_query_for_loadjob(filename):
         else:
             return jsonify({'error': 'No query found for the given load job filename.'}), 404
     except Exception as e:
-        logging.error(f"Error retrieving query for load job '{filename}': {str(e)}")
+        logging.error(f"[x] Error retrieving query for load job '{filename}': {str(e)}")
         return jsonify({'error': 'Internal server error.'}), 500
 
 
@@ -116,7 +116,7 @@ def save_results():
     start = data.get('start', 0)
     end = data.get('end', None)
 
-    logging.info(f"Saving results: {format_type} - {save_type}")
+    logging.info(f"[i] Saving results: {format_type} - {save_type}")
 
     try:
         result_df = load_dataframe(request_id)
@@ -134,6 +134,6 @@ def save_results():
         return jsonify({'status': 'success', 'file_url': f'/static/temp/{file_name}', 'file_name': file_name})
 
     except Exception as e:
-        logging.error(f"Error saving results: {str(e)}")
+        logging.error(f"[x] Error saving results: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)})
 

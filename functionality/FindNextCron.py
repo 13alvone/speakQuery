@@ -52,7 +52,7 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
                         hour = next_time.hour
                         cron_count[(hour, minute)] += 1
                 except Exception as e:
-                    logging.error(f"Failed to parse cron expression '{cron_expr}': {e}")
+                    logging.error(f"[x] Failed to parse cron expression '{cron_expr}': {e}")
                     continue
 
             # Now, find the minute and hour with the least scheduled jobs
@@ -71,7 +71,7 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
             logging.info(f"[i] Suggested next best cron runtime: {suggested_time}")
             return suggested_time
         else:
-            logging.error("Failed to determine the best time slot.")
+            logging.error("[x] Failed to determine the best time slot.")
             return None
 
     except sqlite3.Error as e:
@@ -83,6 +83,6 @@ def suggest_next_cron_runtime(db_path='saved_searches.db'):
 if __name__ == '__main__':
     suggested_cron_time = suggest_next_cron_runtime()
     if suggested_cron_time:
-        logging.info(f"Suggested Cron Time: {suggested_cron_time}")
+        logging.info(f"[i] Suggested Cron Time: {suggested_cron_time}")
     else:
-        logging.info("Could not determine a suggested cron time.")
+        logging.info("[i] Could not determine a suggested cron time.")

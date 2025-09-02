@@ -29,7 +29,7 @@ def list_users():
         ]
         return jsonify({'status': 'success', 'users': users})
     except Exception as exc:
-        logging.error(f"Error fetching users: {exc}")
+        logging.error(f"[x] Error fetching users: {exc}")
         return jsonify({'status': 'error', 'message': 'Failed to fetch users'}), 500
 
 
@@ -67,5 +67,5 @@ def create_user():
             conn.commit()
         return jsonify({'status': 'success', 'api_token': token}), 201
     except Exception as exc:
-        logging.error(f"Error creating user {username}: {exc}")
+        logging.error(f"[x] Error creating user {username}: {exc}")
         return jsonify({'status': 'error', 'message': 'Failed to create user'}), 500
