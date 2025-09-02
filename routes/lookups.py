@@ -13,6 +13,9 @@ from datetime import datetime
 from pathlib import Path
 from werkzeug.utils import secure_filename
 
+BYTES_PER_MB = 1024 * 1024
+DEFAULT_LOOKUP_MAX_BYTES = 16 * BYTES_PER_MB
+
 lookups_bp = Blueprint('lookups_bp', __name__)
 
 @lookups_bp.route('/get_lookup_files', methods=['GET'])
@@ -62,6 +65,13 @@ def get_loadjob_files():
 @lookups_bp.route('/upload_file', methods=['POST'])
 @login_required
 def upload_file():
+    """Handle lookup file uploads with size and content validation."""
+    max_bytes = app.config.get('LOOKUP_MAX_FILESIZE', app.config.get('MAX_CONTENT_LENGTH', DEFAULT_LOOKUP_MAX_BYTES))
+    if request.content_length and request.content_length > max_bytes:
+        limit_mb = max_bytes // BYTES_PER_MB
+        logging.warning("[!] Upload exceeds size limit: %s > %s", request.content_length, max_bytes)
+        return jsonify({'status': 'error', 'message': f'File exceeds maximum size of {limit_mb} MB.'}), 413
+
     if 'file' not in request.files:
         return jsonify({'status': 'error', 'message': 'No file part in the request.'}), 400
 

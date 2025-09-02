@@ -331,6 +331,10 @@ The server performs an additional check when a `.csv` file is uploaded. The
 falls back to `pandas.read_csv` if necessary. Files that fail these checks are
 rejected even if they use the `.csv` extension.
 
+Uploads exceeding 16 MB are rejected. Adjust `LOOKUP_MAX_FILESIZE` (defaults to
+Flask's `MAX_CONTENT_LENGTH`) in `app.py` to change this limit. Requests above
+the limit return HTTP 413 with a clear error message.
+
 ## Timechart command
 
 The query language includes a `timechart` directive for quick time-series
