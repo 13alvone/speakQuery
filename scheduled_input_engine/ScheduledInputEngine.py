@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 CURRENT_SCRIPT_DIR = Path(__file__).parent.resolve()
 SCHEDULED_INPUTS_DB = CURRENT_SCRIPT_DIR.parent / 'scheduled_inputs.db'
 HISTORY_DB = CURRENT_SCRIPT_DIR.parent / 'scheduled_inputs_history.db'
+INPUT_REPOS_ROOT = (CURRENT_SCRIPT_DIR.parent / 'input_repos').resolve()
 
 # Scheduler instance
 scheduler = AsyncIOScheduler()
@@ -160,7 +161,24 @@ async def execute_repo_script(
     retry_count=0,
 ):
     """Run a repo script in an isolated subprocess."""
-    path = Path(repo_path) / script_name
+    # Resolve repository and script paths to prevent path traversal
+    repo_root = Path(repo_path).resolve()
+    script_path = (repo_root / script_name).resolve()
+
+    # Ensure repository resides within the expected root directory
+    if not repo_root.is_relative_to(INPUT_REPOS_ROOT):
+        logger.error(
+            f"[x] Repo path {repo_root} is outside allowed root {INPUT_REPOS_ROOT}"
+        )
+        return
+
+    # Ensure the script is inside the repository directory
+    if not script_path.is_relative_to(repo_root):
+        logger.error(
+            f"[x] Script path {script_path} escapes repo root {repo_root}"
+        )
+        return
+
     start = time.time()
     try:
         output_dir = Path('indexes')
@@ -173,12 +191,12 @@ async def execute_repo_script(
             'SPEAKQUERY_OVERWRITE': '1' if overwrite else '0',
         }
 
-        result = await run_in_subprocess(path, env=env)
+        result = await run_in_subprocess(script_path, env=env)
     except FileNotFoundError:
-        logger.error(f"[x] Repo script not found: {path}")
+        logger.error(f"[x] Repo script not found: {script_path}")
         return
     except Exception as exc:
-        logger.error(f"[x] Failed running repo script {path}: {exc}")
+        logger.error(f"[x] Failed running repo script {script_path}: {exc}")
         return
 
     end = time.time()
