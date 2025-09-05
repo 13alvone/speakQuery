@@ -13,6 +13,7 @@ import shlex
 import sys
 import os
 import re
+from pathlib import Path
 
 from antlr4.tree.Tree import TerminalNodeImpl
 from antlr4 import ParseTreeListener
@@ -605,7 +606,16 @@ class speakQueryListener(ParseTreeListener):
         filename = seg_tokens[1]
         key = seg_tokens[2]
         output_fields = [t.strip(",") for t in seg_tokens[4:]] if "OUTPUT" in seg_tokens else []
-        lookup_df = self.lookup_handler.load_data(os.path.join(self.lookup_root, filename))
+
+        root = Path(self.lookup_root).resolve()
+        lookup_path = (root / filename).resolve()
+        try:
+            lookup_path.relative_to(root)
+        except ValueError:
+            logger.error(f"[x] Invalid lookup filename: {filename}")
+            return self.main_df
+
+        lookup_df = self.lookup_handler.load_data(str(lookup_path))
         if lookup_df is not None:
             self.main_df = self.general_handler.execute_join(self.main_df, lookup_df, [key], "left")
             if output_fields:
@@ -617,11 +627,25 @@ class speakQueryListener(ParseTreeListener):
         Returns the original DataFrame.
         """
         args = self.general_handler.parse_outputlookup_args(seg_tokens[1:])
+        root = Path(self.lookup_root).resolve()
         if isinstance(args, str):
-            kwargs = {"filename": os.path.join(self.lookup_root, args)}
+            filename = args
         else:
-            args["filename"] = os.path.join(self.lookup_root, args.get("filename", "output.csv"))
+            filename = args.get("filename", "output.csv")
+
+        output_path = (root / filename).resolve()
+        try:
+            output_path.relative_to(root)
+        except ValueError:
+            logger.error(f"[x] Invalid lookup filename: {filename}")
+            return self.main_df
+
+        if isinstance(args, str):
+            kwargs = {"filename": str(output_path)}
+        else:
+            args["filename"] = str(output_path)
             kwargs = args
+
         self.general_handler.execute_outputlookup(self.main_df, **kwargs)
         return self.main_df
 
@@ -630,8 +654,15 @@ class speakQueryListener(ParseTreeListener):
         Returns the original DataFrame.
         """
         filename = seg_tokens[1].strip('"').strip("'")
-        path = os.path.join(self.lookup_root, filename)
-        self.general_handler.execute_outputnew(self.main_df, path)
+        root = Path(self.lookup_root).resolve()
+        output_path = (root / filename).resolve()
+        try:
+            output_path.relative_to(root)
+        except ValueError:
+            logger.error(f"[x] Invalid lookup filename: {filename}")
+            return self.main_df
+
+        self.general_handler.execute_outputnew(self.main_df, str(output_path))
         return self.main_df
 
     def _cmd_coalesce(self, seg_tokens, seg_str):
