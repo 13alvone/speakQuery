@@ -199,8 +199,14 @@ class ScheduledInputBackend:
 
             target_dir.mkdir(parents=True, exist_ok=True)
 
-            # Construct the full output path
-            output_path = target_dir / output_filename
+            # Construct and resolve the full output path
+            output_path = (target_dir / output_filename).resolve()
+
+            # Ensure the resolved path is within the target directory
+            try:
+                output_path.relative_to(target_dir)
+            except ValueError:
+                raise ValueError("Invalid output file path.")
 
             # Handle overwrite
             if output_path.exists():
@@ -223,4 +229,5 @@ class ScheduledInputBackend:
 
         except Exception as e:
             logger.error(f"Error executing scheduled input '{title}': {str(e)}")
+            raise
 
