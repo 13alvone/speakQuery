@@ -1,0 +1,187 @@
+tests:
+  auth_register_standard:
+    title: "Register standard user"
+    steps:
+      1: "Navigate to /register.html"
+      2: "Enter a unique username"
+      3: "Enter a password and confirm"
+      4: "Leave 'Register as admin' unchecked"
+      5: "Submit form"
+      6: "Verify confirmation or redirection to login"
+  auth_register_admin:
+    title: "Register admin user"
+    steps:
+      1: "Navigate to /register.html"
+      2: "Enter unique admin username"
+      3: "Enter password and confirm"
+      4: "Check 'Register as admin'"
+      5: "Submit form"
+      6: "Verify admin can log in and access admin pages"
+  auth_login_valid:
+    title: "Login with valid credentials"
+    steps:
+      1: "Open /login.html"
+      2: "Enter valid username and password"
+      3: "Submit form"
+      4: "Verify redirection to Search page with navbar visible"
+  auth_login_invalid:
+    title: "Login with invalid credentials"
+    steps:
+      1: "Open /login.html"
+      2: "Enter invalid username or password"
+      3: "Submit form"
+      4: "Verify error notification appears and login page remains"
+  auth_logout:
+    title: "Logout"
+    steps:
+      1: "Log in as any user"
+      2: "Click Logout in navbar"
+      3: "Verify redirection to login page and session ended"
+  auth_change_password:
+    title: "Change password"
+    steps:
+      1: "Log in"
+      2: "Navigate to /change_password.html"
+      3: "Enter current password"
+      4: "Enter new password"
+      5: "Submit and verify success message"
+  access_admin_pages_denied:
+    title: "Standard user denied admin pages"
+    steps:
+      1: "Log in as standard user"
+      2: "Attempt to open /settings.html"
+      3: "Verify access denied or redirection"
+      4: "Attempt to open /users.html"
+      5: "Verify access denied or redirection"
+  access_requires_login:
+    title: "Unauthenticated access redirects to login"
+    steps:
+      1: "Ensure not logged in"
+      2: "Open /"
+      3: "Verify redirect to /login.html"
+      4: "Attempt to open any other protected page"
+      5: "Verify redirect to login"
+  user_theme_toggle:
+    title: "Toggle theme preference"
+    steps:
+      1: "Log in"
+      2: "Navigate to /user_settings.html"
+      3: "Click 'Toggle Theme'"
+      4: "Verify theme changes and persists after refresh"
+  search_run_query:
+    title: "Run query and view results"
+    steps:
+      1: "Log in and open /"
+      2: "Enter query into text area"
+      3: "Click 'Run Query'"
+      4: "Verify results table populates and row count displayed"
+  search_directory_tree:
+    title: "Directory tree loads and populates query"
+    steps:
+      1: "Log in and open /"
+      2: "Verify directory tree displays index files"
+      3: "Click a file link"
+      4: "Verify query box populated with index statement"
+  search_pagination_export:
+    title: "Paginate and export results"
+    steps:
+      1: "Run a query returning >100 rows"
+      2: "Use Next/Previous buttons to navigate pages"
+      3: "Click 'Save as CSV' and verify file download"
+      4: "Click 'Save as JSON' and verify file download"
+  search_save_search:
+    title: "Save search from results"
+    steps:
+      1: "Run a query"
+      2: "Click 'Save Search'"
+      3: "Verify redirect to save search page"
+      4: "Enter title, description, schedule and other fields"
+      5: "Submit and verify entry appears on Saved Searches page"
+  history_load_job:
+    title: "Load job from history"
+    steps:
+      1: "Open /history.html"
+      2: "Verify load job files listed"
+      3: "Click 'Load' on a file"
+      4: "Confirm notification and redirection to Search page with command populated"
+  lookups_manage_files:
+    title: "Manage lookup files"
+    steps:
+      1: "Open /lookups.html"
+      2: "Verify lookup files table loads"
+      3: "Click 'Upload File' and select valid file"
+      4: "Submit and verify file appears in list"
+      5: "Attempt to upload invalid extension and verify error"
+      6: "Use 'View' link to open file"
+      7: "Use 'Clone' and verify copy appears"
+      8: "Use 'Delete' and verify removal"
+  saved_searches_list:
+    title: "List and run saved searches"
+    steps:
+      1: "Open /saved_searches.html"
+      2: "Verify table lists saved searches"
+      3: "Click 'Run' to execute a search"
+      4: "Confirm redirection to Search page with query loaded"
+      5: "Click search title link to edit"
+      6: "From dropdown choose 'Clone' and verify duplicate entry"
+      7: "From dropdown choose 'Disable' then 'Enable' and verify status change"
+      8: "From dropdown choose 'Delete' and verify removal"
+  saved_search_edit:
+    title: "Edit saved search fields"
+    steps:
+      1: "Open a saved search via /saved_search/<id>"
+      2: "Toggle 'Throttle' to Yes and verify additional fields show"
+      3: "Toggle 'Send Email' to Yes and verify email fields show"
+      4: "Modify fields and submit"
+      5: "Verify redirect to Saved Searches with updated info"
+  repos_manage:
+    title: "Manage repositories and schedules"
+    steps:
+      1: "Open /schedule_input.html"
+      2: "Clone repository using name and Git URL"
+      3: "Verify repo appears with scripts listed"
+      4: "Click 'Pull' to update"
+      5: "Set cron schedule for a script and verify confirmation"
+      6: "Delete schedule and verify removal"
+      7: "Edit file via 'Edit' and confirm contents saved"
+      8: "Delete script file"
+      9: "Delete repository"
+  scheduled_inputs_list:
+    title: "List and control scheduled inputs"
+    steps:
+      1: "Open /scheduled_inputs.html"
+      2: "Verify table lists scheduled inputs"
+      3: "Click 'Run' to execute input"
+      4: "Use dropdown 'Edit' to navigate to edit page"
+      5: "Use dropdown 'Clone' to create duplicate entry"
+      6: "Use dropdown 'Disable' then 'Enable'"
+      7: "Use dropdown 'Delete' to remove entry"
+  scheduled_input_edit:
+    title: "Edit scheduled input"
+    steps:
+      1: "Open /edit_scheduled_input/<id>"
+      2: "Modify fields such as title or cron schedule"
+      3: "Toggle 'Overwrite' option"
+      4: "Submit and verify changes on Scheduled Inputs page"
+  settings_admin:
+    title: "Update application settings (admin)"
+    steps:
+      1: "Log in as admin"
+      2: "Open /settings.html"
+      3: "Verify form pre-populated"
+      4: "Change a setting (e.g., MAX_CONTENT_LENGTH) and submit"
+      5: "Verify success notification"
+      6: "Use Reset to restore original values"
+  users_admin:
+    title: "Manage users (admin)"
+    steps:
+      1: "Log in as admin and open /users.html"
+      2: "Verify table lists existing users"
+      3: "Fill form to create new user with role"
+      4: "Submit and verify user appears in table"
+  logout_theme_persistence:
+    title: "Logout preserves theme"
+    steps:
+      1: "Ensure theme set to dark or light"
+      2: "Log out"
+      3: "Log back in and verify previous theme preference applies"
