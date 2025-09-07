@@ -21,9 +21,9 @@ jobs.
    cp .env.example input_repos/speakQuery/.env
    # edit the file and set SECRET_KEY and admin credentials
    export MASTER_KEY=$(python - <<'PY'
-from cryptography.fernet import Fernet
-print(Fernet.generate_key().decode())
-PY
+   from cryptography.fernet import Fernet
+   print(Fernet.generate_key().decode())
+   PY
    )
    python utils/env_crypto.py encrypt input_repos/speakQuery/.env \
        input_repos/speakQuery/.env.enc
