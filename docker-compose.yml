@@ -5,6 +5,13 @@ services:
     container_name: speakquery
     env_file:
       - .env
+    environment:
+      PYCHARM_ATTACH: "${PYCHARM_ATTACH:-0}"
+      PYCHARM_DEBUG_HOST: "${PYCHARM_DEBUG_HOST:-host.docker.internal}"
+      PYCHARM_DEBUG_PORT: "${PYCHARM_DEBUG_PORT:-5678}"
+      PYCHARM_DEBUG_PATCH_MULTIPROCESSING: "${PYCHARM_DEBUG_PATCH_MULTIPROCESSING:-1}"
+      PYCHARM_DEBUG_REDIRECT_OUTPUT: "${PYCHARM_DEBUG_REDIRECT_OUTPUT:-0}"
+      PYCHARM_DEBUG_SUSPEND: "${PYCHARM_DEBUG_SUSPEND:-0}"
     ports:
       - "5000:5000"
     volumes:

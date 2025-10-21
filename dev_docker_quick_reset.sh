@@ -14,6 +14,14 @@ log() {
   echo "[$level] $*"
 }
 
+# Surface debugging configuration for the developer.
+if [[ "${PYCHARM_ATTACH:-}" =~ ^([Tt]rue|[Yy]es|[Oo]n|1)$ ]]; then
+  debug_host="${PYCHARM_DEBUG_HOST:-host.docker.internal}"
+  debug_port="${PYCHARM_DEBUG_PORT:-5678}"
+  log "i" "PyCharm debugger attach enabled (PYCHARM_ATTACH=${PYCHARM_ATTACH})"
+  log "i" "Debug server target: ${debug_host}:${debug_port}"
+fi
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Pre-checks
 # ─────────────────────────────────────────────────────────────────────────────
@@ -64,6 +72,12 @@ log "i" "Starting Docker container: $APP_NAME"
 sudo docker run -d \
   --name "$APP_NAME" \
   --env-file "$ENV_FILE" \
+  --env "PYCHARM_ATTACH=${PYCHARM_ATTACH:-0}" \
+  --env "PYCHARM_DEBUG_HOST=${PYCHARM_DEBUG_HOST:-host.docker.internal}" \
+  --env "PYCHARM_DEBUG_PORT=${PYCHARM_DEBUG_PORT:-5678}" \
+  --env "PYCHARM_DEBUG_PATCH_MULTIPROCESSING=${PYCHARM_DEBUG_PATCH_MULTIPROCESSING:-1}" \
+  --env "PYCHARM_DEBUG_REDIRECT_OUTPUT=${PYCHARM_DEBUG_REDIRECT_OUTPUT:-0}" \
+  --env "PYCHARM_DEBUG_SUSPEND=${PYCHARM_DEBUG_SUSPEND:-0}" \
   -p "$PORT:$PORT" \
   --restart unless-stopped \
   "$APP_NAME"

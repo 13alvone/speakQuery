@@ -10,6 +10,18 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_ROOT"
 
+# Surface debugger configuration so developers immediately know whether attach
+# mode is active for this launcher.
+if [[ "${PYCHARM_ATTACH:-}" =~ ^([Tt]rue|[Yy]es|[Oo]n|1)$ ]]; then
+  debug_host="${PYCHARM_DEBUG_HOST:-127.0.0.1}"
+  debug_port="${PYCHARM_DEBUG_PORT:-5678}"
+  echo "[i] PyCharm debugger attach enabled (PYCHARM_ATTACH=${PYCHARM_ATTACH})"
+  echo "[i] Debug server target: ${debug_host}:${debug_port}"
+  if [[ "${PYCHARM_DEBUG_PATCH_MULTIPROCESSING:-}" =~ ^([Ff]alse|0|[Nn]o|[Oo]ff)$ ]]; then
+    echo "[!] Multiprocessing auto-patching is disabled; child processes must attach manually"
+  fi
+fi
+
 # Attempt to decrypt repo-specific environment file
 REPO_NAME="$(basename "$PROJECT_ROOT")"
 ENV_ENC="$PROJECT_ROOT/input_repos/$REPO_NAME/.env.enc"
