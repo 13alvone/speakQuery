@@ -68,6 +68,13 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
              "overwrite":true,"ttl":3600}'
    ```
 
+## PyCharm Remote Debugging
+
+Remote debugging is available across the entire stack via a site-level attach
+hook.  Refer to [docs/pycharm_debugging.md](docs/pycharm_debugging.md) for
+configuration steps, environment variables, Docker tips, and verification
+commands.
+
 ## Architecture
 
 - `app.py` – Flask application that can optionally start the background engines.
