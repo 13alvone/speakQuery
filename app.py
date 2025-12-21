@@ -8,6 +8,7 @@ import logging
 import sqlite3
 import sys
 import hashlib
+import secrets 
 from werkzeug.security import generate_password_hash, check_password_hash
 import argparse
 from pathlib import Path
@@ -74,13 +75,21 @@ else:
     else:
         logging.info("[i] No .env file found; using existing environment variables")
 
+# Retrieve the Flask secret key from the environment.
+# - Fail fast for real runtime (default)
+# - Allow setup/bootstrap (db init, etc.) with an ephemeral key
+is_setup_mode = os.environ.get("SPEAKQUERY_SETUP", "").strip().lower() in {"1", "true", "yes"}
+
 # Retrieve the Flask secret key from the environment; fail fast if missing
 secret_key = os.environ.get('SECRET_KEY')
 if not secret_key:
-    logging.error(
-        "[x] SECRET_KEY environment variable not set; application cannot start."
-    )
-    raise RuntimeError('SECRET_KEY environment variable not set')
+    if is_setup_mode:
+        secret_key = secrets.token_hex(32)
+        logging.warning("[!] SECRET_KEY not set; generated an ephemeral key for setup-only mode.")
+    else:
+        logging.error("[x] SECRET_KEY environment variable not set; application cannot start.")
+        raise RuntimeError("SECRET_KEY environment variable not set")
+
 app.config['SECRET_KEY'] = secret_key
 csrf = CSRFProtect(app)
 app.config['WTF_CSRF_ENABLED'] = True

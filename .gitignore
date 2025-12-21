@@ -1,6 +1,8 @@
 env/*
 executed_scheduled_searches/*
 __pycache__/*
+*/__pycache__/*
+lexers/antlr4_active/__pycache__/
 jobs/*
 functionality/cpp_datetime_parser/build/*
 functionality/cpp_index_call/build/*

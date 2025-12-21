@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from .Alert import email_results
 
 # Add current directory to PYTHONPATH and import custom classes
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
