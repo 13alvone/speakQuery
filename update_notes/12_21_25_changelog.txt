@@ -1,0 +1,22 @@
+12/21/2025
+* Enforced **Python 3.12.x** as a hard requirement (fail-fast with clear remediation + OS-specific install hints).
+* Hardened `setup.sh` argument parsing and UX:
+
+  * Added `--python`, `--venv-dir`, `--recreate-venv`, `--skip-dev`, `--wheel-only`, `--allow-source-builds`.
+  * Added consistent log helpers and improved error output.
+* Improved cross-platform portability (major Linux families + macOS) with best-effort distro detection and actionable dependency hints.
+* Added defensive checks for build prerequisites (e.g., warning if `cmake` missing before native builds).
+* Made venv creation idempotent and safe (reuse existing env; optionally recreate; verify venv Python is also 3.12).
+* Added pip installation controls (optional wheel-only installs; explicit main/dev requirements handling with robust file checks).
+* Added `.env` bootstrap logic during setup:
+
+  * Create `./.env` if missing.
+  * Auto-generate and persist `SECRET_KEY` if absent (unblocks DB init/import-time Flask config).
+* Updated DB initialization path to provide clearer import/traceback context during failures.
+* Updated README to reflect:
+
+  * Python 3.12 pin rationale and expectations.
+  * New `setup.sh` behavior/options.
+  * Correct env var loading order and required vs optional variables.
+  * Email alerting behavior change (SMTP vars required only when sending, not at setup/import time).
+
