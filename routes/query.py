@@ -43,7 +43,7 @@ def fetch_api_data():
 
 @query_bp.route('/run_query', methods=['POST'])
 def run_query():
-    from app import execute_speakQuery, save_dataframe
+    from app import execute_speakquery, save_dataframe
     data = request.get_json(force=True, silent=True)
     if data is None:
         logging.error("[x] No JSON payload detected in /run_query request.")
@@ -52,7 +52,7 @@ def run_query():
     logging.info(f"[i] Query received: {query_str}")
 
     try:
-        result_df = execute_speakQuery(data.get('query'))
+        result_df = execute_speakquery(data.get('query'))
         logging.info(f"[i] Query result before processing: {result_df}")
 
         if result_df is None or result_df.empty:

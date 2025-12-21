@@ -13,16 +13,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import argparse
 from pathlib import Path
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 from datetime import datetime, timezone
 from concurrent.futures import ProcessPoolExecutor
-from queue import Full
+from query_engine.CmdExecutionBackend import process_query
 from utils.task_queue import TaskQueue
 from utils.file_utils import get_row_count as util_get_row_count, allowed_file as util_allowed_file
 
 # Third-party imports
-import requests
 import pandas as pd
-import antlr4
+# import antlr4
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_wtf import CSRFProtect
 from flask_login import (
@@ -37,11 +37,11 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 # Local application imports
-from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
-from lexers.antlr4_active.speakQueryParser import speakQueryParser
+# from lexers.antlr4_active.speakQueryLexer import speakQueryLexer
+# from lexers.antlr4_active.speakQueryParser import speakQueryParser
 try:
     from lexers.speakQueryListener import speakQueryListener
-except ImportError as e:
+except Exception as e:
     logging.error(f"[x] Failed to import speakQueryListener: {e}")
     sys.exit(1)
 from handlers.JavaHandler import JavaHandler
@@ -53,6 +53,13 @@ from scheduled_input_engine.ScheduledInputEngine import (
 )
 from query_engine.QueryEngine import crank_query_engine
 from scheduled_input_engine.SIExecution import SIExecution
+
+# Global Variables
+required_fields_scheduled_searches = [
+    'title', 'description', 'query', 'cron_schedule', 'trigger',
+    'lookback', 'throttle', 'throttle_time_period', 'throttle_by',
+    'event_message', 'send_email', 'email_address', 'email_content', 'disabled'
+]
 
 app = Flask(
     __name__,
@@ -103,8 +110,8 @@ login_manager.login_view = 'login_page'
 class User:
     """Simple user model for authentication."""
 
-    def __init__(self, id, username, role, api_token=None, force_password_change=0):
-        self.id = str(id)
+    def __init__(self, _id, username, role, api_token=None, force_password_change=0):
+        self.id = str(_id)
         self.username = username
         self.role = role
         self.api_token = api_token
@@ -179,7 +186,7 @@ def load_user(user_id):
             row = cursor.fetchone()
             if row:
                 return User(
-                    id=row[0],
+                    _id=row[0],
                     username=row[1],
                     role=row[2],
                     api_token=row[3],
@@ -191,9 +198,9 @@ def load_user(user_id):
 
 
 @login_manager.request_loader
-def load_user_from_request(request):
+def load_user_from_request(_request):
     """Authenticate via Authorization bearer token."""
-    auth_header = request.headers.get("Authorization")
+    auth_header = _request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return None
     token = auth_header.split(None, 1)[1]
@@ -209,7 +216,7 @@ def load_user_from_request(request):
             row = cursor.fetchone()
             if row:
                 return User(
-                    id=row[0],
+                    _id=row[0],
                     username=row[1],
                     role=row[2],
                     api_token=row[3],
@@ -240,6 +247,7 @@ def enforce_password_change():
         if request.path.startswith(app.static_url_path):
             return None
         return redirect(url_for('change_password_page'))
+    return None
 
 
 def allowed_file(filename):
@@ -247,17 +255,39 @@ def allowed_file(filename):
     return util_allowed_file(filename, app.config['ALLOWED_EXTENSIONS'])
 
 
-def is_allowed_api_url(api_url):
-    """Return True if the api_url's domain matches ALLOWED_API_DOMAINS patterns."""
+def is_allowed_api_url(api_url: str) -> bool:
+    """Return True if api_url is http(s) and hostname matches ALLOWED_API_DOMAINS regex patterns."""
     try:
-        parsed = requests.utils.urlparse(api_url)
-        hostname = parsed.hostname or ''
-        allowed_domains = app.config.get('ALLOWED_API_DOMAINS', set())
+        if not isinstance(api_url, str) or not api_url.strip():
+            logging.warning("[!] is_allowed_api_url called with empty/non-string api_url")
+            return False
+
+        parsed = urlparse(api_url.strip())
+        if parsed.scheme not in ("http", "https"):
+            logging.warning("[!] Disallowed URL scheme: %s", parsed.scheme)
+            return False
+
+        hostname = (parsed.hostname or "").strip().lower().rstrip(".")
+        if not hostname:
+            logging.warning("[!] URL missing hostname: %s", api_url)
+            return False
+
+        allowed_domains = app.config.get("ALLOWED_API_DOMAINS", set())
+        if not allowed_domains:
+            logging.warning("[!] ALLOWED_API_DOMAINS is empty; denying by default")
+            return False
+
         for pattern in allowed_domains:
-            if re.fullmatch(pattern, hostname):
-                return True
+            try:
+                if re.fullmatch(pattern, hostname):
+                    return True
+            except re.error as rex:
+                logging.error("[x] Invalid regex in ALLOWED_API_DOMAINS (%s): %s", pattern, rex)
+
         return False
-    except Exception:
+
+    except Exception as exc:
+        logging.error("[x] is_allowed_api_url exception: %s", exc)
         return False
 
 
@@ -618,7 +648,7 @@ def login():
             )
             row = cursor.fetchone()
             if row and check_password_hash(row[1], password):
-                user = User(id=row[0], username=username, role=row[2], api_token=row[3])
+                user = User(_id=row[0], username=username, role=row[2], api_token=row[3])
                 cursor.execute('UPDATE users SET last_login = ? WHERE id = ?', (int(time.time()), row[0]))
                 conn.commit()
                 login_user(user)
@@ -1105,6 +1135,7 @@ def scheduled_input(scheduled_input_id):
             conn.commit()
 
             return jsonify({'status': 'success', 'message': 'Scheduled input updated successfully.'}), 200
+        return None
 
 
 @app.route('/scheduled_inputs.html')
@@ -1347,23 +1378,20 @@ def get_saved_search(search_id):
         )
 
 
+def check_missing_fields(_data):
+    global required_fields_scheduled_searches
+    # Validate presence of all required fields
+    missing_fields = [field for field in required_fields_scheduled_searches if field not in _data]
+    if missing_fields:
+        return jsonify({'status': 'error', 'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
+    return None
+
+
 @app.route('/update_saved_search/<search_id>', methods=['POST'])
 def update_saved_search(search_id):
     data = request.get_json()
 
-    # Define required fields
-    required_fields = [
-        'title', 'description', 'query', 'cron_schedule', 'trigger',
-        'lookback', 'throttle', 'throttle_time_period', 'throttle_by',
-        'event_message', 'send_email', 'email_address', 'email_content', 'disabled'
-    ]
-
-    # Validate presence of all required fields
-    missing_fields = [field for field in required_fields if field not in data]
-    if missing_fields:
-        return jsonify({'status': 'error', 'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
-
-    # Optional: Add further validation (e.g., email format, cron syntax)
+    check_missing_fields(data)
 
     try:
         with sqlite3.connect(app.config['SAVED_SEARCHES_DB']) as conn:
@@ -1526,7 +1554,7 @@ def update_scheduled_input(input_id):
 
 @app.route('/get_directory_tree', methods=['GET'])
 def get_directory_tree():
-    """Return a nested representation of the indexes directory."""
+    """Return a nested representation of the index's directory."""
 
     root_dir = app.config['INDEXES_DIR']
 
@@ -1679,21 +1707,11 @@ def execute_sql_query(db_path, query, params=()):
         raise
 
 
-def execute_speakQuery(speak_query: str):
-    logging.info("[i] Starting the parsing process.")
-    if not isinstance(speak_query, str):
-        raise ValueError("Query must be a string")
-
-    input_stream = antlr4.InputStream(speak_query)
-    lexer = speakQueryLexer(input_stream)
-    stream = antlr4.CommonTokenStream(lexer)
-    parser = speakQueryParser(stream)
-    tree = parser.speakQuery()
-    listener = speakQueryListener(speak_query)
-    walker = antlr4.ParseTreeWalker()
-    walker.walk(listener, tree)
-
-    return listener.main_df
+def execute_speakquery(speak_query: str):
+    try:
+        return process_query(speak_query)
+    except Exception as e:
+        logging.error(f"[x] Error executing speak query: {str(e)}")
 
 
 # Register blueprints

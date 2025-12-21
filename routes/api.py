@@ -5,7 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 def execute_speakQuery(*args, **kwargs):
     """Proxy to ``app.execute_speakQuery`` to avoid import cycles."""
-    from app import execute_speakQuery as _execute
+    from app import execute_speakquery as _execute
     return _execute(*args, **kwargs)
 
 
