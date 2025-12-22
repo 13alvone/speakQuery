@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logos/speakQueryLogoREV0.png" alt="SpeakQuery Logo" width="420">
+</p>
+
 # SpeakQuery
 
 SpeakQuery is an experimental search and ingestion engine. It processes a custom query language over local SQLite and Parquet files. A Flask web UI exposes search capabilities while background workers execute scheduled queries and ingestion jobs.
