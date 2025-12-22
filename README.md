@@ -2,10 +2,29 @@
 
 SpeakQuery is an experimental search and ingestion engine. It processes a custom query language over local SQLite and Parquet files. A Flask web UI exposes search capabilities while background workers execute scheduled queries and ingestion jobs.
 
+> **Project ethos**
+>
+> SpeakQuery is intentionally designed as non–rent-seeking software.
+> It exists to be transparent, inspectable, and useful on its own merits.
+> The core engine is free by design and remains so permanently.
+>
+> SpeakQuery survives only through correctness, clarity, and trust—not artificial restrictions or gated capability.
+
 ## Hard requirements
 
 - Python **3.12.x** is a **hard requirement** for the initial release due to native/C++ (pybind/extension) dependencies.
 	- The project will track newer Python versions on a delayed schedule to prioritize correctness and stability.
+
+## Project philosophy and authorship
+
+SpeakQuery is authored infrastructure, not a productized service.
+
+- The core engine is open, inspectable, and intended for real-world use.
+- Attribution matters: professional credit enables accountability and future work.
+- Commercial use is welcome; erasure of authorship is not.
+- Power belongs in software that can be audited and challenged.
+
+Licensing and attribution details are defined in the repository’s `LICENSE` and `NOTICE` files.
 
 ## Environment variables
 
@@ -186,8 +205,13 @@ The web UI accepts `.sqlite3`, `.parquet`, `.csv`, and `.json` files. CSV upload
 
 The grammar omits increment/decrement operators, bitwise negation, semicolons and the `else` keyword.
 
+## License and attribution
+
+SpeakQuery is licensed under the Apache License, Version 2.0.
+
+See `LICENSE` and `NOTICE` for full terms, attribution requirements, and authorship details.
+
 ## References
 
 - Query syntax: `docs/syntax.md`
 - API reference: `docs/api.md`
-

@@ -1,0 +1,22 @@
+2025-12-22
+SpeakQuery – Project Governance & Security Hardening
+
+Added a clear project ethos emphasizing non-rent-seeking, transparency, and usefulness-first design.
+
+Introduced an explicit Project Philosophy and Authorship section in README.md.
+
+Preserved all existing technical documentation while framing SpeakQuery as authored infrastructure, not a productized service.
+
+Declared Apache License, Version 2.0, with explicit attribution expectations.
+
+Added a standalone NOTICE file for authorship, attribution, and ethos (Apache-conformant).
+
+Created a concise, engineer-focused CONTRIBUTING.md outlining contribution scope, standards, and attribution principles.
+
+Created a lean, professional CODE_OF_CONDUCT.md focused on respect, technical rigor, and integrity.
+
+Added a formal SECURITY.md defining supported versions, responsible disclosure process, security scope, and operational expectations.
+
+Clarified that security is an engineering responsibility and that obscurity-based protection is rejected.
+
+Established SpeakQuery as transparent, auditable infrastructure intended for real-world use without artificial restrictions.
