@@ -53,9 +53,13 @@ Important behavior change (recent):
 
 1. **Build the image**
 
-	docker build --no-cache -t speakquery .
+
+	```docker build --no-cache -t speakquery .```
+
 
 2. **Create and encrypt the environment file**
+
+
 
 	mkdir -p input_repos/speakQuery
 	chmod 700 input_repos/speakQuery
@@ -73,10 +77,12 @@ Important behavior change (recent):
 
 3. **Start the container**
 
+
 	python utils/env_crypto.py decrypt input_repos/speakQuery/.env.enc > /tmp/sq_env
 	docker run -d --name speakquery --env-file /tmp/sq_env -p 5000:5000 \
 		--restart unless-stopped speakquery
 	rm /tmp/sq_env
+
 
 ### Docker Compose
 
@@ -93,16 +99,17 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
 
 2. Run setup (Python 3.12.x required).
 
-	./setup.sh --recreate-venv
+```./setup.sh --recreate-venv```
+	
 
 	What setup does:
 	- Enforces Python 3.12.x (will fail fast with OS-specific install hints if missing).
 	- Creates `./env` and installs `requirements.txt` and `requirements-dev.txt` (unless `--skip-dev`).
 	- Builds native/C++ components via `build_custom_components.py` (if present).
 	- Ensures a usable `./.env` exists:
-		- If `./.env` is missing, it creates it.
-		- If `SECRET_KEY` is missing, it generates one and writes it to `./.env`.
-	- Initializes databases by importing `initialize_database()`.
+    	- If `./.env` is missing, it creates it.
+    	- If `SECRET_KEY` is missing, it generates one and writes it to `./.env`.
+    - Initializes databases by importing `initialize_database()`.
 
 3. (Optional) Create and encrypt `input_repos/speakQuery/.env` as described in the Docker section if you want encrypted-at-rest env handling outside Docker.
 
@@ -112,11 +119,13 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
 
 6. Add scheduled jobs through `/set_script_schedule`:
 
+
 	curl -X POST http://localhost:5000/set_script_schedule \
 		-H 'Content-Type: application/json' \
 		-d '{"repo_id":1,"script_name":"scheduled_input_scripts/example_dataframe_job.py",
 			"cron_schedule":"0 * * * *","output_subdir":"daily",
 			"overwrite":true,"ttl":3600}'
+
 
 ### setup.sh options
 
