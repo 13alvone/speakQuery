@@ -1,9 +1,11 @@
 <p align="center">
   <img src="logos/speakQueryLogoREV1_trimmed.png" alt="SpeakQuery Logo" width="620">
 </p>
+
 SpeakQuery is an experimental search and ingestion engine. It processes a custom query language over local SQLite and Parquet files. A Flask web UI exposes search capabilities while background workers execute scheduled queries and ingestion jobs.
 
-> **Project ethos**
+
+## **Project ethos**
 >
 > SpeakQuery is intentionally designed as non–rent-seeking software.
 > It exists to be transparent, inspectable, and useful on its own merits.
@@ -60,7 +62,7 @@ Important behavior change (recent):
 2. **Create and encrypt the environment file**
 
 
-
+	```
 	mkdir -p input_repos/speakQuery
 	chmod 700 input_repos/speakQuery
 	cp .env.example input_repos/speakQuery/.env
@@ -74,15 +76,16 @@ Important behavior change (recent):
 		input_repos/speakQuery/.env.enc
 	rm input_repos/speakQuery/.env
 	chmod 600 input_repos/speakQuery/.env.enc
+	```
 
 3. **Start the container**
 
-
+	```
 	python utils/env_crypto.py decrypt input_repos/speakQuery/.env.enc > /tmp/sq_env
 	docker run -d --name speakquery --env-file /tmp/sq_env -p 5000:5000 \
 		--restart unless-stopped speakquery
 	rm /tmp/sq_env
-
+	```
 
 ### Docker Compose
 
@@ -99,9 +102,9 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
 
 2. Run setup (Python 3.12.x required).
 
-```./setup.sh --recreate-venv```
+	```./setup.sh --recreate-venv```
 	
-
+	```
 	What setup does:
 	- Enforces Python 3.12.x (will fail fast with OS-specific install hints if missing).
 	- Creates `./env` and installs `requirements.txt` and `requirements-dev.txt` (unless `--skip-dev`).
@@ -110,6 +113,7 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
     	- If `./.env` is missing, it creates it.
     	- If `SECRET_KEY` is missing, it generates one and writes it to `./.env`.
     - Initializes databases by importing `initialize_database()`.
+	```
 
 3. (Optional) Create and encrypt `input_repos/speakQuery/.env` as described in the Docker section if you want encrypted-at-rest env handling outside Docker.
 
@@ -119,23 +123,25 @@ Volumes defined in `docker-compose.yml` persist databases and index files.
 
 6. Add scheduled jobs through `/set_script_schedule`:
 
-
+	```
 	curl -X POST http://localhost:5000/set_script_schedule \
 		-H 'Content-Type: application/json' \
 		-d '{"repo_id":1,"script_name":"scheduled_input_scripts/example_dataframe_job.py",
 			"cron_schedule":"0 * * * *","output_subdir":"daily",
 			"overwrite":true,"ttl":3600}'
-
+	```
 
 ### setup.sh options
 
+	```
 	./setup.sh --python /path/to/python3.12
 	./setup.sh --venv-dir ./env
 	./setup.sh --skip-dev
 	./setup.sh --wheel-only
 	./setup.sh --allow-source-builds
 	./setup.sh --recreate-venv
-
+	```
+	
 Notes:
 - `--wheel-only` is helpful on systems where compiling heavy dependencies is problematic.
 - Native component builds may require `cmake` and a working compiler toolchain.
@@ -145,17 +151,17 @@ Notes:
 If you enable scheduled searches that email results, configure SMTP variables in your environment (or `.env` / decrypted env file used by Docker).
 
 Minimum required to send email:
-
+	```
 	SMTP_USER="your-smtp-username"
 	SMTP_PASSWORD="your-smtp-password"
-
+	```
 Optional overrides:
-
+	```
 	SMTP_SERVER="smtp.gmail.com"
 	SMTP_PORT="587"
 	SMTP_STARTTLS="true"
 	SMTP_FROM="your-from-address@example.com"
-
+	```
 Important:
 - Missing SMTP variables will not prevent setup or database initialization.
 - Email sends will fail at runtime with a clear error if SMTP credentials are not set.
@@ -174,9 +180,9 @@ Remote debugging is available across the entire stack via a site-level attach ho
 ## Authentication
 
 Create an administrator:
-
+	```
 	python app.py create-admin <username> <password> --token <api_token>
-
+	```
 Include the API token in requests:
 
 	curl -H "Authorization: Bearer <api_token>" \
@@ -187,13 +193,13 @@ The `/users.html` page lets administrators create additional accounts.
 ## Testing
 
 After activating your virtual environment:
-
+	```
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
 	flake8 --exclude=env
 	bandit -r .
 	pytest -vv
-
+	```
 `ci_setup.sh` performs these steps in continuous integration environments.
 
 ## Helper utilities
@@ -209,10 +215,10 @@ The web UI accepts `.sqlite3`, `.parquet`, `.csv`, and `.json` files. CSV upload
 ## Regenerating the parser
 
 `lexers/speakQuery.g4` defines the grammar. Regenerate the parser with ANTLR:
-
+	```
 	java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor \
 		-o lexers/antlr4_active lexers/speakQuery.g4
-
+	```
 The grammar omits increment/decrement operators, bitwise negation, semicolons and the `else` keyword.
 
 ## License and attribution
