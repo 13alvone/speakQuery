@@ -1,6 +1,0 @@
-2024-10-26 15:20:14,750 - INFO - Deleted existing 'lexers/antlr4_active' directory.
-2024-10-26 15:20:15,257 - ERROR - Failed to regenerate target files: Command 'java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor -o lexers/antlr4_active lexers/speakQuery.g4' returned non-zero exit status 1.
-2024-10-26 15:20:15,357 - ERROR - [!] Failure to import the updated components
-	No module named 'speakQueryParser'
-2024-10-26 15:20:15,357 - INFO - --------------------
-2024-10-26 15:20:15,357 - INFO - Test 0: CATEGORY: [INDEX], COMPLEXITY: [basic], TITLE: [Basic Index Call]

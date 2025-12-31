@@ -1,5 +1,0 @@
-2024-10-26 12:35:00,619 - ERROR - Failed to regenerate target files: Command 'java -jar utils/antlr-4.13.1-complete.jar -Dlanguage=Python3 -no-listener -visitor -o lexers/antlr4_active lexers/speakQuery.g4' returned non-zero exit status 1.
-2024-10-26 12:35:00,817 - INFO - --------------------
-2024-10-26 12:35:00,817 - INFO - Test 0: CATEGORY: [TABLE], COMPLEXITY: [basic], TITLE: [Basic Table Command]
-2024-10-26 12:35:00,839 - ERROR - Syntax Error - line 1:2 no viable alternative at input '|table'
-2024-10-26 12:35:00,843 - ERROR - Syntax Error - line 1:2 mismatched input 'table' expecting {'maketable', 'fieldsummary', 'special_func', 'timechart', 'mvexpand', TO_EPOCH, 'sort', 'eval', 'bin', 'streamstats', 'eventstats', 'stats', WHERE, 'rename', 'reverse', 'fields', 'appendpipe', 'search', 'head', LIMIT, 'rex', 'regex', 'dedup', 'outputlookup', 'lookup', 'fillnull', 'join', 'base64', 'spath'}

@@ -1,6 +1,0 @@
-2024-04-03 09:33:50,200 - INFO - Deleted existing 'lexers/antlr4_active' directory.
-2024-04-03 09:33:50,825 - INFO - Regenerated the target antlr4 files successfully.
-2024-04-03 09:33:50,898 - ERROR - [!] Failure to import the updated components
-	No module named 'speakQueryLexer'
-2024-04-03 09:33:50,898 - INFO - --------------------
-2024-04-03 09:33:50,898 - INFO - Test 0: CATEGORY: [TABLE], COMPLEXITY: [basic], TITLE: [Basic Table Call]
